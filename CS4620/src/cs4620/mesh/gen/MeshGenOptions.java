@@ -7,15 +7,15 @@ package cs4620.mesh.gen;
  */
 public class MeshGenOptions {
 	/**
-	 * Number Of Times To Cut A Mesh Along The Latitude Lines
+	 * Number of times to cut a mesh along the latitude lines
 	 */
 	public int divisionsLatitude;
 	/**
-	 * Number Of Times To Cut A Mesh Along The Longitude Lines
+	 * Number of times to cut a mesh along the longitude lines
 	 */
 	public int divisionsLongitude;
 	/**
-	 * Extra Value (Used For Torus)
+	 * Extra radius value (used for torus)
 	 */
 	public float innerRadius;
 }
