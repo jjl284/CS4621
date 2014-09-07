@@ -43,6 +43,13 @@ public class Vector3d extends AbstractList<Double> implements Cloneable {
 		this(v.x, v.y, v.z);
 	}
 	/**
+	 * Copy Constructor
+	 * @param v Vector
+	 */
+	public Vector3d(Vector3 v) {
+		this(v.x, v.y, v.z);
+	}
+	/**
 	 * Uniform Value Constructor
 	 * @param f Value
 	 */

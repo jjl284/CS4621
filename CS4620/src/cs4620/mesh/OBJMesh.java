@@ -2,6 +2,8 @@ package cs4620.mesh;
 
 import java.util.ArrayList;
 
+import org.lwjgl.BufferUtils;
+
 import egl.math.Vector2;
 import egl.math.Vector3;
 import egl.math.Vector3i;
@@ -69,6 +71,47 @@ public class OBJMesh {
 	 */
 	public boolean hasNormals() {
 		return normals.size() > 0;
+	}
+	
+	public MeshData flatten() {
+		if (!hasData()) return null;
+		
+		MeshData meshdata = new MeshData();
+		meshdata.vertexCount = vertices.size();
+		meshdata.indexCount = triangles.size() * 3;
+		
+		meshdata.positions = BufferUtils.createFloatBuffer(meshdata.vertexCount * 3);
+		for (Vector3i vert : vertices) {
+			meshdata.positions.put(positions.get(vert.x).x);
+			meshdata.positions.put(positions.get(vert.x).y);
+			meshdata.positions.put(positions.get(vert.x).z);
+		}
+		
+		meshdata.indices = BufferUtils.createIntBuffer(meshdata.indexCount);
+		for (Vector3i tri : triangles) {
+			meshdata.indices.put(tri.x);
+			meshdata.indices.put(tri.y);
+			meshdata.indices.put(tri.z);
+		}
+		
+		if (hasUVs()) {
+			meshdata.uvs = BufferUtils.createFloatBuffer(meshdata.vertexCount * 2);
+			for (Vector3i vert : vertices) {
+				meshdata.uvs.put(uvs.get(vert.y).x);
+				meshdata.uvs.put(uvs.get(vert.y).y);
+			}
+		}
+		
+		if (hasNormals()) {
+			meshdata.normals = BufferUtils.createFloatBuffer(meshdata.vertexCount * 3);
+			for (Vector3i vert : vertices) {
+				meshdata.normals.put(normals.get(vert.z).x);
+				meshdata.normals.put(normals.get(vert.z).y);
+				meshdata.normals.put(normals.get(vert.z).z);
+			}
+		}
+		
+		return meshdata;
 	}
 
 }
