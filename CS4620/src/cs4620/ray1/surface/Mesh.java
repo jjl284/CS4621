@@ -2,14 +2,14 @@ package cs4620.ray1.surface;
 
 import java.util.ArrayList;
 
+import cs4620.mesh.MeshData;
+import cs4620.mesh.OBJParser;
 import cs4620.ray1.IntersectionRecord;
 import cs4620.ray1.Ray;
-import cs4620.ray1.SceneFolderPath;
+import cs4620.ray1.RayTracer;
 import egl.math.Vector2d;
 import egl.math.Vector3d;
 import egl.math.Vector3i;
-import cs4620.mesh.MeshData;
-import cs4620.mesh.OBJParser;
 
 /**
  * An interface between a MeshData and the ray tracer. When the Scene calls
@@ -43,8 +43,8 @@ public class Mesh extends Surface {
 	 * @param fileName the name of a .obj file on disk.
 	 */
 	public void setData(String fileName) {
-		System.out.println("Loading " + SceneFolderPath.get() + fileName);
-		mesh = (OBJParser.parse(SceneFolderPath.get() + fileName)).flatten();
+		System.out.println("Loading " + RayTracer.sceneWorkspace.resolve(fileName));
+		mesh = (OBJParser.parse(RayTracer.sceneWorkspace.resolve(fileName))).flatten();
 	}
 	
 	public boolean intersect(IntersectionRecord outRecord, Ray rayIn) {	return false; }

@@ -1,12 +1,10 @@
 package cs4620.ray1.shader;
 
 import cs4620.ray1.IntersectionRecord;
-import cs4620.ray1.Light;
 import cs4620.ray1.Ray;
 import cs4620.ray1.Scene;
 import egl.math.Color;
 import egl.math.Colord;
-import egl.math.Vector3d;
 
 /**
  * A Lambertian material scatters light equally in all directions. BRDF value is

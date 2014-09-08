@@ -1,20 +1,72 @@
 package cs4620.ray1;
 
 import java.io.File;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
 import cs4620.ray1.camera.Camera;
-import egl.math.Colord;
-import cs4620.ray1.shader.Shader;
 import cs4620.ray1.surface.Surface;
+import egl.math.Colord;
 
 public class RayTracer {
+	public static class ScenePath {
+		/**
+		 * The Scene's File
+		 */
+		public Path file;
+		/**
+		 * The Folder Containing The Scene
+		 */
+		public Path sceneRoot;
+		/**
+		 * The Root Workspace Path
+		 */
+		public Path root;
+		
+		public ScenePath(String r, String f) {
+			if(r == null) {
+				root = null;
+				file = Paths.get(f);
+			}
+			else  {
+				root = Paths.get(r);
+				file = root.resolve(f);
+			}
+			sceneRoot = file.getParent();
+		}
+		
+		public String getRoot() {
+			return root == null ? null : root.toAbsolutePath().toString();
+		}
+		public String getFile() {
+			return file.toAbsolutePath().toString();
+		}
+
+		/**
+		 * Attempt To Search The Scene And Program Workspace For A File
+		 * @param f The File To Search For
+		 * @return The Absolute File Path That Is Resolved (Or null)
+		 */
+		public String resolve(String f) {
+			Path p = root != null ? root.resolve(f) : null;
+			if(p == null) p = sceneRoot.resolve(f);
+			if(p == null) p = Paths.get(f);
+			return p == null ? null : p.toAbsolutePath().toString();
+		}
+	}
+	
+	/**
+	 * The Workspace For The Scene
+	 */
+	public static ScenePath sceneWorkspace = null;
+	
 	/**
 	 * This directory precedes the arguments passed in via the command line.
 	 */
-	public static String directory = "data/scenes/ray1";
+	public static final String directory = "data/scenes/ray1";
 	
 	/**
 	 * The main method takes all the parameters and assumes they are input files
@@ -25,76 +77,72 @@ public class RayTracer {
 	 * @param args
 	 */
 	public static final void main(String[] args) {
-		String[] newArgs;
-		if (args.length > 0 && (args[0].equals("p") || args[0].equals("-p"))) {
-			if (args.length == 1) {
-				printUsage();
-				System.exit(-1);
+		ArrayList<ScenePath> pathArgs = new ArrayList<>();
+		ArrayList<ScenePath> scenesToRender = new ArrayList<>();
+		String currentRoot = directory;
+		
+		// Use All The Arguments
+		for(int i = 0;i < args.length;i++) {
+			switch(args[i].toLowerCase()) {
+			case "-p":
+				// Use A Different Root Path
+				i++;
+				if(i < args.length) currentRoot = args[i];
+				break;
+			case "-pnull":
+				// Use The CWD
+				currentRoot = null;
+				break;
+			default:
+				// This Must Be A File
+				pathArgs.add(new ScenePath(currentRoot, args[i]));
+				break;
 			}
-			directory = args[1];
-			if (directory.endsWith("/"))
-				directory = directory.substring(0, directory.length()-1);
-			newArgs = new String[args.length-2];
-			for (int i=0; i<args.length-2; i++) {
-				newArgs[i] = args[i+2];
-			}
-		} else {
-			newArgs = args;
 		}
+		
+		if(pathArgs.size() < 1) {
+			// Attempt To Render All The Scenes
+			pathArgs.add(new ScenePath(currentRoot, "."));
+			
+			// Display What's Going To Go Down
+			printUsage();
+			System.out.println("\nAttempting To Render All Scenes");
+		}
+		
+		// Expand All The Possible Scenes
+		for(ScenePath p : pathArgs) {
+			// Add All The Files In The 
+			File f = p.file.toFile();
+			if(f.isDirectory()) {
+				for(File _f : f.listFiles()) {
+					// We Only Want XML Files
+					if(!_f.getPath().endsWith(".xml")) continue;
+					
+					scenesToRender.add(new ScenePath(p.getRoot(), _f.toPath().toAbsolutePath().toString()));
+				}
+			}
+			else {
+				// We Only Want XML Files
+				if(!f.getPath().endsWith(".xml")) continue;
+				
+				// Just A Single Scene
+				scenesToRender.add(p);
+			}
+		}
+		
+		System.out.println("Attempting To Render " + scenesToRender.size() + " Scene(s)");
 		RayTracer rayTracer = new RayTracer();
-		rayTracer.run(newArgs);
+		rayTracer.run(scenesToRender);
 	}
 	
-	/**
-	 * If filename is a directory, set testFolderPath = fn.
-	 * And return a list of all .xml files inside the directory
-	 * @param fn Filename or directory
-	 * @return fn itself in case fn is a file, or all .xml files inside fn
-	 */
-	public ArrayList<String> getFileLists(String fn) {
-		if(fn.endsWith("*"))
-			fn = fn.substring(0, fn.length()-1);
-		if(fn.endsWith("/"))
-			fn = fn.substring(0, fn.length()-1);
-
-		File file = new File(fn);
-		ArrayList<String> output = new ArrayList<String>();
-		if(file.exists()) {
-			if(file.isFile()) {
-				// Extract the folder part of the name
-				int dir_index = fn.lastIndexOf('/');
-				if (dir_index > 0 && dir_index < fn.length()) {
-					SceneFolderPath.set(fn.substring(0, dir_index + 1));
-				} else {  
-					SceneFolderPath.set("");
-				}
-				output.add(fn);
-			} else {
-				SceneFolderPath.set(fn + "/");				
-				for(String fl : file.list()) {
-					if(fl.endsWith(".xml")) {
-						output.add(SceneFolderPath.get() + fl);
-					}
-				}
-				if (output.size() == 0) {
-					System.err.println("Warning: no XML files found in the directory " + fn);
-				}
-			}
-		} else {
-			System.err.println("Error: File or directory " + fn + " not found.");
-			printUsage();
-			System.exit(-1);
-		}
-		return output;
-	}
-
 	public static void printUsage() {
 		System.out.println("Usage: java RayTracer [-p path] [directory1 directory2 ... | file1 file2 ...]");
 		System.out.println("List each scene file you would like to render on the command line separated by spaces.");
 		System.out.println("You may also specify a directory, and all scene files in that directory will be rendered.");
 		System.out.println("By default, all files specified are prepended with a given path. Use the -p option to");
-		System.out.println("override this path. This path is currently: " + directory);
-		System.out.println("NB: the path starts from where the base of the project is stored in the file system.");
+		System.out.println("override this path. The path may be overriden multiple times or -pnull may be provided to set");
+		System.out.println("the path to the program's working directory. With no -p argument given, this path is: " + directory);
+		System.out.println("NB: the path is relative to the working directory of the application, which is normally the root of the CS4620 project.");
 	}
 	
 	/**
@@ -104,43 +152,28 @@ public class RayTracer {
 	 *
 	 * @param args
 	 */
-	public void run(String[] args) {
-		if (args.length == 0) {
-			System.out.println("No arguments found... attempting to render all scenes");
-			args = new String[] {"."};
-		}
-		
+	public void run(ArrayList<ScenePath> args) {
 		Parser parser = new Parser();
-		for (int ctr = 0; ctr < args.length; ctr++) {
+		for (ScenePath p : args) {
+			// Set The Current Workspace For The Scene
+			sceneWorkspace = p;
 
-			String arg;
-			if (args[ctr].startsWith(directory)) {
-				arg = args[ctr];
-			} else {
-				arg = directory + "/" + args[ctr];
+			// Parse the input file
+			Scene scene = (Scene) parser.parse(sceneWorkspace.getFile(), Scene.class);
+			
+			// Create the acceleration structure.
+			ArrayList<Surface> renderableSurfaces = new ArrayList<Surface>();
+			List<Surface> surfaces = scene.getSurfaces();
+			for (Iterator<Surface> iter = surfaces.iterator(); iter.hasNext();) {
+				iter.next().appendRenderableSurfaces(renderableSurfaces);
 			}
-			ArrayList<String> fileLists = getFileLists(arg);
+			scene.setSurfaces(renderableSurfaces);
 
-			for (String inputFilename : fileLists) {
-				String outputFilename = inputFilename + ".png";
+			// Render the scene
+			renderImage(scene);
 
-				// Parse the input file
-				Scene scene = (Scene) parser.parse(inputFilename, Scene.class);
-				
-				// Create the acceleration structure.
-				ArrayList<Surface> renderableSurfaces = new ArrayList<Surface>();
-				List<Surface> surfaces = scene.getSurfaces();
-				for (Iterator<Surface> iter = surfaces.iterator(); iter.hasNext();) {
-					iter.next().appendRenderableSurfaces(renderableSurfaces);
-				}
-				scene.setSurfaces(renderableSurfaces);
-
-				// Render the scene
-				renderImage(scene);
-
-				// Write the image out
-				scene.getImage().write(outputFilename);
-			}
+			// Write the image out
+			scene.getImage().write(sceneWorkspace.getFile() + ".png");
 		}
 	}
 	
@@ -211,6 +244,6 @@ public class RayTracer {
 		//    just return the scene's background color.
 		// 2) Get the shader from the intersection record.
 		// 3) Call the shader's shade() method to set the color for this ray.
-
+		
 	}
 }

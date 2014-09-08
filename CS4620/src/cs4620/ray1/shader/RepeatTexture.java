@@ -1,7 +1,5 @@
 package cs4620.ray1.shader;
 
-import cs4620.ray1.shader.Texture;
-import egl.math.Color;
 import egl.math.Colord;
 import egl.math.Vector2d;
 

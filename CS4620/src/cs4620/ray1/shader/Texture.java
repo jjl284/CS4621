@@ -5,7 +5,7 @@ import java.io.File;
 
 import javax.imageio.ImageIO;
 
-import cs4620.ray1.SceneFolderPath;
+import cs4620.ray1.RayTracer;
 import egl.math.Colord;
 import egl.math.Vector2d;
 
@@ -23,9 +23,9 @@ public abstract class Texture {
 	public BufferedImage getImage() { return image; }
 	/** Set the BufferedImage from a given file on disk. */
 	public void setImage(String filename) {
-		System.out.println("Loading: " + SceneFolderPath.get() + filename);
+		System.out.println("Loading: " + RayTracer.sceneWorkspace.resolve(filename));
 		try {
-			File f = new File(SceneFolderPath.get() + filename);
+			File f = new File(RayTracer.sceneWorkspace.resolve(filename));
 			image = ImageIO.read(f);
 		} catch (Exception e) {
 			System.err.println("Error loading texture: " + e);
