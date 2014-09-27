@@ -1,14 +1,13 @@
 package egl;
 
 import static org.lwjgl.opengl.GL20.glAttachShader;
-import static org.lwjgl.opengl.GL20.glDetachShader;
 import static org.lwjgl.opengl.GL20.glBindAttribLocation;
 import static org.lwjgl.opengl.GL20.glCompileShader;
 import static org.lwjgl.opengl.GL20.glCreateProgram;
-import static org.lwjgl.opengl.GL20.glValidateProgram;
 import static org.lwjgl.opengl.GL20.glCreateShader;
 import static org.lwjgl.opengl.GL20.glDeleteProgram;
 import static org.lwjgl.opengl.GL20.glDeleteShader;
+import static org.lwjgl.opengl.GL20.glDetachShader;
 import static org.lwjgl.opengl.GL20.glGetActiveAttrib;
 import static org.lwjgl.opengl.GL20.glGetActiveUniform;
 import static org.lwjgl.opengl.GL20.glGetAttribLocation;
@@ -18,21 +17,23 @@ import static org.lwjgl.opengl.GL20.glGetUniformLocation;
 import static org.lwjgl.opengl.GL20.glLinkProgram;
 import static org.lwjgl.opengl.GL20.glShaderSource;
 import static org.lwjgl.opengl.GL20.glUseProgram;
+import static org.lwjgl.opengl.GL20.glValidateProgram;
 
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
 import java.util.HashMap;
 import java.util.Map.Entry;
 import java.util.regex.MatchResult;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.lwjgl.opengl.GL20;
+
 import egl.GL.GetProgramParameterName;
 import egl.GL.ShaderParameter;
 import egl.GL.ShaderType;
+import ext.java.IOUtils;
 
-public class GLProgram {
+public class GLProgram implements IDisposable {
 	private static final String NON_ALLOWABLE_PREFIX = "gl_";
     private static final Pattern RGX_SEMANTIC = Pattern.compile(
         "(\\w+)\\s*;\\s*//\\s*sem\\s*\\x28\\s*(\\w+)\\s*(\\d+)\\s*\\x29\\s*$",
@@ -43,7 +44,7 @@ public class GLProgram {
     public static GLProgram getProgramInUse() {
     	return programInUse;
     }
-    public static void Unuse() {
+    public static void unuse() {
         programInUse = null;
         glUseProgram(0);
     }
@@ -64,9 +65,9 @@ public class GLProgram {
         return programInUse == this;
     }
 
-    public final HashMap<String, Integer> Uniforms = new HashMap<>();
-    public final HashMap<String, Integer> Attributes = new HashMap<>();
-    public final HashMap<Integer, Integer> SemanticLinks = new HashMap<>();
+    private final HashMap<String, Integer> uniforms = new HashMap<>();
+    private final HashMap<String, Integer> attributes = new HashMap<>();
+    public final HashMap<Integer, Integer> semanticLinks = new HashMap<>();
     private HashMap<String, Integer> foundSemantics;
     
     public GLProgram(boolean init) {
@@ -74,16 +75,16 @@ public class GLProgram {
         idFS = 0;
         idVS = 0;
 
-        if(init) Init();
+        if(init) init();
         isLinked = false;
     }
     public GLProgram() {
     	this(false);
     }
-    public void Dispose() {
+    public void dispose() {
         if(!getIsCreated()) return;
 
-        if(getIsInUse()) Unuse();
+        if(getIsInUse()) unuse();
         id = 0;
         if(idVS != 0) {
         	glDetachShader(id, idVS);
@@ -98,13 +99,13 @@ public class GLProgram {
         glDeleteProgram(id);
     }
 
-    public void Init() {
+    public void init() {
         if(getIsCreated()) return;
         isLinked = false;
         id = glCreateProgram();
     }
 
-    public void AddShader(int st, String src) throws Exception {
+    public void addShader(int st, String src) throws Exception {
         if(getIsLinked()) throw new Exception("Program Is Already Linked");
 
         switch(st) {
@@ -121,19 +122,20 @@ public class GLProgram {
         }
         int idS = glCreateShader(st);
         glShaderSource(idS, src);
-        GLError.Get(st + " Source");
+        GLError.get(st + " Source");
         glCompileShader(idS);
-        GLError.Get(st + " Compile");
+        GLError.get(st + " Compile");
 
         // Check Status
         int status = glGetShaderi(idS, ShaderParameter.CompileStatus);
         if(status != 1) {
+        	GLDiagnostic.writeln(GL20.glGetShaderInfoLog(idS, 1024));
             glDeleteShader(idS);
             throw new Exception("Shader Had Compilation Errors");
         }
 
         glAttachShader(id, idS);
-        GLError.Get(st + " Attach");
+        GLError.get(st + " Attach");
 
         // If It's A Vertex Shader -> Get Semantics From Source
         if(st == ShaderType.VertexShader) {
@@ -147,7 +149,7 @@ public class GLProgram {
                     case "position": sem = Semantic.Position; break;
                     case "normal": sem = Semantic.Normal; break;
                     case "tangent": sem = Semantic.Tangent; break;
-                    case "binormal": sem = Semantic.Binormal; break;
+                    case "binormal": sem = Semantic.Bitangent; break;
                     case "texcoord": sem = Semantic.TexCoord; break;
                     case "color": sem = Semantic.Color; break;
                     default: sem = Semantic.None; break;
@@ -163,27 +165,26 @@ public class GLProgram {
             case ShaderType.FragmentShader: idFS = idS; break;
         }
     }
-    public void AddShaderFile(int st, String file) throws Exception {
-    	File f = new File(file);
-        if(!f.exists())
-            throw new Exception("Shader File \"" + file + "\" Was Not Found");
+    public void addShaderFile(int st, String file) throws Exception {
+    	BufferedReader reader = IOUtils.openReaderFile(file);
+    	if(reader == null) throw new Exception("Shader File \"" + file + "\" Was Not Found");
 
-        String src = null;
-        StringBuffer fileData = new StringBuffer();
-        BufferedReader reader = new BufferedReader(new FileReader(f));
-        char[] buf = new char[1024];
-        int numRead=0;
-        while((numRead=reader.read(buf)) != -1){
-            String readData = String.valueOf(buf, 0, numRead);
-            fileData.append(readData);
-        }
-        reader.close();
-        src = fileData.toString();
+    	String src = IOUtils.readFull(reader);
+    	if(src == null) throw new Exception("Shader File \"" + file + "\" Could Not Be Read");
+    	
+        addShader(st, src);
+    }
+    public void addShaderResource(int st, String name) throws Exception {
+    	BufferedReader reader = IOUtils.openReaderResource(name);
+    	if(reader == null) throw new Exception("Shader Resource \"" + name + "\" Was Not Found");
 
-        AddShader(st, src);
+    	String src = IOUtils.readFull(reader);
+    	if(src == null) throw new Exception("Shader Resource \"" + name + "\" Could Not Be Read");
+    	
+        addShader(st, src);
     }
 
-    public void SetAttributes(HashMap<String, Integer> attr) throws Exception {
+    public void setAttributes(HashMap<String, Integer> attr) throws Exception {
         if(getIsLinked()) throw new Exception("Program Is Already Linked");
         for(Entry<String, Integer> kvp : attr.entrySet()) {
             // Make Sure It Is A Good Binding
@@ -197,18 +198,18 @@ public class GLProgram {
                 continue;
 
             // Place It In
-            Attributes.put(name, loc);
+            attributes.put(name, loc);
             glBindAttribLocation(id, loc, name);
-            GLError.Get("Program Attr Bind");
+            GLError.get("Program Attr Bind");
         }
     }
-    public boolean Link() {
+    public boolean link() {
         if(getIsLinked()) return false;
 
         glLinkProgram(id);
-        GLError.Get("Program Link");
+        GLError.get("Program Link");
         glValidateProgram(id);
-        GLError.Get("Program Validate");
+        GLError.get("Program Validate");
 
 //        glDeleteShader(idVS);
 //        idVS = 0;
@@ -219,7 +220,7 @@ public class GLProgram {
         isLinked = status == 1;
         return isLinked;
     }
-    public void InitAttributes() {
+    public void initAttributes() {
         // How Many Attributes Are In The Program
         int count = glGetProgrami(id, GetProgramParameterName.ActiveAttributes);
 
@@ -235,15 +236,15 @@ public class GLProgram {
 
             // Get Rid Of System Uniforms
             if(!name.startsWith(NON_ALLOWABLE_PREFIX) && loc > -1)
-                Attributes.put(name, loc);
+                attributes.put(name, loc);
         }
 
         if(foundSemantics != null) {
-            GenerateSemanticBindings(foundSemantics);
+            generateSemanticBindings(foundSemantics);
             foundSemantics = null;
         }
     }
-    public void InitUniforms() {
+    public void initUniforms() {
         // How Many Uniforms Are In The Program
         int count = glGetProgrami(id, GetProgramParameterName.ActiveUniforms);
 
@@ -259,54 +260,81 @@ public class GLProgram {
 
             // Get Rid Of System Uniforms
             if(!name.startsWith(NON_ALLOWABLE_PREFIX) && loc > -1)
-                Uniforms.put(name, loc);
-        }
-    }
-    
-    public void GenerateSemanticBindings(HashMap<String, Integer> dSems) {
-        for(Entry<String, Integer> kvp : dSems.entrySet()) {
-        	Integer vi = Attributes.get(kvp.getKey());
-            if(vi != null)
-                SemanticLinks.put(kvp.getValue(), vi);
+                uniforms.put(name, loc);
         }
     }
 
-    public void Use() {
+    public int getAttribute(String name) {
+    	Integer i = attributes.get(name);
+    	return i == null ? GL.BadAttributeLocation : i;
+    }
+    public int getUniform(String name) {
+    	Integer i = uniforms.get(name);
+    	return i == null ? GL.BadUniformLocation : i;
+    }
+    
+    public void generateSemanticBindings(HashMap<String, Integer> dSems) {
+        for(Entry<String, Integer> kvp : dSems.entrySet()) {
+        	Integer vi = attributes.get(kvp.getKey());
+            if(vi != null)
+                semanticLinks.put(kvp.getValue(), vi);
+        }
+    }
+
+    public void use() {
         if(getIsInUse()) return;
         programInUse = this;
         glUseProgram(id);
     }
 
-    public GLProgram QuickCreate(String vsFile, String fsFile, HashMap<String, Integer> attr) {
-        Init();
+    public GLProgram quickCreate(String vsFile, String fsFile, HashMap<String, Integer> attr) {
+        init();
         try {
-            AddShaderFile(ShaderType.VertexShader, vsFile);
-            AddShaderFile(ShaderType.FragmentShader, fsFile);
+            addShaderFile(ShaderType.VertexShader, vsFile);
+            addShaderFile(ShaderType.FragmentShader, fsFile);
             if(attr != null)
-                SetAttributes(attr);
-            Link();
+                setAttributes(attr);
+            link();
         }
         catch(Exception e) {
             return this;
         }
-        InitAttributes();
-        InitUniforms();
+        initAttributes();
+        initUniforms();
         return this;
     }
-    public GLProgram QuickCreateSource(String vsSrc, String fsSrc, HashMap<String, Integer> attr) {
-        Init();
+    public GLProgram quickCreateSource(String vsSrc, String fsSrc, HashMap<String, Integer> attr) {
+        init();
         try {
-            AddShader(ShaderType.VertexShader, vsSrc);
-            AddShader(ShaderType.FragmentShader, fsSrc);
+            addShader(ShaderType.VertexShader, vsSrc);
+            addShader(ShaderType.FragmentShader, fsSrc);
             if(attr != null)
-                SetAttributes(attr);
-            Link();
+                setAttributes(attr);
+            link();
         }
         catch(Exception e) {
+        	System.out.println("Shader error:" + e.getMessage());
             return this;
         }
-        InitAttributes();
-        InitUniforms();
+        initAttributes();
+        initUniforms();
+        return this;
+    }
+    public GLProgram quickCreateResource(String vsRes, String fsRes, HashMap<String, Integer> attr) {
+        init();
+        try {
+            addShaderResource(ShaderType.VertexShader, vsRes);
+            addShaderResource(ShaderType.FragmentShader, fsRes);
+            if(attr != null)
+                setAttributes(attr);
+            link();
+        }
+        catch(Exception e) {
+        	System.out.println("Shader error:" + e.getMessage());
+            return this;
+        }
+        initAttributes();
+        initUniforms();
         return this;
     }
 }

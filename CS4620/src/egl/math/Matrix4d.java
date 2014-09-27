@@ -2,7 +2,7 @@ package egl.math;
 
 /**
  * 4x4 Matrix With Row Major Ordering
- * <br>Single Precision</br>
+ * <br>Double Precision</br>
  * @author Cristian
  * 
  */
@@ -230,6 +230,27 @@ public class Matrix4d implements Cloneable {
 	public Vector4d getColumn(int c) {
 		return new Vector4d(m[c], m[c + 4], m[c + 8], m[c + 12]);
 	}
+	/**
+	 * Set A Matrix To The XYZ-Axes Of This Matrix
+	 * @param out [{@link Matrix3d OUT}] Matrix
+	 * @return Out
+	 */
+	public Matrix3d getAxes(Matrix3d out) {
+		return out.set(m[0], m[1], m[2],
+				m[4], m[5], m[6],
+				m[8], m[9], m[10]
+				);
+	}
+	/**
+	 * Obtains The XYZ-Axes Of This Matrix
+	 * @return New Matrix
+	 */
+	public Matrix3d getAxes() {
+		return new Matrix3d(m[0], m[1], m[2],
+				m[4], m[5], m[6],
+				m[8], m[9], m[10]
+				);
+	}
 	
 	/**
 	 * Inline Setter
@@ -358,7 +379,7 @@ public class Matrix4d implements Cloneable {
 	/**
 	 * Transforms A Vector In Place
 	 * <pre>
-	 * V = This * V
+	 * V = V * This
 	 * <pre>
 	 * @param v [{@link #Vec4 POS}] Vector
 	 * @return Transformed Vector
@@ -374,7 +395,7 @@ public class Matrix4d implements Cloneable {
 	/**
 	 * Transforms And Homogenizes A Position Vector In Place
 	 * <pre>
-	 * {V, w} = This * {V, 1}
+	 * {V, w} = {V, 1} * This
 	 * V = V / w
 	 * </pre>
 	 * @param v [{@link Vector3d POS}] Vector
@@ -392,7 +413,7 @@ public class Matrix4d implements Cloneable {
 	/**
 	 * Transforms A Direction Vector In Place (Does Not Homogenize)
 	 * <pre>
-	 * {V, _} = This * {V, 0}
+	 * {V, _} = {V, 0} * This
 	 * </pre>
 	 * @param v [{@link Vector3d DIRN}] Vector
 	 * @return Transformed Vector
@@ -564,10 +585,10 @@ public class Matrix4d implements Cloneable {
 	/**
 	 * Create A Translation Matrix Into Out
 	 * <pre>
-	 * | 1  0  0  x |
-	 * | 0  1  0  y |
-	 * | 0  0  1  z |
-	 * | 0  0  0  1 |
+	 * | 1  0  0  0 |
+	 * | 0  1  0  0 |
+	 * | 0  0  1  0 |
+	 * | x  y  z  1 |
 	 * <pre>
 	 * @param x X Translation
 	 * @param y Y Translation
@@ -614,10 +635,10 @@ public class Matrix4d implements Cloneable {
 	/**
 	 * Create A X-Axis Rotation Matrix Into Out
 	 * <pre>
-	 * | 1  0        0       0 |
-	 * | 0  cos(t)  -sin(t)  0 |
-	 * | 0  sin(t)   cos(t)  0 |
-	 * | 0  0        0       1 |
+	 * | 1   0       0       0 |
+	 * | 0   cos(t)  sin(t)  0 |
+	 * | 0  -sin(t)  cos(t)  0 |
+	 * | 0   0       0       1 |
 	 * </pre>
 	 * @param t Angle (Radians)
 	 * @param out Non-Null Output Matrix
@@ -635,10 +656,10 @@ public class Matrix4d implements Cloneable {
 	/**
 	 * Create A Y-Axis Rotation Matrix Into Out
 	 * <pre>
-	 * |  cos(t)  0  sin(t)  0 |
-	 * |  0       1  0       0 |
-	 * | -sin(t)  0  cos(t)  0 |
-	 * |  0       0  0       1 |
+	 * | cos(t)  0  -sin(t)  0 |
+	 * | 0       1   0       0 |
+	 * | sin(t)  0   cos(t)  0 |
+	 * | 0       0   0       1 |
 	 * </pre>
 	 * @param t Angle (Radians)
 	 * @param out Non-Null Output Matrix
@@ -656,10 +677,10 @@ public class Matrix4d implements Cloneable {
 	/**
 	 * Create A Z-Axis Rotation Matrix Into Out
 	 * <pre>
-	 * | cos(t)  -sin(t)  0  0 |
-	 * | sin(t)   cos(t)  0  0 |
-	 * | 0        0       1  0 |
-	 * | 0        0       0  1 |
+	 * |  cos(t)  sin(t)  0  0 |
+	 * | -sin(t)  cos(t)  0  0 |
+	 * |  0       0       1  0 |
+	 * |  0       0       0  1 |
 	 * </pre>
 	 * @param t Angle (Radians)
 	 * @param out Non-Null Output Matrix
@@ -705,10 +726,10 @@ public class Matrix4d implements Cloneable {
 	 * Let ys = cot(fov)
 	 * Let xs = ys / aspect
 	 * Let a = zfar / (znear - zfar)
-	 * | xs  0   0  0         |
-	 * | 0   ys  0  0         |
-	 * | 0   0   a  znear * a |
-	 * | 0   0  -1  0         |
+	 * | xs  0   0          0 |
+	 * | 0   ys  0          0 |
+	 * | 0   0   a         -1 |
+	 * | 0   0   znear * a  0 |
 	 * </pre>
 	 * @param fov Field Of View Y Direction In Radians From The Center Plane (0,PI/2) <pre>
 	 *        /
@@ -753,10 +774,10 @@ public class Matrix4d implements Cloneable {
 	 * Create A Perspective Matrix Into Out
 	 * <pre>
 	 * Let a = zfar / (znear - zfar)
-	 * | 2 * znear / w  0              0  0         |
-	 * | 0              2 * znear / h  0  0         |
-	 * | 0              0              a  znear * a |
-	 * | 0              0             -1  0         |
+	 * | 2 * znear / w  0              0          0 |
+	 * | 0              2 * znear / h  0          0 |
+	 * | 0              0              a         -1 |
+	 * | 0              0              znear * a  0 |
 	 * </pre>
 	 * @param w Width Of Near View (Image) Plane
 	 * @param h Height Of Near View (Image) Plane
@@ -789,10 +810,10 @@ public class Matrix4d implements Cloneable {
 	 * Create An Orthographic Matrix Into Out
 	 * <pre>
 	 * Let a = 1 / (znear - zfar)
-	 * | 2 / w  0      0  0         |
-	 * | 0      2 / h  0  0         |
-	 * | 0      0      a  znear * a |
-	 * | 0      0      0  1         |
+	 * | 2 / w  0      0          0 |
+	 * | 0      2 / h  0          0 |
+	 * | 0      0      a          0 |
+	 * | 0      0      znear * a  1 |
 	 * </pre>
 	 * @param w Width Of View Volume
 	 * @param h Height Of View Volume
@@ -828,10 +849,10 @@ public class Matrix4d implements Cloneable {
 	 * Let z = normalize(eye - target)
 	 * Let x = normalize(cross(up, z))
 	 * Let y = cross(z, x)
-	 * | x.x  x.y  x.z  -dot(x, eye) |
-	 * | y.x  y.y  y.z  -dot(y, eye) |
-	 * | z.x  z.y  z.z  -dot(z, eye) |
-	 * | 0    0    0     1           |
+	 * |  x.x          y.x          z.x         0 |
+	 * |  x.y          y.y          z.y         0 |
+	 * |  x.z          y.z          z.z         0 |
+	 * | -dot(x, eye) -dot(y, eye) -dot(z, eye) 1 |
 	 * </pre>
 	 * @param eye [{@link Vector3d POS}] Camera Origin
 	 * @param target [{@link Vector3d POS}] Camera Viewing Target
@@ -866,10 +887,10 @@ public class Matrix4d implements Cloneable {
 	 * Let z = normalize(-viewDir)
 	 * Let x = normalize(cross(up, z))
 	 * Let y = cross(z, x)
-	 * | x.x  x.y  x.z  -dot(x, eye) |
-	 * | y.x  y.y  y.z  -dot(y, eye) |
-	 * | z.x  z.y  z.z  -dot(z, eye) |
-	 * | 0    0    0     1           |
+	 * |  x.x          y.x          z.x         0 |
+	 * |  x.y          y.y          z.y         0 |
+	 * |  x.z          y.z          z.z         0 |
+	 * | -dot(x, eye) -dot(y, eye) -dot(z, eye) 1 |
 	 * </pre>
 	 * @param eye [{@link Vector3d POS}] Camera Origin
 	 * @param viewDir [{@link Vector3d DIRN}] Camera Viewing Direction

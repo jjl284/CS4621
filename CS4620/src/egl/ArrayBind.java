@@ -12,27 +12,27 @@ public class ArrayBind {
 	/**
 	 * Input Location In The Program
 	 */
-	public int Location;
+	public int location;
 	/**
 	 * Vertex Attribute Usage
 	 */
-    public int Semantic;
+    public int semantic;
     /**
      * The Basic Type (Float, Byte, etc.)
      */
-    public int CompType;
+    public int compType;
     /**
      * Number Of Components Types Packed Together For The Full Component
      */
-    public int CompCount;
+    public int compCount;
     /**
      * Bytes Of Offset Into The Struct
      */
-    public int Offset;
+    public int offset;
     /**
      * Normalization Upon Being Sent To GPU (For Integral Types Mainly)
      */
-    public boolean Normalized;
+    public boolean isNormalized;
 
     /**
      * Default Full Constructor Before Program Linkage
@@ -43,12 +43,12 @@ public class ArrayBind {
      * @param norm GPU Normalization Of Integral Values To [0-1]
      */
     public ArrayBind(int sem, int ct, int cc, int o, boolean norm) {
-        Location = 0;
-        Semantic = sem;
-        CompType = ct;
-        CompCount = cc;
-        Offset = o;
-        Normalized = norm;
+        location = 0;
+        semantic = sem;
+        compType = ct;
+        compCount = cc;
+        offset = o;
+        isNormalized = norm;
     }
     /**
      * @see {@link #ArrayBind(int, int, int, int, boolean) ArrayBind(sem, ct, cc, o, false)}

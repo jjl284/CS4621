@@ -10,59 +10,129 @@ import egl.math.Vector3d;
 import egl.math.Vector4;
 import egl.math.Vector4d;
 
+/**
+ * Provides Common Method To Append Elements Into A ByteBuffer
+ * @author Cristian
+ *
+ */
 public class VertexUtils {
-	public static void AppendToBuffer(ByteBuffer b, byte v) {
+	/**
+	 * Place A Byte In The Vertex Buffer Memory
+	 * @param b Vertex Memory
+	 * @param v Value
+	 */
+	public static void appendToBuffer(ByteBuffer b, byte v) {
 		b.put(v);
 	}
-	public static void AppendToBuffer(ByteBuffer b, short v) {
+	/**
+	 * Place A Short In The Vertex Buffer Memory
+	 * @param b Vertex Memory
+	 * @param v Value
+	 */
+	public static void appendToBuffer(ByteBuffer b, short v) {
 		b.putShort(v);
 	}
-	public static void AppendToBuffer(ByteBuffer b, int v) {
+	/**
+	 * Place An Integer In The Vertex Buffer Memory
+	 * @param b Vertex Memory
+	 * @param v Value
+	 */
+	public static void appendToBuffer(ByteBuffer b, int v) {
 		b.putInt(v);
 	}
-	public static void AppendToBuffer(ByteBuffer b, long v) {
+	/**
+	 * Place A Long In The Vertex Buffer Memory
+	 * @param b Vertex Memory
+	 * @param v Value
+	 */
+	public static void appendToBuffer(ByteBuffer b, long v) {
 		b.putLong(v);
 	}
-	public static void AppendToBuffer(ByteBuffer b, float v) {
+	/**
+	 * Place A Float In The Vertex Buffer Memory
+	 * @param b Vertex Memory
+	 * @param v Value
+	 */
+	public static void appendToBuffer(ByteBuffer b, float v) {
 		b.putFloat(v);
 	}
-	public static void AppendToBuffer(ByteBuffer b, double v) {
+	/**
+	 * Place A Double In The Vertex Buffer Memory
+	 * @param b Vertex Memory
+	 * @param v Value
+	 */
+	public static void appendToBuffer(ByteBuffer b, double v) {
 		b.putDouble(v);
 	}
 
-	public static void AppendToBuffer(ByteBuffer b, Color v) {
+	/**
+	 * Place 4 Bytes RGBA In The Vertex Buffer Memory
+	 * @param b Vertex Memory
+	 * @param v Value
+	 */
+	public static void appendToBuffer(ByteBuffer b, Color v) {
 		b.put(v.R);
 		b.put(v.G);
 		b.put(v.B);
 		b.put(v.A);
 	}
 	
-	public static void AppendToBuffer(ByteBuffer b, Vector2 v) {
+	/**
+	 * Place 2 Floats XY In The Vertex Buffer Memory
+	 * @param b Vertex Memory
+	 * @param v Value
+	 */
+	public static void appendToBuffer(ByteBuffer b, Vector2 v) {
 		b.putFloat(v.x);
 		b.putFloat(v.y);
 	}
-	public static void AppendToBuffer(ByteBuffer b, Vector3 v) {
+	/**
+	 * Place 3 Floats XYZ In The Vertex Buffer Memory
+	 * @param b Vertex Memory
+	 * @param v Value
+	 */
+	public static void appendToBuffer(ByteBuffer b, Vector3 v) {
 		b.putFloat(v.x);
 		b.putFloat(v.y);
 		b.putFloat(v.z);
 	}
-	public static void AppendToBuffer(ByteBuffer b, Vector4 v) {
+	/**
+	 * Place 4 Floats XYZW In The Vertex Buffer Memory
+	 * @param b Vertex Memory
+	 * @param v Value
+	 */
+	public static void appendToBuffer(ByteBuffer b, Vector4 v) {
 		b.putFloat(v.x);
 		b.putFloat(v.y);
 		b.putFloat(v.z);
 		b.putFloat(v.w);
 	}
 	
-	public static void AppendToBuffer(ByteBuffer b, Vector2d v) {
+	/**
+	 * Place 2 Doubles XY In The Vertex Buffer Memory
+	 * @param b Vertex Memory
+	 * @param v Value
+	 */
+	public static void appendToBuffer(ByteBuffer b, Vector2d v) {
 		b.putDouble(v.x);
 		b.putDouble(v.y);
 	}
-	public static void AppendToBuffer(ByteBuffer b, Vector3d v) {
+	/**
+	 * Place 3 Doubles XYZ In The Vertex Buffer Memory
+	 * @param b Vertex Memory
+	 * @param v Value
+	 */
+	public static void appendToBuffer(ByteBuffer b, Vector3d v) {
 		b.putDouble(v.x);
 		b.putDouble(v.y);
 		b.putDouble(v.z);
 	}
-	public static void AppendToBuffer(ByteBuffer b, Vector4d v) {
+	/**
+	 * Place 4 Doubles XYZW In The Vertex Buffer Memory
+	 * @param b Vertex Memory
+	 * @param v Value
+	 */
+	public static void appendToBuffer(ByteBuffer b, Vector4d v) {
 		b.putDouble(v.x);
 		b.putDouble(v.y);
 		b.putDouble(v.z);

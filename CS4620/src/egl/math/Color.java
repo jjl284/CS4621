@@ -329,6 +329,15 @@ public class Color {
     	return set(c.R, c.G, c.B, c.A);
     }
     
+    /**
+     * Set Color Data From An Integer
+     * @param argb ARGB Integer Value
+     * @return This
+     */
+    public Color setIntARGB(int argb) {
+    	return set((argb >> 16) & 0xFF, (argb >> 8) & 0xFF, (argb >> 0) & 0xFF, (argb >> 24) & 0xFF);
+    }
+    
     /*
      * GETTERS
      */

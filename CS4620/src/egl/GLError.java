@@ -10,20 +10,20 @@ import egl.GL.ErrorCode;
 public class GLError {
 	public static OutputStreamWriter ErrorLog;
 
-	public static void Get(String desc) {
+	public static void get(String desc) {
 		int error;
 		while((error = GL11.glGetError()) != ErrorCode.NoError) {
-			Write("ERROR - " + desc + " - " + error);
+			write("ERROR - " + desc + " - " + error);
 		}
 	}
-	public static void Write(String err) {
+	public static void write(String err) {
 		if(ErrorLog != null) {
 			try { ErrorLog.write(err + System.lineSeparator()); } 
 			catch (IOException e) { }
 		}
 	}
 
-	public static void Close() {
+	public static void close() {
 		if(ErrorLog == null) return;
 		try {
 			ErrorLog.flush();

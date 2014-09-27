@@ -304,7 +304,7 @@ public class Matrix3 implements Cloneable {
 	/**
 	 * Transforms A Vector In Place
 	 * <pre>
-	 * V = This * V
+	 * V = V * This
 	 * <pre>
 	 * @param v [{@link #Vec3 POS}] Vector
 	 * @return Transformed Vector
@@ -319,7 +319,7 @@ public class Matrix3 implements Cloneable {
 	/**
 	 * Transforms And Homogenizes A Position Vector In Place
 	 * <pre>
-	 * {V, w} = This * {V, 1}
+	 * {V, w} = {V, 1} * This
 	 * V = V / w
 	 * </pre>
 	 * @param v [{@link Vector2 POS}] Vector
@@ -497,9 +497,9 @@ public class Matrix3 implements Cloneable {
 	/**
 	 * Create A Translation Matrix Into Out
 	 * <pre>
-	 * | 1  0  x |
-	 * | 0  1  y |
-	 * | 0  0  1 |
+	 * | 1  0  0 |
+	 * | 0  1  0 |
+	 * | x  y  1 |
 	 * <pre>
 	 * @param x X Translation
 	 * @param y Y Translation
@@ -543,9 +543,9 @@ public class Matrix3 implements Cloneable {
 	/**
 	 * Create A Rotation Matrix Into Out
 	 * <pre>
-	 * | cos(t)  -sin(t)  0 |
-	 * | sin(t)   cos(t)  0 |
-	 * | 0        0       1 |
+	 * |  cos(t)  sin(t)  0 |
+	 * | -sin(t)  cos(t)  0 |
+	 * |  0       0       1 |
 	 * </pre>
 	 * @param t Angle (Radians)
 	 * @param out Non-Null Output Matrix
@@ -570,9 +570,9 @@ public class Matrix3 implements Cloneable {
 	/**
 	 * Create A X Rotation Matrix Into Out
 	 * <pre>
-	 * | 1  0        0      |
-	 * | 0  cos(t)  -sin(t) |
-	 * | 0  sin(t)   cos(t) |
+	 * | 1   0       0      |
+	 * | 0   cos(t)  sin(t) |
+	 * | 0  -sin(t)  cos(t) |
 	 * </pre>
 	 * @param t Angle (Radians)
 	 * @param out Non-Null Output Matrix
@@ -597,9 +597,9 @@ public class Matrix3 implements Cloneable {
 	/**
 	 * Create A Y Rotation Matrix Into Out
 	 * <pre>
-	 * |  cos(t)  0  sin(t) |
-	 * |  0       1  0      |
-	 * | -sin(t)  0  cos(t) |
+	 * | cos(t)  0  -sin(t) |
+	 * | 0       1   0      |
+	 * | sin(t)  0   cos(t) |
 	 * </pre>
 	 * @param t Angle (Radians)
 	 * @param out Non-Null Output Matrix
@@ -624,9 +624,9 @@ public class Matrix3 implements Cloneable {
 	/**
 	 * Create A Z Rotation Matrix Into Out
 	 * <pre>
-	 * | cos(t)  -sin(t)  0 |
-	 * | sin(t)   cos(t)  0 |
-	 * | 0        0       1 |
+	 * |  cos(t)  sin(t)  0 |
+	 * | -sin(t)  cos(t)  0 |
+	 * |  0       0       1 |
 	 * </pre>
 	 * @param t Angle (Radians)
 	 * @param out Non-Null Output Matrix
@@ -654,9 +654,9 @@ public class Matrix3 implements Cloneable {
 	 * <pre>
 	 * Let w = r - l
 	 * Let h = t - b
-	 * | 2 / w  0      -(l + r) / w |
-	 * | 0      2 / h  -(b + t) / h |
-	 * | 0      0       1           |
+	 * |  2 / w         0            0 |
+	 * |  0             2 / h        0 |
+	 * | -(l + r) / w  -(b + t) / h  1 |
 	 * </pre>
 	 * @param l Left Side Of Rect
 	 * @param r Right Side Of Rect

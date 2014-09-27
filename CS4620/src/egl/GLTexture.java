@@ -11,13 +11,14 @@ import static org.lwjgl.opengl.GL13.glActiveTexture;
 import static org.lwjgl.opengl.GL20.glUniform1i;
 
 import java.awt.image.BufferedImage;
-import java.awt.image.DataBufferByte;
-import java.io.File;
+import java.io.InputStream;
 import java.nio.ByteBuffer;
+//import java.nio.ByteBuffer;
 import java.util.HashMap;
 
 import javax.imageio.ImageIO;
 
+//import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL30;
 
 import egl.GL.PixelFormat;
@@ -26,6 +27,8 @@ import egl.GL.PixelType;
 import egl.GL.TextureParameterName;
 import egl.GL.TextureTarget;
 import egl.GL.TextureUnit;
+import egl.math.Color;
+import ext.java.IOUtils;
 
 public class GLTexture implements IDisposable {
 	private static final int[] TEXTURE_TARGETS = {
@@ -128,7 +131,7 @@ public class GLTexture implements IDisposable {
 
         setTarget(target);
         InternalFormat = PixelInternalFormat.Rgba;
-        if(init) Init();
+        if(init) init();
     }
     public GLTexture(int target) {
     	this(target, false);
@@ -137,31 +140,31 @@ public class GLTexture implements IDisposable {
     	this(TextureTarget.Texture2D);
     }
     @Override
-    public void Dispose() {
+    public void dispose() {
         if(getIsCreated()) {
             glDeleteTextures(id);
             id = 0;
         }
     }
 
-    public GLTexture Init() {
+    public GLTexture init() {
         if(getIsCreated()) return this;
         id = glGenTextures();
         return this;
     }
 
-    public void Bind() {
+    public void bind() {
         if(!getIsBound()) {
             refBind.Current = this;
             glBindTexture(target, id);
-            GLError.Get("Texture Bind");
+            GLError.get("Texture Bind");
         }
     }
-    public void Unbind() {
+    public void unbind() {
         if(getIsBound()) refBind.Unbind();
     }
 
-    public void SetImage(int[] dim, int pixelFormat, int pixelType, ByteBuffer buf, boolean mipMap) throws Exception {
+    public void setImage(int[] dim, int pixelFormat, int pixelType, ByteBuffer buf, boolean mipMap) throws Exception {
         if(dim == null || dim.length < 1 || dim.length > 3)
             throw new Exception("Dimensions For The Texture Must Be Given (Must Be 1 - 3)");
         System.arraycopy(dim, 0, dimensions, 0, dim.length);
@@ -174,7 +177,7 @@ public class GLTexture implements IDisposable {
         else found = true;
         if(!found && getDepth() > 0) dims++;
         
-        Bind();
+        bind();
         switch(dims) {
             case 1:
                 if(buf != null) glTexImage1D(target, 0, InternalFormat, getWidth(), 0, pixelFormat, pixelType, buf);
@@ -195,58 +198,76 @@ public class GLTexture implements IDisposable {
             default:
                 throw new Exception("Invalid Dimensions For The Texture (Must Be > 0)");
         }
-        Unbind();
+		SamplerState.POINT_WRAP.set(target);
+        unbind();
     }
-    public void SetImage(int w, int h, int d, int pixelFormat, int pixelType, ByteBuffer buf, boolean mipMap) {
+    public void setImage(int w, int h, int d, int pixelFormat, int pixelType, ByteBuffer buf, boolean mipMap) {
     	try {
-			SetImage(new int[] {w, h, d}, pixelFormat, pixelType, buf, mipMap);
+			setImage(new int[] {w, h, d}, pixelFormat, pixelType, buf, mipMap);
 		} 
     	catch (Exception e) {
     		// The Apocalypse Has Begun. Quick... Hide In The Garage!
 		}
     }
-    public void SetImage(int w, int h, int pixelFormat, int pixelType, ByteBuffer buf, boolean mipMap) {
-    	SetImage(w, h, 0, pixelFormat, pixelType, buf, mipMap);
+    public void setImage(int w, int h, int pixelFormat, int pixelType, ByteBuffer buf, boolean mipMap) {
+    	setImage(w, h, 0, pixelFormat, pixelType, buf, mipMap);
     }
-    public void SetImage(int w, int pixelFormat, int pixelType, ByteBuffer buf, boolean mipMap) {
-    	SetImage(w, 0, 0, pixelFormat, pixelType, buf, mipMap);
+    public void setImage(int w, int pixelFormat, int pixelType, ByteBuffer buf, boolean mipMap) {
+    	setImage(w, 0, 0, pixelFormat, pixelType, buf, mipMap);
     }
 
-    public void SetImage2D(BufferedImage data, boolean mipMap) throws Exception {
+    public void setImage2D(BufferedImage data, boolean mipMap) throws Exception {
+    	
     	int w = data.getWidth();
     	int h = data.getHeight();
-    	byte[] pixels = ((DataBufferByte)data.getRaster().getDataBuffer()).getData();
-    	for(int i = 0, y = 0;y < h;y++) {
+    	
+//    	byte[] pixels = ((DataBufferByte)data.getRaster().getDataBuffer()).getData();
+    	ByteBuffer bb = NativeMem.createByteBuffer(w * h * 4);
+    	Color c = new Color();
+    	for(int y = h - 1;y >= 0;y--) {
     		for(int x = 0; x < w; x++) {
-    			byte buf;
-    			buf = pixels[i + 0]; pixels[i + 0] = pixels[i + 3]; pixels[i + 3] = buf;
-    			buf = pixels[i + 1]; pixels[i + 1] = pixels[i + 2]; pixels[i + 2] = buf;
-    			i += 4;
+    			int argb = data.getRGB(x, y);
+    			c.setIntARGB(argb);
+    			bb.put(c.R);
+    			bb.put(c.G);
+    			bb.put(c.B);
+    			bb.put(c.A);
     		}
     	}
-    	ByteBuffer bb = ByteBuffer.allocateDirect(w * h * 4);
-    	bb.put(pixels);
     	bb.flip();
-        SetImage(new int[] { w, h, 0 }, PixelFormat.Bgra, PixelType.UnsignedByte, bb, mipMap);
+        setImage(new int[] { w, h, 0 }, PixelFormat.Rgba, PixelType.UnsignedByte, bb, mipMap);
     }
-    public void SetImage2D(String file, boolean mipMap) throws Exception {
-    	BufferedImage image = ImageIO.read(new File(file));
-    	SetImage2D(image, mipMap);
+    public void setImage2D(String file, boolean mipMap) throws Exception {
+    	InputStream s = IOUtils.openFile(file);
+    	if(s == null) throw new Exception("Could Not Open Image File: " + file);
+    	BufferedImage image = ImageIO.read(s);
+    	setImage2D(image, mipMap);
+    }
+    public void setImage2DResource(String name, boolean mipMap) throws Exception {
+    	InputStream s = IOUtils.openResource(name);
+    	if(s == null) throw new Exception("Could Not Open Image Resource: " + name);
+    	BufferedImage image = ImageIO.read(s);
+    	setImage2D(image, mipMap);
     }
     
-    public void BindToUnit(int unit) {
+    public void bindToUnit(int unit) {
         glActiveTexture(unit);
-        Bind();
+        bind();
     }
-    public void SetUniformSampler(int unit, int unSampler) {
+    public void setUniformSampler(int unit, int unSampler) {
         glUniform1i(unSampler, unit - TextureUnit.Texture0);
     }
 
-    public void Use(int unit, int unSampler) {
-        BindToUnit(unit);
-        SetUniformSampler(unit, unSampler);
+    /**
+     * Uses This Texture In A Program
+     * @param unit {@link TextureUnit}0 - Maximum Texture Units
+     * @param unSampler Sampler Uniform ID
+     */
+    public void use(int unit, int unSampler) {
+        bindToUnit(unit);
+        setUniformSampler(unit, unSampler);
     }
-    public void Unuse() {
-        Unbind();
+    public void unuse() {
+        unbind();
     }
 }

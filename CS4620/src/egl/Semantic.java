@@ -1,5 +1,10 @@
 package egl;
 
+/**
+ * All Necessary Semantic Attribute Enums (Type | Index)
+ * @author Cristian
+ *
+ */
 public class Semantic {
 	public static final int Index0 = 0x0000;
 	public static final int Index1 = 0x0001;
@@ -21,7 +26,7 @@ public class Semantic {
 	public static final int Position = 0x0000;
 	public static final int Normal = 0x0010;
 	public static final int Tangent = 0x0020;
-	public static final int Binormal = 0x0030;
+	public static final int Bitangent = 0x0030;
 	public static final int Color = 0x0040;
 	public static final int TexCoord = 0x0050;
 	public static final int Custom = 0x0060;

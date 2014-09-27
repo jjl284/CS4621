@@ -16,8 +16,14 @@ import java.nio.ShortBuffer;
 import java.util.HashMap;
 
 import egl.GL.BufferTarget;
-import egl.GL.VertexAttribPointerType;
+import egl.GL.GLType;
 
+/**
+ * Wrapper For An OpenGL Vertex Array Object
+ * And Multiple Buffer Objects
+ * @author Cristian
+ *
+ */
 public class GLBuffer implements IDisposable {
 	/**
 	 * Because Java Sucks At Enums
@@ -40,21 +46,21 @@ public class GLBuffer implements IDisposable {
 	};
 	
 	/**
-	 * Use As Pointer
+	 * Used As Pointer
 	 * @author Cristian
 	 *
 	 */
-	static class Binding {
-        private int Target;
-        public GLBuffer Current;
+	private static class Binding {
+        private int target;
+        public GLBuffer current;
 
         public Binding(int t) {
-            Target = t;
-            Current = null;
+            target = t;
+            current = null;
         }
-        public void Unbind() {
-            Current = null;
-            glBindBuffer(Target, 0);
+        public void unbind() {
+            current = null;
+            glBindBuffer(target, 0);
         }
     }
 
@@ -73,8 +79,8 @@ public class GLBuffer implements IDisposable {
      * When Messing With Wild OpenGL
      * @param t Enum {@link BufferTarget}
      */
-    public static void Unbind(int t) {
-        currentBindings.get(t).Unbind();
+    public static void unbind(int t) {
+        currentBindings.get(t).unbind();
     }
 
     // OpenGL Buffer ID
@@ -97,8 +103,8 @@ public class GLBuffer implements IDisposable {
     // Buffer Type And Double Pointer For Checking Usage
     private int target;
     /**
-     * @see Enum {@link egl.GL.BufferTarget}
-     * @return The OpenGL Buffer Bind Target
+     * Return This Target
+     * @return The OpenGL Buffer Bind {@link egl.GL.BufferTarget Target}
      */
     public int getTarget() {
         return target;
@@ -113,7 +119,7 @@ public class GLBuffer implements IDisposable {
      * @return True If GLBuffer Recognizes This As The Currently Bound Buffer
      */
     public boolean getIsBound() {
-        return refBind != null && refBind.Current == this;
+        return refBind != null && refBind.current == this;
     }
 
     // Scream At The GPU Where Data Should Be Placed
@@ -129,7 +135,7 @@ public class GLBuffer implements IDisposable {
     // Element Information
     private int componentFormat, componentCount, elementByteSize;
     /**
-     * @see {@link egl.GL.VertexAttribPointerType}
+     * @see {@link egl.GL.GLType}
      * @return Format Of A Single Element Of The Buffer
      */
     public int getComponentFormat() {
@@ -173,7 +179,7 @@ public class GLBuffer implements IDisposable {
         setTarget(target);
         usageType = usage;
 
-        if(init) Init();
+        if(init) init();
     }
     /**
      * @see {@link #GLBuffer(int, int, boolean) GLBuffer(target, usage, false)}
@@ -185,7 +191,7 @@ public class GLBuffer implements IDisposable {
      * Destroy The OpenGL Resources Held By The Buffer
      */
     @Override
-    public void Dispose() {
+    public void dispose() {
         if(!getIsCreated()) return;
         glDeleteBuffers(id);
         id = 0;
@@ -195,7 +201,7 @@ public class GLBuffer implements IDisposable {
      * Create The OpenGL Buffer Resource In The Active Context
      * @return Self
      */
-    public GLBuffer Init() {
+    public GLBuffer init() {
         if(getIsCreated()) return this;
         id = glGenBuffers();
         return this;
@@ -203,90 +209,90 @@ public class GLBuffer implements IDisposable {
 
     /**
      * Set The Element Format For This Buffer
-     * @param format Enum {@link egl.GL.VertexAttribPointerType}
+     * @param format Enum {@link egl.GL.GLType}
      * @param count Number Of Components Of Type Format
      * @return Self
      */
-    public GLBuffer SetElementFormat(int format, int count) {
+    public GLBuffer setElementFormat(int format, int count) {
         // Use A New Element Format Basis
         componentFormat = format;
         componentCount = count;
-        elementByteSize = componentCount * GLUtil.SizeOf(componentFormat);
+        elementByteSize = componentCount * GLUtil.sizeOf(componentFormat);
         return this;
     }
     /**
      * Turns This Buffer Into An Index Buffer Of 32-Bit Indices
      * @return Self
      */
-    public GLBuffer SetAsIndexInt() {
+    public GLBuffer setAsIndexInt() {
         setTarget(BufferTarget.ElementArrayBuffer);
-        return SetElementFormat(VertexAttribPointerType.UnsignedInt, 1);
+        return setElementFormat(GLType.UnsignedInt, 1);
     }
     /**
      * Turns This Buffer Into An Index Buffer Of 16-Bit Indices
      * @return Self
      */
-    public GLBuffer SetAsIndexShort() {
+    public GLBuffer setAsIndexShort() {
     	setTarget(BufferTarget.ElementArrayBuffer);
-        return SetElementFormat(VertexAttribPointerType.UnsignedShort, 1);
+        return setElementFormat(GLType.UnsignedShort, 1);
     }
     /**
      * Turns This Buffer Into A Vertex Buffer Using A Single 32-Bit Float
      * @return Self
      */
-    public GLBuffer SetAsVertexFloat() {
+    public GLBuffer setAsVertexFloat() {
     	setTarget(BufferTarget.ArrayBuffer);
-        return SetElementFormat(VertexAttribPointerType.Float, 1);
+        return setElementFormat(GLType.Float, 1);
     }
     /**
      * Turns This Buffer Into A Vertex Buffer Using 2 32-Bit Floats
      * @return Self
      */
-    public GLBuffer SetAsVertexVec2() {
+    public GLBuffer setAsVertexVec2() {
     	setTarget(BufferTarget.ArrayBuffer);
-        return SetElementFormat(VertexAttribPointerType.Float, 2);
+        return setElementFormat(GLType.Float, 2);
     }
     /**
      * Turns This Buffer Into A Vertex Buffer Using 3 32-Bit Floats
      * @return Self
      */
-    public GLBuffer SetAsVertexVec3() {
+    public GLBuffer setAsVertexVec3() {
     	setTarget(BufferTarget.ArrayBuffer);
-        return SetElementFormat(VertexAttribPointerType.Float, 3);
+        return setElementFormat(GLType.Float, 3);
     }
     /**
      * Turns This Buffer Into A Vertex Buffer Using 4 32-Bit Floats
      * @return Self
      */
-    public GLBuffer SetAsVertexVec4() {
+    public GLBuffer setAsVertexVec4() {
     	setTarget(BufferTarget.ArrayBuffer);
-        return SetElementFormat(VertexAttribPointerType.Float, 4);
+        return setElementFormat(GLType.Float, 4);
     }
     /**
      * Turns This Buffer Into A Vertex Buffer Using A Vertex Struct
      * @param vSize Size Of A Vertex Element In Bytes
      * @return Self
      */
-    public GLBuffer SetAsVertex(int vSize) {
+    public GLBuffer setAsVertex(int vSize) {
     	setTarget(BufferTarget.ArrayBuffer);
-        return SetElementFormat(VertexAttribPointerType.UnsignedByte, vSize);
+        return setElementFormat(GLType.UnsignedByte, vSize);
     }
 
     /**
      * Bind This Buffer To It's Target If Not Already Bound
      */
-    public void Bind() {
+    public void bind() {
         if(!getIsBound()) {
-            refBind.Current = this;
+            refBind.current = this;
             glBindBuffer(target, id);
-            GLError.Get("Buffer Bind");
+            GLError.get("Buffer Bind");
         }
     }
     /**
      * Unbind This Buffer If It Is Recognized As Being Bound
      */
-    public void Unbind() {
-        if(getIsBound()) refBind.Unbind();
+    public void unbind() {
+        if(getIsBound()) refBind.unbind();
     }
     /**
      * Use This As A Vertex Buffer With Elements Bound To An Attribute
@@ -295,33 +301,33 @@ public class GLBuffer implements IDisposable {
      * @param instDiv Instancing Count
      * @param norm True To Normalize Integer Components On The GPU
      */
-    public void UseAsAttrib(int loc, int offset, int instDiv, boolean norm) {
-        Bind();
+    public void useAsAttrib(int loc, int offset, int instDiv, boolean norm) {
+        bind();
         glEnableVertexAttribArray(loc);
-        GLError.Get("Enable VAA");
+        GLError.get("Enable VAA");
         glVertexAttribPointer(loc, componentCount, componentFormat, norm, elementByteSize, offset * elementByteSize);
         if(instDiv > 0)
             glVertexAttribDivisor(loc, instDiv);
-        GLError.Get("VAP");
-        Unbind();
+        GLError.get("VAP");
+        unbind();
     }
     /**
-     * @see {@link #UseAsAttrib(int, int, int, boolean) UseAsAttrib(loc, offset, instDiv, false)}
+     * @see {@link #useAsAttrib(int, int, int, boolean) UseAsAttrib(loc, offset, instDiv, false)}
      */
-    public void UseAsAttrib(int loc, int offset, int instDiv) {
-    	UseAsAttrib(loc, offset, instDiv, false);
+    public void useAsAttrib(int loc, int offset, int instDiv) {
+    	useAsAttrib(loc, offset, instDiv, false);
     }
     /**
-     * @see {@link #UseAsAttrib(int, int, int, boolean) UseAsAttrib(loc, offset, 0, false)}
+     * @see {@link #useAsAttrib(int, int, int, boolean) UseAsAttrib(loc, offset, 0, false)}
      */
-    public void UseAsAttrib(int loc, int offset) {
-    	UseAsAttrib(loc, offset, 0);
+    public void useAsAttrib(int loc, int offset) {
+    	useAsAttrib(loc, offset, 0);
     }
    /**
-    * @see {@link #UseAsAttrib(int, int, int, boolean) UseAsAttrib(loc, 0, instDiv, false)}
+    * @see {@link #useAsAttrib(int, int, int, boolean) UseAsAttrib(loc, 0, instDiv, false)}
     */
-    public void UseAsAttrib(int loc) {
-    	UseAsAttrib(loc, 0);
+    public void useAsAttrib(int loc) {
+    	useAsAttrib(loc, 0);
     }
     /**
      * Use This As A Vertex Buffer With Struct Elements Bound To An Interface Of Attributes
@@ -329,199 +335,202 @@ public class GLBuffer implements IDisposable {
      * @param offset Starting Element
      * @param instDiv Instancing Count
      */
-    public void UseAsAttrib(ShaderInterface si, int offset, int instDiv) {
-        Bind();
+    public void useAsAttrib(ShaderInterface si, int offset, int instDiv) {
+        bind();
         // Calculate Stride And Bytes Of Offset
         offset *= elementByteSize;
-        for(ArrayBind bind : si.Binds) {
-            if(bind.Location < 0) continue;
-            glEnableVertexAttribArray(bind.Location);
-            GLError.Get("Enable VAA");
-            glVertexAttribPointer(bind.Location, bind.CompCount, bind.CompType, bind.Normalized, elementByteSize, offset + bind.Offset);
+        for(ArrayBind bind : si.binds) {
+            if(bind.location < 0) continue;
+            glEnableVertexAttribArray(bind.location);
+            GLError.get("Enable VAA");
+            glVertexAttribPointer(bind.location, bind.compCount, bind.compType, bind.isNormalized, elementByteSize, offset + bind.offset);
             if(instDiv > 0)
-                glVertexAttribDivisor(bind.Location, instDiv);
-            GLError.Get("VAP");
+                glVertexAttribDivisor(bind.location, instDiv);
+            GLError.get("VAP");
         }
-        Unbind();
+        unbind();
     }
     /**
-     * @see {@link #UseAsAttrib(ShaderInterface, int, int) UseAsAttrib(si, offset, 0)}
+     * @see {@link #useAsAttrib(ShaderInterface, int, int) UseAsAttrib(si, offset, 0)}
      */
-    public void UseAsAttrib(ShaderInterface si, int offset) {
-    	UseAsAttrib(si, offset, 0);
+    public void useAsAttrib(ShaderInterface si, int offset) {
+    	useAsAttrib(si, offset, 0);
     }
     /**
-     * @see {@link #UseAsAttrib(ShaderInterface, int, int) UseAsAttrib(si, 0, 0)}
+     * @see {@link #useAsAttrib(ShaderInterface, int, int) UseAsAttrib(si, 0, 0)}
      */
-    public void UseAsAttrib(ShaderInterface si) {
-    	UseAsAttrib(si, 0);
+    public void useAsAttrib(ShaderInterface si) {
+    	useAsAttrib(si, 0);
     }
 
     /**
      * Resize This Buffer (And Discard Buffer Data)
      * @param bytes New Capacity In Bytes
      */
-    public void SetSizeInBytes(int bytes) {
+    public void setSizeInBytes(int bytes) {
         bufCapacity = bytes;
-        Bind();
+        bind();
         glBufferData(target, bufCapacity, usageType);
-        Unbind();
+        unbind();
     }
     /**
-     * @see {@link #SetSizeInBytes(int) SetSizeInBytes(elements * getElementByteSize())}
+     * @see {@link #setSizeInBytes(int) SetSizeInBytes(elements * getElementByteSize())}
      * @param elements Element Capacity
      */
-    public void SetSizeInElements(int elements) {
-        SetSizeInBytes(elements * elementByteSize);
+    public void setSizeInElements(int elements) {
+        setSizeInBytes(elements * elementByteSize);
     }
     
-    public void SetDataInitial(ByteBuffer data) {
+    public void setDataInitial(ByteBuffer data) {
         bufCapacity = data.limit();
-        Bind();
+        bind();
         glBufferData(target, data, usageType);
-        Unbind();
+        unbind();
     }
-    public void SetDataInitial(ShortBuffer data) {
+    public void setDataInitial(ShortBuffer data) {
         bufCapacity = data.limit() << 1;
-        Bind();
+        bind();
         glBufferData(target, data, usageType);
-        Unbind();
+        unbind();
     }
-    public void SetDataInitial(IntBuffer data) {
+    public void setDataInitial(IntBuffer data) {
         bufCapacity = data.limit() << 2;
-        Bind();
+        bind();
         glBufferData(target, data, usageType);
-        Unbind();
+        unbind();
     }
-    public void SetDataInitial(FloatBuffer data) {
+    public void setDataInitial(FloatBuffer data) {
         bufCapacity = data.limit() << 2;
-        Bind();
+        bind();
         glBufferData(target, data, usageType);
-        Unbind();
+        unbind();
     }
 
-    public void CheckResizeInBytes(int bytes) {
+    public void checkResizeInBytes(int bytes) {
         if(bytes <= bufCapacity / 4 || bytes > bufCapacity) {
             // Resize To Double The Desired Size
-            SetSizeInBytes(bytes * 2);
+            setSizeInBytes(bytes * 2);
         }
     }
-    public void CheckResizeInElements(int elements) {
-        CheckResizeInBytes(elements * elementByteSize);
+    public void checkResizeInElements(int elements) {
+        checkResizeInBytes(elements * elementByteSize);
     }
 
-    public void SetData(ByteBuffer data, int len, int off) {
-        Bind();
+    public void setData(ByteBuffer data, int len, int off) {
+        bind();
         data.limit(off + len);
         glBufferSubData(target, off, data);
-        Unbind();
+        unbind();
     }
-    public void SetData(ByteBuffer data, long off) {
-        Bind();
+    public void setData(ByteBuffer data, long off) {
+        bind();
         glBufferSubData(target, off, data);
-        Unbind();
+        unbind();
     }
-    public void SetData(byte[] data, int len, int off) {
+    public void setData(byte[] data, int len, int off) {
     	if(len <= 0) len = data.length - off;
-    	SetData(ByteBuffer.wrap(data, off, len), len, 0);
+    	ByteBuffer b = NativeMem.createByteBuffer(len);
+    	b.put(data, off, len);
+    	b.flip();
+    	setData(b, len, 0);
     }
-    public void SetData(short[] data, int len, int off) {
+    public void setData(short[] data, int len, int off) {
     	if(len <= 0) len = data.length - off;
-    	ByteBuffer bb = ByteBuffer.allocateDirect(len << 1);
+    	ByteBuffer bb = NativeMem.createByteBuffer(len << 1);
     	bb.asShortBuffer().put(data, off, len);
     	bb.limit(bb.capacity());
-    	SetData(bb, bb.capacity(), 0);
+    	setData(bb, bb.capacity(), 0);
     }
-    public void SetData(int[] data, int len, int off) {
+    public void setData(int[] data, int len, int off) {
     	if(len <= 0) len = data.length - off;
-    	ByteBuffer bb = ByteBuffer.allocateDirect(len << 2);
+    	ByteBuffer bb = NativeMem.createByteBuffer(len << 2);
     	bb.asIntBuffer().put(data, off, len);
     	bb.limit(bb.capacity());
-    	SetData(bb, bb.capacity(), 0);
+    	setData(bb, bb.capacity(), 0);
     }
-    public void SetData(long[] data, int len, int off) {
+    public void setData(long[] data, int len, int off) {
     	if(len <= 0) len = data.length - off;
-    	ByteBuffer bb = ByteBuffer.allocateDirect(len << 3);
+    	ByteBuffer bb = NativeMem.createByteBuffer(len << 3);
     	bb.asLongBuffer().put(data, off, len);
     	bb.limit(bb.capacity());
-    	SetData(bb, bb.capacity(), 0);
+    	setData(bb, bb.capacity(), 0);
     }
-    public void SetData(float[] data, int len, int off) {
+    public void setData(float[] data, int len, int off) {
     	if(len <= 0) len = data.length - off;
-    	ByteBuffer bb = ByteBuffer.allocateDirect(len << 2);
+    	ByteBuffer bb = NativeMem.createByteBuffer(len << 2);
     	bb.asFloatBuffer().put(data, off, len);
     	bb.limit(bb.capacity());
-    	SetData(bb, bb.capacity(), 0);
+    	setData(bb, bb.capacity(), 0);
     }
-    public void SetData(double[] data, int len, int off) {
+    public void setData(double[] data, int len, int off) {
     	if(len <= 0) len = data.length - off;
-    	ByteBuffer bb = ByteBuffer.allocateDirect(len << 3);
+    	ByteBuffer bb = NativeMem.createByteBuffer(len << 3);
     	bb.asDoubleBuffer().put(data, off, len);
     	bb.limit(bb.capacity());
-    	SetData(bb, bb.capacity(), 0);
+    	setData(bb, bb.capacity(), 0);
     }
-    public void SetData(IVertexType[] data, int len, int off) {
+    public void setData(IVertexType[] data, int len, int off) {
     	if(len <= 0) len = data.length - off;
     	int vs = data[0].getByteSize();
     	int e = off + len;
-    	ByteBuffer bb = ByteBuffer.allocateDirect(len * vs);
+    	ByteBuffer bb = NativeMem.createByteBuffer(len * vs);
     	for(int i = off;i < e;i++) {
-    		data[i].AppendToBuffer(bb);
+    		data[i].appendToBuffer(bb);
     	}
     	bb.flip();
-    	SetData(bb, bb.capacity(), 0);
+    	setData(bb, bb.capacity(), 0);
     }
 
-    public void SmartSetData(ByteBuffer data, int len, int off) {
-        CheckResizeInBytes(off + len);
-        SetData(data, len, off);
+    public void smartSetData(ByteBuffer data, int len, int off) {
+        checkResizeInBytes(off + len);
+        setData(data, len, off);
     }
-    public void SmartSetData(byte[] data, int len, int off) {
-        CheckResizeInBytes(off + len);
-        SetData(data, len, off);
+    public void smartSetData(byte[] data, int len, int off) {
+        checkResizeInBytes(off + len);
+        setData(data, len, off);
     }
-    public void SmartSetData(short[] data, int len, int off) {
-        CheckResizeInBytes((off + len) << 1);
-        SetData(data, len, off);
+    public void smartSetData(short[] data, int len, int off) {
+        checkResizeInBytes((off + len) << 1);
+        setData(data, len, off);
     }
-    public void SmartSetData(int[] data, int len, int off) {
-        CheckResizeInBytes((off + len) << 2);
-        SetData(data, len, off);
+    public void smartSetData(int[] data, int len, int off) {
+        checkResizeInBytes((off + len) << 2);
+        setData(data, len, off);
     }
-    public void SmartSetData(long[] data, int len, int off) {
-        CheckResizeInBytes((off + len) << 3);
-        SetData(data, len, off);
+    public void smartSetData(long[] data, int len, int off) {
+        checkResizeInBytes((off + len) << 3);
+        setData(data, len, off);
     }
-    public void SmartSetData(float[] data, int len, int off) {
-        CheckResizeInBytes((off + len) << 2);
-        SetData(data, len, off);
+    public void smartSetData(float[] data, int len, int off) {
+        checkResizeInBytes((off + len) << 2);
+        setData(data, len, off);
     }
-    public void SmartSetData(double[] data, int len, int off) {
-        CheckResizeInBytes((off + len) << 3);
-        SetData(data, len, off);
+    public void smartSetData(double[] data, int len, int off) {
+        checkResizeInBytes((off + len) << 3);
+        setData(data, len, off);
     }
-    public void SmartSetData(IVertexType[] data, int len, int off) {
-        CheckResizeInBytes((off + len) * data[0].getByteSize());
-        SetData(data, len, off);
+    public void smartSetData(IVertexType[] data, int len, int off) {
+        checkResizeInBytes((off + len) * data[0].getByteSize());
+        setData(data, len, off);
     }
 
-    public GLBuffer InitAsVertex(float[] data, int vecDim) {
-        Init();
-        SetElementFormat(VertexAttribPointerType.Float, vecDim);
+    public GLBuffer initAsVertex(float[] data, int vecDim) {
+        init();
+        setElementFormat(GLType.Float, vecDim);
         setTarget(BufferTarget.ArrayBuffer);
-        SmartSetData(data, 0, 0);
+        smartSetData(data, 0, 0);
         return this;
     }
-    public GLBuffer InitAsIndex(int[] data) {
-        Init();
-        SetAsIndexInt();
-        SmartSetData(data, 0, 0);
+    public GLBuffer initAsIndex(int[] data) {
+        init();
+        setAsIndexInt();
+        smartSetData(data, 0, 0);
         return this;
     }
-    public GLBuffer InitAsIndex(short[] data) {
-        Init();
-        SetAsIndexShort();
-        SmartSetData(data, 0, 0);
+    public GLBuffer initAsIndex(short[] data) {
+        init();
+        setAsIndexShort();
+        smartSetData(data, 0, 0);
         return this;
     }
 }

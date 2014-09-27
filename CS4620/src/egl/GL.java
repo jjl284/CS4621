@@ -18,9 +18,23 @@ import static org.lwjgl.opengl.GL43.*;
 import static org.lwjgl.opengl.GL44.*;
 import org.lwjgl.opengl.*;
 
+/**
+ * MEGA-ENUM Hierarchy For OpenGL Enums (Most Of The Important Ones)
+ * @author Cristian
+ *
+ */
 public class GL {
 	/**
-	 * Enum For Various OpenGL Buffer Bindings
+	 * OpenGL Value For A Bad Uniform Location
+	 */
+	public static final int BadUniformLocation = -1;
+	/**
+	 * OpenGL Value For A Bad Attribute Location
+	 */
+	public static final int BadAttributeLocation = -1;
+	
+	/**
+	 * Enum For Classifying OpenGL Buffer Objects
 	 * @author Cristian
 	 *
 	 */
@@ -57,7 +71,12 @@ public class GL {
 		public static final int StreamDraw = GL_STREAM_DRAW;
 		public static final int StreamRead = GL_STREAM_READ;
 	}
-	public static class VertexAttribPointerType {
+	/**
+	 * Enum For Various OpenGL Primitive Types
+	 * @author Cristian
+	 *
+	 */
+	public static class GLType {
 		public static final int Byte = GL_BYTE;
 		public static final int Double = GL_DOUBLE;
 		public static final int Fixed = GL_FIXED;
@@ -71,6 +90,11 @@ public class GL {
 		public static final int UnsignedInt2101010Rev = GL_UNSIGNED_INT_2_10_10_10_REV;
 		public static final int UnsignedShort = GL_UNSIGNED_SHORT;
 	}
+	/**
+	 * Enum For Classifying OpenGL Texture Objects
+	 * @author Cristian
+	 *
+	 */
 	public static class TextureTarget {
 		public static final int ProxyTexture1D = GL_PROXY_TEXTURE_1D;
 		public static final int ProxyTexture1DArray = GL_PROXY_TEXTURE_1D_ARRAY;
@@ -116,6 +140,11 @@ public class GL {
 		public static final int TextureRectangle = GL31.GL_TEXTURE_RECTANGLE;
 		public static final int TextureRectangle43 = GL43.GL_TEXTURE_RECTANGLE;
 	}
+	/**
+	 * Enum For Internal Pixel Representation Of OpenGL Texture Objects
+	 * @author Cristian
+	 *
+	 */
 	public static class PixelInternalFormat {
 		public static final int Alpha = GL_ALPHA;
 		public static final int CompressedAlpha = GL_COMPRESSED_ALPHA;
@@ -224,6 +253,11 @@ public class GL {
 		public static final int Three = 3;
 		public static final int Two = 2;
 	}
+	/**
+	 * Enum For Pixel Representation Of External Texture Memory
+	 * @author Cristian
+	 *
+	 */
 	public static class PixelFormat {
 		public static final int Alpha = GL_ALPHA;
 		public static final int AlphaInteger = GL_ALPHA_INTEGER;
@@ -252,6 +286,11 @@ public class GL {
 		public static final int UnsignedInt = GL_UNSIGNED_INT;
 		public static final int UnsignedShort = GL_UNSIGNED_SHORT;
 	}
+	/**
+	 * Enum For Representing Pixel Component Types
+	 * @author Cristian
+	 *
+	 */
 	public static class PixelType {
 		public static final int Byte = GL_BYTE;
 		public static final int Float = GL_FLOAT;
@@ -270,6 +309,11 @@ public class GL {
 		public static final int UnsignedShort5551 = GL_UNSIGNED_SHORT_5_5_5_1;
 		public static final int UnsignedShort565 = GL_UNSIGNED_SHORT_5_6_5;
 	}
+	/**
+	 * Enum For Pointing OpenGL Texture Objects Towards A GPU Texture Unit
+	 * @author Cristian
+	 *
+	 */
 	public static class TextureUnit {
 		public static final int Texture0 = GL_TEXTURE0;
 		public static final int Texture1 = GL_TEXTURE1;
@@ -304,6 +348,11 @@ public class GL {
 		public static final int Texture30 = GL_TEXTURE30;
 		public static final int Texture31 = GL_TEXTURE31;
 	}
+	/**
+	 * Enum For Specifying Properties Of An OpenGL Texture Object
+	 * @author Cristian
+	 *
+	 */
 	public static class TextureParameterName {
 		public static final int ClampToBorder = GL_CLAMP_TO_BORDER;
 		public static final int ClampToEdge = GL_CLAMP_TO_EDGE;
@@ -330,6 +379,11 @@ public class GL {
 		public static final int TextureWrapS = GL_TEXTURE_WRAP_S;
 		public static final int TextureWrapT = GL_TEXTURE_WRAP_T;
 	}
+	/**
+	 * Enum For Classifying OpenGL Shader Objects
+	 * @author Cristian
+	 *
+	 */
 	public static class ShaderType {
 		public static final int ComputeShader = GL_COMPUTE_SHADER;
 		public static final int FragmentShader = GL_FRAGMENT_SHADER;
@@ -338,6 +392,11 @@ public class GL {
 		public static final int TessEvaluationShader = GL_TESS_EVALUATION_SHADER;
 		public static final int VertexShader = GL_VERTEX_SHADER;
 	}
+	/**
+	 * Enum For Retrieving Properties Of OpenGL Shader Objects
+	 * @author Cristian
+	 *
+	 */
 	public static class ShaderParameter {
 		public static final int CompileStatus = GL_COMPILE_STATUS;
 		public static final int DeleteStatus = GL_DELETE_STATUS;
@@ -345,6 +404,11 @@ public class GL {
 		public static final int ShaderSourceLength = GL_SHADER_SOURCE_LENGTH;
 		public static final int ShaderType = GL_SHADER_TYPE;
 	}
+	/**
+	 * Enum For Retrieving Properties Of OpenGL Program Objects
+	 * @author Cristian
+	 *
+	 */
 	public static class GetProgramParameterName {
 		public static final int ActiveAtomicCounterBuffers = GL_ACTIVE_ATOMIC_COUNTER_BUFFERS;
 		public static final int ActiveAttributeMaxLength = GL_ACTIVE_ATTRIBUTE_MAX_LENGTH;
@@ -374,11 +438,21 @@ public class GL {
 		public static final int TransformFeedbackVaryings = GL_TRANSFORM_FEEDBACK_VARYINGS;
 		public static final int ValidateStatus = GL_VALIDATE_STATUS;
 	}
+	/**
+	 * Enum For Classifying OpenGL Framebuffer Objects
+	 * @author Cristian
+	 *
+	 */
 	public static class FramebufferTarget {
 		public static final int DrawFramebuffer = GL_DRAW_FRAMEBUFFER;
 		public static final int Framebuffer = GL_FRAMEBUFFER;
 		public static final int ReadFramebuffer = GL_READ_FRAMEBUFFER;
 	}
+	/**
+	 * Enum For Describing Texture-To-Framebuffer Attachments
+	 * @author Cristian
+	 *
+	 */
 	public static class FramebufferAttachment {
 		public static final int Aux0 = GL_AUX0;
 		public static final int Aux1 = GL_AUX1;
@@ -411,10 +485,20 @@ public class GL {
 		public static final int Stencil = GL_STENCIL;
 		public static final int StencilAttachment = GL_STENCIL_ATTACHMENT;
 	}
+	/**
+	 * Enum For Classifying OpenGL Renderbuffer Objects
+	 * @author Cristian
+	 *
+	 */
 	public static class RenderbufferTarget {
 		public static final int Renderbuffer = GL30.GL_RENDERBUFFER;
 		public static final int Renderbuffer43 = GL43.GL_RENDERBUFFER;
 	}
+	/**
+	 * Enum For Data Type Of OpenGL Renderbuffer Objects
+	 * @author Cristian
+	 *
+	 */
 	public static class RenderbufferStorage {
 		public static final int Depth24Stencil8 = GL_DEPTH24_STENCIL8;
 		public static final int Depth32fStencil8 = GL_DEPTH32F_STENCIL8;
@@ -483,6 +567,11 @@ public class GL {
 		public static final int StencilIndex4 = GL_STENCIL_INDEX4;
 		public static final int StencilIndex8 = GL_STENCIL_INDEX8;
 	}
+	/**
+	 * Enum For Specifying Pixel Output Location
+	 * @author Cristian
+	 *
+	 */
 	public static class DrawBufferMode {
 		public static final int Back = GL_BACK;
 		public static final int BackLeft = GL_BACK_LEFT;
@@ -511,6 +600,11 @@ public class GL {
 		public static final int None = GL_NONE;
 		public static final int Right = GL_RIGHT;
 	}
+	/**
+	 * Enum For Errors With The OpenGL Framebuffer Objects
+	 * @author Cristian
+	 *
+	 */
 	public static class FramebufferErrorCode {
 		public static final int FramebufferComplete = GL_FRAMEBUFFER_COMPLETE;
 		public static final int FramebufferIncompleteAttachment = GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT;
@@ -522,6 +616,11 @@ public class GL {
 		public static final int FramebufferUndefined = GL_FRAMEBUFFER_UNDEFINED;
 		public static final int FramebufferUnsupported = GL_FRAMEBUFFER_UNSUPPORTED;
 	}
+	/**
+	 * Enum For General OpenGL Errors
+	 * @author Cristian
+	 *
+	 */
 	public static class ErrorCode {
 		public static final int InvalidEnum = GL_INVALID_ENUM;
 		public static final int InvalidFramebufferOperation = GL_INVALID_FRAMEBUFFER_OPERATION;
@@ -530,6 +629,11 @@ public class GL {
 		public static final int NoError = GL_NO_ERROR;
 		public static final int OutOfMemory = GL_OUT_OF_MEMORY;
 	}
+	/**
+	 * Enum For Toggling OpenGL Pipeline Features
+	 * @author Cristian
+	 *
+	 */
 	public static class EnableCap {
 		public static final int Blend = GL_BLEND;
 		public static final int ClipDistance0 = GL_CLIP_DISTANCE0;
@@ -589,6 +693,11 @@ public class GL {
 		public static final int VertexProgramPointSize = GL_VERTEX_PROGRAM_POINT_SIZE;
 		public static final int VertexProgramTwoSide = GL_VERTEX_PROGRAM_TWO_SIDE;
 	}
+	/**
+	 * Enum For OpenGL Texture Minification Sampling
+	 * @author Cristian
+	 *
+	 */
 	public static class TextureMinFilter {
 		public static final int Linear = GL_LINEAR;
 		public static final int LinearMipmapLinear = GL_LINEAR_MIPMAP_LINEAR;
@@ -597,16 +706,31 @@ public class GL {
 		public static final int NearestMipmapLinear = GL_NEAREST_MIPMAP_LINEAR;
 		public static final int NearestMipmapNearest = GL_NEAREST_MIPMAP_NEAREST;
 	}
+	/**
+	 * Enum For OpenGL Texture Magnification Sampling
+	 * @author Cristian
+	 *
+	 */
 	public static class TextureMagFilter {
 		public static final int Linear = GL_LINEAR;
 		public static final int Nearest = GL_NEAREST;
 	}
+	/**
+	 * Enum For OpenGL Texture Wrapping Mode
+	 * @author Cristian
+	 *
+	 */
 	public static class TextureWrapMode {
 		public static final int ClampToBorder = GL_CLAMP_TO_BORDER;
 		public static final int ClampToEdge = GL_CLAMP_TO_EDGE;
 		public static final int MirroredRepeat = GL_MIRRORED_REPEAT;
 		public static final int Repeat = GL_REPEAT;
 	}
+	/**
+	 * Enum For Depth Value Comparisons Used To Determine Pixel Output
+	 * @author Cristian
+	 *
+	 */
 	public static class DepthFunction {
 		public static final int Always = GL_ALWAYS;
 		public static final int Equal = GL_EQUAL;
@@ -617,15 +741,30 @@ public class GL {
 		public static final int Never = GL_NEVER;
 		public static final int Notequal = GL_NOTEQUAL;
 	}
+	/**
+	 * Enum For Specifying Which Faces Of A Triangle To Cull
+	 * @author Cristian
+	 *
+	 */
 	public static class CullFaceMode {
 		public static final int Back = GL_BACK;
 		public static final int Front = GL_FRONT;
 		public static final int FrontAndBack = GL_FRONT_AND_BACK;
 	}
+	/**
+	 * Enum For Specifying What Vertex Winding Leads To A Front Face On A Triangle
+	 * @author Cristian
+	 *
+	 */
 	public static class FrontFaceDirection {
 		public static final int Ccw = GL_CCW;
 		public static final int Cw = GL_CW;
 	}
+	/**
+	 * Enum For Setting General Pixel Blending Operation
+	 * @author Cristian
+	 *
+	 */
 	public static class BlendEquationMode {
 		public static final int FuncAdd = GL_FUNC_ADD;
 		public static final int FuncReverseSubtract = GL_FUNC_REVERSE_SUBTRACT;
@@ -633,6 +772,11 @@ public class GL {
 		public static final int Max = GL_MAX;
 		public static final int Min = GL_MIN;
 	}
+	/**
+	 * Enum For Setting Multiplicative Factor Of Source Pixel In Blend Equation
+	 * @author Cristian
+	 *
+	 */
 	public static class BlendingFactorSrc {
 		public static final int ConstantAlpha = GL_CONSTANT_ALPHA;
 		public static final int ConstantColor = GL_CONSTANT_COLOR;
@@ -655,6 +799,11 @@ public class GL {
 		public static final int SrcColor = GL_SRC_COLOR;
 		public static final int Zero = GL_ZERO;
 	}
+	/**
+	 * Enum For Setting Multiplicative Factor Of Destination Pixel In Blend Equation
+	 * @author Cristian
+	 *
+	 */
 	public static class BlendingFactorDest {
 		public static final int ConstantAlpha = GL_CONSTANT_ALPHA;
 		public static final int ConstantColor = GL_CONSTANT_COLOR;
@@ -677,6 +826,11 @@ public class GL {
 		public static final int SrcColor = GL_SRC_COLOR;
 		public static final int Zero = GL_ZERO;
 	}
+	/**
+	 * Enum For Specifying Topology And Render Method Of The Input Data
+	 * @author Cristian
+	 *
+	 */
 	public static class PrimitiveType {
 		public static final int LineLoop = GL_LINE_LOOP;
 		public static final int Lines = GL_LINES;
