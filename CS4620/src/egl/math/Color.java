@@ -329,6 +329,15 @@ public class Color {
     	return set(c.R, c.G, c.B, c.A);
     }
     
+    /**
+     * Set Color Data From An Integer
+     * @param argb ARGB Integer Value
+     * @return This
+     */
+    public Color setIntARGB(int argb) {
+    	return set((argb >> 16) & 0xFF, (argb >> 8) & 0xFF, (argb >> 0) & 0xFF, (argb >> 24) & 0xFF);
+    }
+    
     /*
      * GETTERS
      */
@@ -380,6 +389,18 @@ public class Color {
 	 */
     public int toIntRGB() {
     	return (r() << 16) | (g() << 8) | (b() << 0);
+    }
+    
+    /**
+     * This function returns a Color from a integer of the form
+     * java.awt.BufferedImage.[TYPE_INT_RGB, TYPE_INT_ARGB]. In the
+     * latter case, the alpha value is ignored; the alpha is always
+     * set to 255.
+     * @param rgb An integer representing a color.
+     * @return A Color object representing the input integer.
+     */
+    public static Color fromIntRGB(int rgb) {
+		return new Color((rgb >> 16) & 0xFF, (rgb >> 8) & 0xFF, (rgb >> 0) & 0xFF);
     }
     
     @Override

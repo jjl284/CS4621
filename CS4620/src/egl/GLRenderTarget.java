@@ -28,13 +28,13 @@ public class GLRenderTarget extends GLTexture {
     	this(false);
     }
 
-    public void BuildRenderTarget() {
+    public void buildRenderTarget() {
         fb = glGenFramebuffers();
         glBindFramebuffer(FramebufferTarget.Framebuffer, fb);
 
-        Bind();
+        bind();
         glFramebufferTexture2D(FramebufferTarget.Framebuffer, FramebufferAttachment.ColorAttachment0, getTarget(), getID(), 0);
-        Unbind();
+        unbind();
 
         rb = glGenRenderbuffers();
         glBindRenderbuffer(RenderbufferTarget.Renderbuffer, rb);
@@ -50,11 +50,11 @@ public class GLRenderTarget extends GLTexture {
         glBindFramebuffer(FramebufferTarget.Framebuffer, 0);
     }
 
-    public void UseTarget() {
+    public void useTarget() {
     	glBindFramebuffer(FramebufferTarget.Framebuffer, fb);
     	glViewport(0, 0, getWidth(), getHeight());
     }
-    public static void UnuseTarget() {
+    public static void unuseTarget() {
     	glBindFramebuffer(FramebufferTarget.Framebuffer, 0);
     }
 }

@@ -6,57 +6,62 @@ import egl.GL.TextureMinFilter;
 import egl.GL.TextureParameterName;
 import egl.GL.TextureWrapMode;
 
+/**
+ * OpenGL State For Texture Sampling Methods
+ * @author Cristian
+ *
+ */
 public class SamplerState {
-    public static final SamplerState LinearClamp = new SamplerState(
+    public static final SamplerState LINEAR_CLAMP = new SamplerState(
         TextureMinFilter.Linear,
         TextureMagFilter.Linear,
         TextureWrapMode.ClampToEdge,
         TextureWrapMode.ClampToEdge,
         TextureWrapMode.ClampToEdge
     );
-    public static final SamplerState LinearWrap = new SamplerState(
+    public static final SamplerState LINEAR_WRAP = new SamplerState(
         TextureMinFilter.Linear,
         TextureMagFilter.Linear,
         TextureWrapMode.Repeat,
         TextureWrapMode.Repeat,
         TextureWrapMode.Repeat
     );
-    public static final SamplerState PointClamp = new SamplerState(
+    public static final SamplerState POINT_CLAMP = new SamplerState(
         TextureMinFilter.Nearest,
         TextureMagFilter.Nearest,
         TextureWrapMode.ClampToEdge,
         TextureWrapMode.ClampToEdge,
         TextureWrapMode.ClampToEdge
     );
-    public static final SamplerState PointWrap = new SamplerState(
+    public static final SamplerState POINT_WRAP = new SamplerState(
         TextureMinFilter.Nearest,
         TextureMagFilter.Nearest,
         TextureWrapMode.Repeat,
         TextureWrapMode.Repeat,
         TextureWrapMode.Repeat
     );
-    public static final SamplerState LinearClampMM = new SamplerState(
+    public static final SamplerState LINEAR_CLAMP_MM = new SamplerState(
         TextureMinFilter.LinearMipmapLinear,
         TextureMagFilter.Linear,
         TextureWrapMode.ClampToEdge,
         TextureWrapMode.ClampToEdge,
         TextureWrapMode.ClampToEdge
     );
-    public static final SamplerState LinearWrapMM = new SamplerState(
+    public static final SamplerState LINEAR_WRAP_MM = new SamplerState(
         TextureMinFilter.LinearMipmapLinear,
         TextureMagFilter.Linear,
         TextureWrapMode.Repeat,
         TextureWrapMode.Repeat,
         TextureWrapMode.Repeat
     );
-    public static final SamplerState PointClampMM = new SamplerState(
+    public static final SamplerState POINT_CLAMP_MM = new SamplerState(
         TextureMinFilter.NearestMipmapLinear,
         TextureMagFilter.Nearest,
         TextureWrapMode.ClampToEdge,
         TextureWrapMode.ClampToEdge,
         TextureWrapMode.ClampToEdge
     );
-    public static final SamplerState PointWrapMM = new SamplerState(
+    public static final SamplerState POINT_WRAP_MM = new SamplerState(
         TextureMinFilter.NearestMipmapLinear,
         TextureMagFilter.Nearest,
         TextureWrapMode.Repeat,
@@ -64,11 +69,11 @@ public class SamplerState {
         TextureWrapMode.Repeat
     );
 
-    public int MinFilter;
-    public int MagFilter;
-    public int WrapS;
-    public int WrapT;
-    public int WrapR;
+    public int minFilter;
+    public int magFilter;
+    public int wrapS;
+    public int wrapT;
+    public int wrapR;
 
     public SamplerState(
 		int textureMinFilter,
@@ -77,18 +82,18 @@ public class SamplerState {
 		int textureWrapModeT,
 		int textureWrapModeR
 		) {
-    	MinFilter = textureMinFilter;
-    	MagFilter = textureMagFilter;
-    	WrapS = textureWrapModeS;
-    	WrapT = textureWrapModeT;
-    	WrapR = textureWrapModeR;
+    	minFilter = textureMinFilter;
+    	magFilter = textureMagFilter;
+    	wrapS = textureWrapModeS;
+    	wrapT = textureWrapModeT;
+    	wrapR = textureWrapModeR;
 	}
 
-	public void Set(int target) {
-        glTexParameteri(target, TextureParameterName.TextureMagFilter, MagFilter);
-        glTexParameteri(target, TextureParameterName.TextureMinFilter, MinFilter);
-        glTexParameteri(target, TextureParameterName.TextureWrapS, WrapS);
-        glTexParameteri(target, TextureParameterName.TextureWrapT, WrapT);
-        glTexParameteri(target, TextureParameterName.TextureWrapR, WrapR);
+	public void set(int target) {
+        glTexParameteri(target, TextureParameterName.TextureMagFilter, magFilter);
+        glTexParameteri(target, TextureParameterName.TextureMinFilter, minFilter);
+        glTexParameteri(target, TextureParameterName.TextureWrapS, wrapS);
+        glTexParameteri(target, TextureParameterName.TextureWrapT, wrapT);
+        glTexParameteri(target, TextureParameterName.TextureWrapR, wrapR);
     }
 }

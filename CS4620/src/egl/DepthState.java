@@ -7,11 +7,16 @@ import static org.lwjgl.opengl.GL11.glEnable;
 import egl.GL.DepthFunction;
 import egl.GL.EnableCap;
 
+/**
+ * OpenGL State For Depth-Buffer Reading, Writing, And Testing
+ * @author Cristian
+ *
+ */
 public class DepthState {
 	/**
 	 * Do Not Write Depth Or Read Depth To Draw
 	 */
-	public static final DepthState None = new DepthState(
+	public static final DepthState NONE = new DepthState(
         false,
         DepthFunction.Always,
         false
@@ -19,7 +24,7 @@ public class DepthState {
 	/**
 	 * Draw Only When Depth Is Less Than Or Equal To Depth Buffer, Without Overwriting Depth
 	 */
-	public static final DepthState DepthRead = new DepthState(
+	public static final DepthState DEPTH_READ = new DepthState(
         true,
         DepthFunction.Lequal,
         false
@@ -27,7 +32,7 @@ public class DepthState {
 	/**
 	 * Overwrite The Depth Buffer With Current Depth
 	 */
-    public static final DepthState DepthWrite = new DepthState(
+    public static final DepthState DEPTH_WRITE = new DepthState(
         false,
         DepthFunction.Always,
         true
@@ -35,27 +40,36 @@ public class DepthState {
     /**
      * Draw Only When Depth Is Less Than Or Equal To Depth Buffer, Overwriting Depth
      */
-    public static final DepthState Default = new DepthState(
+    public static final DepthState DEFAULT = new DepthState(
         true,
         DepthFunction.Lequal,
         true
     );
 
-    public boolean Read;
-    public int DepthFunc;
-    public boolean Write;
+    public boolean shouldRead;
+    public int depthFunc;
+    public boolean shouldWrite;
 
+    /**
+     * 
+     * @param read
+     * @param depthFunction
+     * @param write
+     */
     public DepthState(boolean read, int depthFunction, boolean write) {
-    	Read = read;
-    	DepthFunc = depthFunction;
-    	Write = write;
+    	shouldRead = read;
+    	depthFunc = depthFunction;
+    	shouldWrite = write;
     }
-    
-    public void Set() {
-        if(Read || Write) {
+
+    /**
+     * Apply This State
+     */
+    public void set() {
+        if(shouldRead || shouldWrite) {
             glEnable(EnableCap.DepthTest);
-            glDepthMask(Write);
-            glDepthFunc(DepthFunc);
+            glDepthMask(shouldWrite);
+            glDepthFunc(depthFunc);
         }
         else {
             glDisable(EnableCap.DepthTest);

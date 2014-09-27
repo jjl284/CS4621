@@ -43,6 +43,12 @@ public class Vector4d extends AbstractList<Double> implements Cloneable {
 	 */
 	public Vector4d(Vector4d v) {
 		this(v.x, v.y, v.z, v.w);
+	}/**
+	 * Copy Constructor
+	 * @param v Vector
+	 */
+	public Vector4d(Vector4 v) {
+		this(v.x, v.y, v.z, v.w);
 	}
 	/**
 	 * Uniform Value Constructor

@@ -2,29 +2,59 @@ package egl;
 
 import java.util.HashMap;
 
+/**
+ * Interface For Communicating Semantic Information Between Programs And Vertex Buffer
+ * @author Cristian
+ *
+ */
 public class ShaderInterface {
-	public final ArrayBind[] Binds;
+	/**
+	 * Copy Of Vertex Semantic Information Filled With Program Attribute Locations
+	 */
+	public final ArrayBind[] binds;
 
-    public ShaderInterface(ArrayBind[] binds) {
-        Binds = new ArrayBind[binds.length];
-        for(int i = 0;i < Binds.length;i++) {
-        	Binds[i] = new ArrayBind(
-    			binds[i].Semantic,
-    			binds[i].CompType,
-    			binds[i].CompCount,
-    			binds[i].Offset,
-    			binds[i].Normalized
-    			);
-        }
-    }
+	/**
+	 * Construct An Interface With A Vertex Declaration That Will Be Copied
+	 * @param _binds Vertex Attribute Semantics
+	 */
+	public ShaderInterface(ArrayBind[] _binds) {
+		binds = new ArrayBind[_binds.length];
+		for(int i = 0;i < binds.length;i++) {
+			binds[i] = new ArrayBind(
+					_binds[i].semantic,
+					_binds[i].compType,
+					_binds[i].compCount,
+					_binds[i].offset,
+					_binds[i].isNormalized
+					);
+		}
+	}
 
-    public int Build(HashMap<Integer, Integer> dSemBinds) {
-        int bound = 0;
-        for(int i = 0; i < Binds.length; i++) {
-        	Integer v = dSemBinds.get(Binds[i].Semantic);
-        	Binds[i].Location = v == null ? -1 : v;
-        	if(Binds[i].Location >= 0) bound++;
-        }
-        return bound;
-    }
+	/**
+	 * Link The Interface To A Attribute Semantic Map
+	 * @param dSemBinds Map Of Semantics To Attribute Locations
+	 * @return Number Of Semantics Properly Linked
+	 */
+	public int build(HashMap<Integer, Integer> dSemBinds) {
+		int bound = 0;
+		for(int i = 0; i < binds.length; i++) {
+			Integer v = dSemBinds.get(binds[i].semantic);
+			if(v != null) {
+				binds[i].location = v;
+				bound++;
+			}
+			else {
+				binds[i].location = GL.BadAttributeLocation;        		
+			}
+		}
+		return bound;
+	}
+	/**
+	 * Link The Interface To A Program
+	 * @param program Program
+	 * @return Number Of Semantics Properly Linked
+	 */
+	public int build(GLProgram program) {
+		return build(program.semanticLinks);
+	}
 }

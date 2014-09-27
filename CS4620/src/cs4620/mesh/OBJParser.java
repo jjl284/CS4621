@@ -177,8 +177,10 @@ public class OBJParser {
 			return mesh;
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
+			System.exit(-1);
 		} catch (IOException e) {
 			e.printStackTrace();
+			System.exit(-1);
 		}
 		
 		return null;
@@ -303,7 +305,7 @@ public class OBJParser {
 		
 		return mesh;
 	}
-
+	
 	private static <T> int indexOfUnique(ArrayList<T> arr, T obj, Comparator<T> comp) {
 		// Find It Was Already Put In
 		boolean foundDuplicate = false;

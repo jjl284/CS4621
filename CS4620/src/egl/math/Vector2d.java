@@ -41,6 +41,13 @@ public class Vector2d extends AbstractList<Double> implements Cloneable {
 		this(v.x, v.y);
 	}
 	/**
+	 * Copy Constructor
+	 * @param v Vector
+	 */
+	public Vector2d(Vector2 v) {
+		this(v.x, v.y);
+	}
+	/**
 	 * Uniform Value Constructor
 	 * @param f Value
 	 */

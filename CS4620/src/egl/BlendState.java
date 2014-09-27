@@ -6,12 +6,17 @@ import egl.GL.BlendEquationMode;
 import egl.GL.BlendingFactorDest;
 import egl.GL.BlendingFactorSrc;
 
+/**
+ * OpenGL State For Pixel Blending Functions
+ * @author Cristian
+ *
+ */
 public class BlendState {
 	/**
 	 * Fully Opaque Blending With No Usage Of Alpha Value:
 	 * Pixel = Src
 	 */
-	public static final BlendState Opaque = new BlendState(
+	public static final BlendState OPAQUE = new BlendState(
         BlendEquationMode.FuncAdd,
         BlendingFactorSrc.One,
         BlendingFactorDest.Zero,
@@ -23,7 +28,7 @@ public class BlendState {
      * Usage Of Alpha For Both Pixels:
      * Pixel = Src * Alpha + Dest * (1 - Alpha)
      */
-	public static final BlendState AlphaBlend = new BlendState(
+	public static final BlendState ALPHA_BLEND = new BlendState(
         BlendEquationMode.FuncAdd,
         BlendingFactorSrc.SrcAlpha,
         BlendingFactorDest.OneMinusSrcAlpha,
@@ -35,7 +40,7 @@ public class BlendState {
      * Usage Of Alpha On The Destination Pixel:
      * Pixel = Src + Dest * (1 - Alpha)
      */
-	public static final BlendState PremultipliedAlphaBlend = new BlendState(
+	public static final BlendState PREMULTIPLIED_ALPHA_BLEND = new BlendState(
         BlendEquationMode.FuncAdd,
         BlendingFactorSrc.One,
         BlendingFactorDest.OneMinusSrcAlpha,
@@ -47,7 +52,7 @@ public class BlendState {
      * Usage Of Alpha On The Source Pixel:
      * Pixel = Src * Alpha + Dest
      */
-    public static final BlendState Additive = new BlendState(
+    public static final BlendState ADDITIVE = new BlendState(
         BlendEquationMode.FuncAdd,
         BlendingFactorSrc.SrcAlpha,
         BlendingFactorDest.One,
@@ -59,7 +64,7 @@ public class BlendState {
      * Pure Color Addition:
      * Pixel = Src + Dest
      */
-    public static final BlendState PremultipliedAdditive = new BlendState(
+    public static final BlendState PREMULTIPLIED_ADDITIVE = new BlendState(
         BlendEquationMode.FuncAdd,
         BlendingFactorSrc.One,
         BlendingFactorDest.One,
@@ -68,13 +73,40 @@ public class BlendState {
         BlendingFactorDest.Zero
     );
 
-    public int BlendMode;
-    public int BlendSrc;
-    public int BlendDest;
-    public int BlendModeAlpha;
-    public int BlendSrcAlpha;
-    public int BlendDestAlpha;
+    /**
+     * RGB Blending Function
+     */
+    public int blendMode;
+    /**
+     * RGB Source Scaling Factor
+     */
+    public int blendSrc;
+    /**
+     * RGB Destination Scaling Factor
+     */
+    public int blendDest;
+    /**
+     * Alpha Blending Function
+     */
+    public int blendModeAlpha;
+    /**
+     * Alpha Source Scaling Factor
+     */
+    public int blendSrcAlpha;
+    /**
+     * Alpha Destination Scaling Factor
+     */
+    public int blendDestAlpha;
 
+    /**
+     * State Constructor
+     * @param blendEquationMode {@link BlendEquationMode RGB Function}
+     * @param blendingFactorSrc {@link BlendingFactorSrc RGB Source Factor}
+     * @param blendingFactorDest {@link BlendingFactorDest RGB Destination Factor }
+     * @param blendEquationModeAlpha {@link BlendEquationMode Alpha Function}
+     * @param blendingFactorSrcAlpha {@link BlendingFactorSrc Alpha Source Factor}
+     * @param blendingFactorDestAlpha {@link BlendingFactorDest Alpha Destination Factor }
+     */
     public BlendState(
 		int blendEquationMode,
 		int blendingFactorSrc,
@@ -83,16 +115,19 @@ public class BlendState {
 		int blendingFactorSrcAlpha,
 		int blendingFactorDestAlpha
 		) {
-    	BlendMode = blendEquationMode;
-    	BlendSrc = blendingFactorSrc;
-    	BlendDest = blendingFactorDest;
-    	BlendModeAlpha = blendEquationModeAlpha;
-    	BlendSrcAlpha = blendingFactorSrcAlpha;
-    	BlendDestAlpha = blendingFactorDestAlpha;
+    	blendMode = blendEquationMode;
+    	blendSrc = blendingFactorSrc;
+    	blendDest = blendingFactorDest;
+    	blendModeAlpha = blendEquationModeAlpha;
+    	blendSrcAlpha = blendingFactorSrcAlpha;
+    	blendDestAlpha = blendingFactorDestAlpha;
 	}
 
-	public void Set() {
-        glBlendEquationSeparate(BlendMode, BlendModeAlpha);
-        glBlendFuncSeparate(BlendSrc, BlendDest, BlendSrcAlpha, BlendDestAlpha);
+    /**
+     * Apply This State
+     */
+	public void set() {
+        glBlendEquationSeparate(blendMode, blendModeAlpha);
+        glBlendFuncSeparate(blendSrc, blendDest, blendSrcAlpha, blendDestAlpha);
     }
 }

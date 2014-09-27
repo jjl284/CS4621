@@ -1,25 +1,30 @@
 package egl;
 
-import egl.GL.VertexAttribPointerType;
+import egl.GL.GLType;
 
 public class GLUtil {
-	public static int SizeOf(int t) {
+	/**
+	 * 
+	 * @param t {@link GLType OpenGL Basic Type}
+	 * @return Size Of The Type In Bytes
+	 */
+	public static int sizeOf(int t) {
         switch(t) {
-            case VertexAttribPointerType.UnsignedByte:
-            case VertexAttribPointerType.Byte:
+            case GLType.UnsignedByte:
+            case GLType.Byte:
                 return 1;
-            case VertexAttribPointerType.UnsignedShort:
-            case VertexAttribPointerType.Short:
-            case VertexAttribPointerType.HalfFloat:
+            case GLType.UnsignedShort:
+            case GLType.Short:
+            case GLType.HalfFloat:
                 return 2;
-            case VertexAttribPointerType.UnsignedInt:
-            case VertexAttribPointerType.Int:
-            case VertexAttribPointerType.Float:
-            case VertexAttribPointerType.Int2101010Rev:
-            case VertexAttribPointerType.UnsignedInt2101010Rev:
-            case VertexAttribPointerType.Fixed:
+            case GLType.UnsignedInt:
+            case GLType.Int:
+            case GLType.Float:
+            case GLType.Int2101010Rev:
+            case GLType.UnsignedInt2101010Rev:
+            case GLType.Fixed:
                 return 4;
-            case VertexAttribPointerType.Double:
+            case GLType.Double:
                 return 8;
         }
         return 0;

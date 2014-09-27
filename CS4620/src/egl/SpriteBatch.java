@@ -20,7 +20,6 @@ import static org.lwjgl.opengl.GL20.glGetShaderi;
 import static org.lwjgl.opengl.GL20.glGetUniformLocation;
 import static org.lwjgl.opengl.GL20.glLinkProgram;
 import static org.lwjgl.opengl.GL20.glShaderSource;
-import static org.lwjgl.opengl.GL20.glUniformMatrix4;
 import static org.lwjgl.opengl.GL20.glUseProgram;
 import static org.lwjgl.opengl.GL20.glValidateProgram;
 import static org.lwjgl.opengl.GL20.glVertexAttribPointer;
@@ -29,42 +28,43 @@ import static org.lwjgl.opengl.GL30.glDeleteVertexArrays;
 import static org.lwjgl.opengl.GL30.glGenVertexArrays;
 
 import java.nio.ByteBuffer;
-import java.nio.FloatBuffer;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Queue;
 
-import org.lwjgl.BufferUtils;
-
-import egl.GL.BufferTarget;
 import egl.GL.BufferUsageHint;
 import egl.GL.GetProgramParameterName;
-import egl.GL.PrimitiveType;
 import egl.GL.ShaderParameter;
 import egl.GL.ShaderType;
-import egl.GL.TextureUnit;
-import egl.GL.VertexAttribPointerType;
-import egl.math.Color;
 import egl.math.Matrix4;
 import egl.math.Vector2;
 import egl.math.Vector4;
+//import org.lwjgl.BufferUtils;
+import egl.GL.PrimitiveType;
+import egl.GL.TextureUnit;
+import egl.math.Color;
+import egl.GL.BufferTarget;
+import egl.GL.GLType;
 
 public class SpriteBatch {
+	/**
+	 * Default Initial Size Of Sprite Buffer
+	 */
 	public static final int INITIAL_GLYPH_CAP = 32;
 
-	public static int SSMTexture(SpriteGlyph g1, SpriteGlyph g2) {
-		return Integer.compare(g1.Texture.getID(), g2.Texture.getID());
+	private static int SSMTexture(SpriteGlyph g1, SpriteGlyph g2) {
+		return Integer.compare(g1.texture.getID(), g2.texture.getID());
 	}
-	public static int SSMFrontToBack(SpriteGlyph g1, SpriteGlyph g2) {
-		return Float.compare(g1.Depth, g2.Depth);
+	private static int SSMFrontToBack(SpriteGlyph g1, SpriteGlyph g2) {
+		return Float.compare(g1.depth, g2.depth);
 	}
-	public static int SSMBackToFront(SpriteGlyph g1, SpriteGlyph g2) {
-		return Float.compare(g2.Depth, g1.Depth);
+	private static int SSMBackToFront(SpriteGlyph g1, SpriteGlyph g2) {
+		return Float.compare(g2.depth, g1.depth);
 	}
 
-	static class SpriteBatchCall {
+	private static class SpriteBatchCall {
 		public GLTexture Texture;
 		public int Indices;
 		public int IndexOffset;
@@ -77,45 +77,56 @@ public class SpriteBatch {
 		}
 
 		public SpriteBatchCall Append(SpriteGlyph g, ArrayList<SpriteBatchCall> calls) {
-			if(g.Texture != Texture) return new SpriteBatchCall(IndexOffset + Indices, g.Texture, calls);
+			if(g.texture != Texture) return new SpriteBatchCall(IndexOffset + Indices, g.texture, calls);
 			else Indices += 6;
 			return this;
 		}
 	}
 
+	/**
+	 * Vertex Shader Source Code
+	 */
 	private static final String VS_SRC = 
-			"#version 130\n" +
+			"#version 120\n" +
 			"uniform mat4 World;\n" + 
 			"uniform mat4 VP;\n" + 
-			"in vec4 vPosition;\n" + 
-			"in vec2 vUV;\n" + 
-			"in vec4 vUVRect;\n" + 
-			"in vec4 vTint;\n" + 
-			"out vec2 fUV;\n" + 
-			"out vec4 fUVRect;\n" + 
-			"out vec4 fTint;\n" + 
-			"void main(void) {\n" + 
+			"attribute vec4 vPosition;\n" + 
+			"attribute vec2 vUV;\n" + 
+			"attribute vec4 vUVRect;\n" + 
+			"attribute vec4 vTint;\n" + 
+			"varying vec2 fUV;\n" + 
+			"varying vec4 fUVRect;\n" + 
+			"varying vec4 fTint;\n" + 
+			"void main() {\n" + 
 			"    fTint = vTint;\n" + 
 			"    fUV = vUV;\n" + 
 			"    fUVRect = vUVRect;\n" + 
-    		"    vec4 worldPos = vPosition * World;\n" + 
-    		"    gl_Position = worldPos * VP;\n" + 
+    		"    vec4 worldPos = World * vPosition;\n" + 
+    		"    gl_Position = VP * worldPos;\n" + 
 			"}";
+	/**
+	 * Fragment Shader Source Code
+	 */
 	private static final String FS_SRC = 
-			"#version 130\n" +
+			"#version 120\n" +
 			"uniform sampler2D SBTex;\n" + 
-			"in vec2 fUV;\n" + 
-			"in vec4 fUVRect;\n" + 
-			"in vec4 fTint;\n" + 
-			"out vec4 out_Color;\n" +
-			"void main(void) {\n" + 
-			"    out_Color = texture(SBTex, (vec2(fract(fUV.x), fract(fUV.y)) * fUVRect.zw) + fUVRect.xy) * fTint;\n" + 
+			"varying vec2 fUV;\n" + 
+			"varying vec4 fUVRect;\n" + 
+			"varying vec4 fTint;\n" + 
+			"void main() {\n" + 
+			"    gl_FragColor = texture2D(SBTex, (vec2(fract(fUV.x), fract(fUV.y)) * fUVRect.zw) + fUVRect.xy) * fTint;\n" + 
 			"}";
 
 	public static final Vector4 FULL_UV_RECT = new Vector4(0, 0, 1, 1);
 	public static final Vector2 UV_NO_TILE = new Vector2(1, 1);
 
-	public static Matrix4 CreateCameraFromWindow(float w, float h) {
+	/**
+	 * Construct A Camera Matrix From A View Size
+	 * @param w View Width
+	 * @param h View Height
+	 * @return New Camera Matrix
+	 */
+	public static Matrix4 createCameraFromWindow(float w, float h) {
 		w *= 0.5f;
 		h *= 0.5f;
 		return Matrix4.createScale(1 / w, -1 / h, 1).mul(Matrix4.createTranslation(-1, 1, 0));
@@ -133,24 +144,24 @@ public class SpriteBatch {
 	// Custom Shader
 	private int idProg, idVS, idFS;
 	private int unWorld, unVP, unTexture;
-	private FloatBuffer fbUniforms;
 
+	/**
+	 * Construct A SpriteBatch With Static/Dynamic Qualifiers
+	 * @param isDynamic Will This SpriteBatch Change Itself Many Times
+	 */
 	public SpriteBatch(boolean isDynamic) {
 		bufUsage = isDynamic ? BufferUsageHint.DynamicDraw : BufferUsageHint.StaticDraw;
 
-		InitGL();
+		init();
 
 		emptyGlyphs = new ArrayDeque<SpriteGlyph>();
-		fbUniforms = BufferUtils.createFloatBuffer(16);
 	}
-	public void InitGL() {
-		CreateProgram();
-		SearchUniforms();
-		CreateVertexArray();
-
-
+	public void init() {
+		createProgram();
+		searchUniforms();
+		createVertexArray();
 	}
-	public void Dispose() {
+	public void dispose() {
 		glDeleteBuffers(vbo);
 		vbo = 0;
 		glDeleteVertexArrays(vao);
@@ -164,7 +175,7 @@ public class SpriteBatch {
 		glDeleteProgram(idProg);
 	}
 
-	private void CreateProgram() {
+	private void createProgram() {
 		// Create The Program
 		idProg = glCreateProgram();
 
@@ -195,12 +206,12 @@ public class SpriteBatch {
 		if(glGetProgrami(idProg, GetProgramParameterName.LinkStatus) != 1)
 			throw new RuntimeException("Program Had Compilation Errors");
 	}
-	private void SearchUniforms() {
+	private void searchUniforms() {
 		unWorld = glGetUniformLocation(idProg, "World");
 		unVP = glGetUniformLocation(idProg, "VP");
 		unTexture = glGetUniformLocation(idProg, "SBTex");
 	}
-	private void CreateVertexArray() {
+	private void createVertexArray() {
 		vao = glGenVertexArrays();
 		glBindVertexArray(vao);
 
@@ -213,80 +224,80 @@ public class SpriteBatch {
 		glEnableVertexAttribArray(1);
 		glEnableVertexAttribArray(2);
 		glEnableVertexAttribArray(3);
-		glVertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, VertexSpriteBatch.Size, 0);
-		glVertexAttribPointer(1, 4, VertexAttribPointerType.UnsignedByte, true, VertexSpriteBatch.Size, 36);
-		glVertexAttribPointer(2, 2, VertexAttribPointerType.Float, false, VertexSpriteBatch.Size, 12);
-		glVertexAttribPointer(3, 4, VertexAttribPointerType.Float, false, VertexSpriteBatch.Size, 20);
+		glVertexAttribPointer(0, 3, GLType.Float, false, VertexSpriteBatch.Size, 0);
+		glVertexAttribPointer(1, 4, GLType.UnsignedByte, true, VertexSpriteBatch.Size, 36);
+		glVertexAttribPointer(2, 2, GLType.Float, false, VertexSpriteBatch.Size, 12);
+		glVertexAttribPointer(3, 4, GLType.Float, false, VertexSpriteBatch.Size, 20);
 
 		glBindVertexArray(0);
 
-		GLBuffer.Unbind(BufferTarget.ArrayBuffer);    	
+		GLBuffer.unbind(BufferTarget.ArrayBuffer);    	
 	}
 
-	public void Begin() {
+	public void begin() {
 		// Only Clear The Glyphs
 		glyphs = new ArrayList<SpriteGlyph>();
 		batches = new ArrayList<SpriteBatchCall>();
 	}
 
-	private SpriteGlyph CreateGlyph(GLTexture t, float d) {
+	private SpriteGlyph createGlyph(GLTexture t, float d) {
 		if(emptyGlyphs.size() > 0) {
 			SpriteGlyph g = emptyGlyphs.remove();
-			g.Texture = t;
-			g.Depth = d;
+			g.texture = t;
+			g.depth = d;
 			return g;
 		}
 		else {
 			return new SpriteGlyph(t, d);
 		}
 	}
-	public void Draw(GLTexture t, Vector4 uvRect, Vector2 uvTiling, Matrix4 mTransform, Color tint, float depth) {
+	public void draw(GLTexture t, Vector4 uvRect, Vector2 uvTiling, Matrix4 mTransform, Color tint, float depth) {
 		Vector4 uvr = uvRect != null ? uvRect : FULL_UV_RECT;
 		Vector2 uvt = uvTiling != null ? uvTiling : UV_NO_TILE;
-		SpriteGlyph g = CreateGlyph(t, depth);
+		SpriteGlyph g = createGlyph(t, depth);
 
-		g.VTL.Position.x = 0;
-		g.VTL.Position.y = 0;
-		g.VTL.Position.z = depth;
-		mTransform.mulPos(g.VTL.Position);
-		g.VTL.UV.x = 0;
-		g.VTL.UV.y = 0;
-		g.VTL.UVRect.set(uvr);
-		g.VTL.Color.set(tint);
+		g.vtl.Position.x = 0;
+		g.vtl.Position.y = 0;
+		g.vtl.Position.z = depth;
+		mTransform.mulPos(g.vtl.Position);
+		g.vtl.UV.x = 0;
+		g.vtl.UV.y = 0;
+		g.vtl.UVRect.set(uvr);
+		g.vtl.Color.set(tint);
 
-		g.VTR.Position.x = 1;
-		g.VTR.Position.y = 0;
-		g.VTR.Position.z = depth;
-		mTransform.mulPos(g.VTR.Position);
-		g.VTR.UV.x = uvt.x;
-		g.VTR.UV.y = 0;
-		g.VTR.UVRect.set(uvr);
-		g.VTR.Color.set(tint);
+		g.vtr.Position.x = 1;
+		g.vtr.Position.y = 0;
+		g.vtr.Position.z = depth;
+		mTransform.mulPos(g.vtr.Position);
+		g.vtr.UV.x = uvt.x;
+		g.vtr.UV.y = 0;
+		g.vtr.UVRect.set(uvr);
+		g.vtr.Color.set(tint);
 
-		g.VBL.Position.x = 0;
-		g.VBL.Position.y = 1;
-		g.VBL.Position.z = depth;
-		mTransform.mulPos(g.VBL.Position);
-		g.VBL.UV.x = 0;
-		g.VBL.UV.y = uvt.y;
-		g.VBL.UVRect.set(uvr);
-		g.VBL.Color.set(tint);
+		g.vbl.Position.x = 0;
+		g.vbl.Position.y = 1;
+		g.vbl.Position.z = depth;
+		mTransform.mulPos(g.vbl.Position);
+		g.vbl.UV.x = 0;
+		g.vbl.UV.y = uvt.y;
+		g.vbl.UVRect.set(uvr);
+		g.vbl.Color.set(tint);
 
-		g.VBR.Position.x = 1;
-		g.VBR.Position.y = 1;
-		g.VBR.Position.z = depth;
-		mTransform.mulPos(g.VBR.Position);
-		g.VBR.UV.x = uvt.x;
-		g.VBR.UV.y = uvt.y;
-		g.VBR.UVRect.set(uvr);
-		g.VBR.Color.set(tint);
+		g.vbr.Position.x = 1;
+		g.vbr.Position.y = 1;
+		g.vbr.Position.z = depth;
+		mTransform.mulPos(g.vbr.Position);
+		g.vbr.UV.x = uvt.x;
+		g.vbr.UV.y = uvt.y;
+		g.vbr.UVRect.set(uvr);
+		g.vbr.Color.set(tint);
 
 		glyphs.add(g);
 	}
-	public void Draw(GLTexture t, Vector4 uvRect, Vector2 uvTiling, Vector2 position, Vector2 offset, Vector2 size, float rotation, Color tint, float depth) {
+	public void draw(GLTexture t, Vector4 uvRect, Vector2 uvTiling, Vector2 position, Vector2 offset, Vector2 size, float rotation, Color tint, float depth) {
 		Vector4 uvr = uvRect != null ? uvRect : FULL_UV_RECT;
 		Vector2 uvt = uvTiling != null ? uvTiling : UV_NO_TILE;
-		SpriteGlyph g = CreateGlyph(t, depth);
+		SpriteGlyph g = createGlyph(t, depth);
 
 		float rxx = (float)Math.cos(-rotation);
 		float rxy = (float)Math.sin(-rotation);
@@ -295,212 +306,200 @@ public class SpriteBatch {
 		float ct = size.y * (-offset.y);
 		float cb = size.y * (1 - offset.y);
 
-		g.VTL.Position.x = (cl * rxx) + (ct * rxy) + position.x;
-		g.VTL.Position.y = (cl * -rxy) + (ct * rxx) + position.y;
-		g.VTL.Position.z = depth;
-		g.VTL.UV.x = 0;
-		g.VTL.UV.y = 0;
-		g.VTL.UVRect.set(uvr);
-		g.VTL.Color.set(tint);
+		g.vtl.Position.x = (cl * rxx) + (ct * rxy) + position.x;
+		g.vtl.Position.y = (cl * -rxy) + (ct * rxx) + position.y;
+		g.vtl.Position.z = depth;
+		g.vtl.UV.x = 0;
+		g.vtl.UV.y = 0;
+		g.vtl.UVRect.set(uvr);
+		g.vtl.Color.set(tint);
 
-		g.VTR.Position.x = (cr * rxx) + (ct * rxy) + position.x;
-		g.VTR.Position.y = (cr * -rxy) + (ct * rxx) + position.y;
-		g.VTR.Position.z = depth;
-		g.VTR.UV.x = uvt.x;
-		g.VTR.UV.y = 0;
-		g.VTR.UVRect.set(uvr);
-		g.VTR.Color.set(tint);
+		g.vtr.Position.x = (cr * rxx) + (ct * rxy) + position.x;
+		g.vtr.Position.y = (cr * -rxy) + (ct * rxx) + position.y;
+		g.vtr.Position.z = depth;
+		g.vtr.UV.x = uvt.x;
+		g.vtr.UV.y = 0;
+		g.vtr.UVRect.set(uvr);
+		g.vtr.Color.set(tint);
 
-		g.VBL.Position.x = (cl * rxx) + (cb * rxy) + position.x;
-		g.VBL.Position.y = (cl * -rxy) + (cb * rxx) + position.y;
-		g.VBL.Position.z = depth;
-		g.VBL.UV.x = 0;
-		g.VBL.UV.y = uvt.y;
-		g.VBL.UVRect.set(uvr);
-		g.VBL.Color.set(tint);
+		g.vbl.Position.x = (cl * rxx) + (cb * rxy) + position.x;
+		g.vbl.Position.y = (cl * -rxy) + (cb * rxx) + position.y;
+		g.vbl.Position.z = depth;
+		g.vbl.UV.x = 0;
+		g.vbl.UV.y = uvt.y;
+		g.vbl.UVRect.set(uvr);
+		g.vbl.Color.set(tint);
 
-		g.VBR.Position.x = (cr * rxx) + (cb * rxy) + position.x;
-		g.VBR.Position.y = (cr * -rxy) + (cb * rxx) + position.y;
-		g.VBR.Position.z = depth;
-		g.VBR.UV.x = uvt.x;
-		g.VBR.UV.y = uvt.y;
-		g.VBR.UVRect.set(uvr);
-		g.VBR.Color.set(tint);
+		g.vbr.Position.x = (cr * rxx) + (cb * rxy) + position.x;
+		g.vbr.Position.y = (cr * -rxy) + (cb * rxx) + position.y;
+		g.vbr.Position.z = depth;
+		g.vbr.UV.x = uvt.x;
+		g.vbr.UV.y = uvt.y;
+		g.vbr.UVRect.set(uvr);
+		g.vbr.Color.set(tint);
 
 		glyphs.add(g);
 	}
-	public void Draw(GLTexture t, Vector4 uvRect, Vector2 uvTiling, Vector2 position, Vector2 offset, Vector2 size, Color tint, float depth) {
+	public void draw(GLTexture t, Vector4 uvRect, Vector2 uvTiling, Vector2 position, Vector2 offset, Vector2 size, Color tint, float depth) {
 		Vector4 uvr = uvRect != null ? uvRect : FULL_UV_RECT;
 		Vector2 uvt = uvTiling != null ? uvTiling : UV_NO_TILE;
-		SpriteGlyph g = CreateGlyph(t, depth);
+		SpriteGlyph g = createGlyph(t, depth);
 
 		float cl = size.x * (-offset.x);
 		float cr = size.x * (1 - offset.x);
 		float ct = size.y * (-offset.y);
 		float cb = size.y * (1 - offset.y);
 
-		g.VTL.Position.x = cl + position.x;
-		g.VTL.Position.y = ct + position.y;
-		g.VTL.Position.z = depth;
-		g.VTL.UV.x = 0;
-		g.VTL.UV.y = 0;
-		g.VTL.UVRect.set(uvr);
-		g.VTL.Color.set(tint);
+		g.vtl.Position.x = cl + position.x;
+		g.vtl.Position.y = ct + position.y;
+		g.vtl.Position.z = depth;
+		g.vtl.UV.x = 0;
+		g.vtl.UV.y = 0;
+		g.vtl.UVRect.set(uvr);
+		g.vtl.Color.set(tint);
 
-		g.VTR.Position.x = cr + position.x;
-		g.VTR.Position.y = ct + position.y;
-		g.VTR.Position.z = depth;
-		g.VTR.UV.x = uvt.x;
-		g.VTR.UV.y = 0;
-		g.VTR.UVRect.set(uvr);
-		g.VTR.Color.set(tint);
+		g.vtr.Position.x = cr + position.x;
+		g.vtr.Position.y = ct + position.y;
+		g.vtr.Position.z = depth;
+		g.vtr.UV.x = uvt.x;
+		g.vtr.UV.y = 0;
+		g.vtr.UVRect.set(uvr);
+		g.vtr.Color.set(tint);
 
-		g.VBL.Position.x = cl + position.x;
-		g.VBL.Position.y = cb + position.y;
-		g.VBL.Position.z = depth;
-		g.VBL.UV.x = 0;
-		g.VBL.UV.y = uvt.y;
-		g.VBL.UVRect.set(uvr);
-		g.VBL.Color.set(tint);
+		g.vbl.Position.x = cl + position.x;
+		g.vbl.Position.y = cb + position.y;
+		g.vbl.Position.z = depth;
+		g.vbl.UV.x = 0;
+		g.vbl.UV.y = uvt.y;
+		g.vbl.UVRect.set(uvr);
+		g.vbl.Color.set(tint);
 
-		g.VBR.Position.x = cr + position.x;
-		g.VBR.Position.y = cb + position.y;
-		g.VBR.Position.z = depth;
-		g.VBR.UV.x = uvt.x;
-		g.VBR.UV.y = uvt.y;
-		g.VBR.UVRect.set(uvr);
-		g.VBR.Color.set(tint);
+		g.vbr.Position.x = cr + position.x;
+		g.vbr.Position.y = cb + position.y;
+		g.vbr.Position.z = depth;
+		g.vbr.UV.x = uvt.x;
+		g.vbr.UV.y = uvt.y;
+		g.vbr.UVRect.set(uvr);
+		g.vbr.Color.set(tint);
 
 		glyphs.add(g);
 	}
-	public void Draw(GLTexture t, Vector4 uvRect, Vector2 uvTiling, Vector2 position, Vector2 size, Color tint, float depth) {
+	public void draw(GLTexture t, Vector4 uvRect, Vector2 uvTiling, Vector2 position, Vector2 size, Color tint, float depth) {
 		Vector4 uvr = uvRect != null ? uvRect : FULL_UV_RECT;
 		Vector2 uvt = uvTiling != null ? uvTiling : UV_NO_TILE;
-		SpriteGlyph g = CreateGlyph(t, depth);
+		SpriteGlyph g = createGlyph(t, depth);
 
-		g.VTL.Position.x = position.x;
-		g.VTL.Position.y = position.y;
-		g.VTL.Position.z = depth;
-		g.VTL.UV.x = 0;
-		g.VTL.UV.y = 0;
-		g.VTL.UVRect.set(uvr);
-		g.VTL.Color.set(tint);
+		g.vtl.Position.x = position.x;
+		g.vtl.Position.y = position.y;
+		g.vtl.Position.z = depth;
+		g.vtl.UV.x = 0;
+		g.vtl.UV.y = 0;
+		g.vtl.UVRect.set(uvr);
+		g.vtl.Color.set(tint);
 
-		g.VTR.Position.x = size.x + position.x;
-		g.VTR.Position.y = position.y;
-		g.VTR.Position.z = depth;
-		g.VTR.UV.x = uvt.x;
-		g.VTR.UV.y = 0;
-		g.VTR.UVRect.set(uvr);
-		g.VTR.Color.set(tint);
+		g.vtr.Position.x = size.x + position.x;
+		g.vtr.Position.y = position.y;
+		g.vtr.Position.z = depth;
+		g.vtr.UV.x = uvt.x;
+		g.vtr.UV.y = 0;
+		g.vtr.UVRect.set(uvr);
+		g.vtr.Color.set(tint);
 
-		g.VBL.Position.x = position.x;
-		g.VBL.Position.y = size.y + position.y;
-		g.VBL.Position.z = depth;
-		g.VBL.UV.x = 0;
-		g.VBL.UV.y = uvt.y;
-		g.VBL.UVRect.set(uvr);
-		g.VBL.Color.set(tint);
+		g.vbl.Position.x = position.x;
+		g.vbl.Position.y = size.y + position.y;
+		g.vbl.Position.z = depth;
+		g.vbl.UV.x = 0;
+		g.vbl.UV.y = uvt.y;
+		g.vbl.UVRect.set(uvr);
+		g.vbl.Color.set(tint);
 
-		g.VBR.Position.x = size.x + position.x;
-		g.VBR.Position.y = size.y + position.y;
-		g.VBR.Position.z = depth;
-		g.VBR.UV.x = uvt.x;
-		g.VBR.UV.y = uvt.y;
-		g.VBR.UVRect.set(uvr);
-		g.VBR.Color.set(tint);
+		g.vbr.Position.x = size.x + position.x;
+		g.vbr.Position.y = size.y + position.y;
+		g.vbr.Position.z = depth;
+		g.vbr.UV.x = uvt.x;
+		g.vbr.UV.y = uvt.y;
+		g.vbr.UVRect.set(uvr);
+		g.vbr.Color.set(tint);
 
 		glyphs.add(g);
 	}
-	public void Draw(GLTexture t, Vector4 uvRect, Vector2 position, Vector2 size, Color tint, float depth) {
+	public void draw(GLTexture t, Vector4 uvRect, Vector2 position, Vector2 size, Color tint, float depth) {
 		Vector4 uvr = uvRect != null ? uvRect : FULL_UV_RECT;
-		SpriteGlyph g = CreateGlyph(t, depth);
+		SpriteGlyph g = createGlyph(t, depth);
 
-		g.VTL.Position.x = position.x;
-		g.VTL.Position.y = position.y;
-		g.VTL.Position.z = depth;
-		g.VTL.UV.x = 0;
-		g.VTL.UV.y = 0;
-		g.VTL.UVRect.set(uvr);
-		g.VTL.Color.set(tint);
+		g.vtl.Position.x = position.x;
+		g.vtl.Position.y = position.y;
+		g.vtl.Position.z = depth;
+		g.vtl.UV.x = 0;
+		g.vtl.UV.y = 0;
+		g.vtl.UVRect.set(uvr);
+		g.vtl.Color.set(tint);
 
-		g.VTR.Position.x = size.x + position.x;
-		g.VTR.Position.y = position.y;
-		g.VTR.Position.z = depth;
-		g.VTR.UV.x = 1;
-		g.VTR.UV.y = 0;
-		g.VTR.UVRect.set(uvr);
-		g.VTR.Color.set(tint);
+		g.vtr.Position.x = size.x + position.x;
+		g.vtr.Position.y = position.y;
+		g.vtr.Position.z = depth;
+		g.vtr.UV.x = 1;
+		g.vtr.UV.y = 0;
+		g.vtr.UVRect.set(uvr);
+		g.vtr.Color.set(tint);
 
-		g.VBL.Position.x = position.x;
-		g.VBL.Position.y = size.y + position.y;
-		g.VBL.Position.z = depth;
-		g.VBL.UV.x = 0;
-		g.VBL.UV.y = 1;
-		g.VBL.UVRect.set(uvr);
-		g.VBL.Color.set(tint);
+		g.vbl.Position.x = position.x;
+		g.vbl.Position.y = size.y + position.y;
+		g.vbl.Position.z = depth;
+		g.vbl.UV.x = 0;
+		g.vbl.UV.y = 1;
+		g.vbl.UVRect.set(uvr);
+		g.vbl.Color.set(tint);
 
-		g.VBR.Position.x = size.x + position.x;
-		g.VBR.Position.y = size.y + position.y;
-		g.VBR.Position.z = depth;
-		g.VBR.UV.x = 1;
-		g.VBR.UV.y = 1;
-		g.VBR.UVRect.set(uvr);
-		g.VBR.Color.set(tint);
-
-		glyphs.add(g);
-	}
-	public void Draw(GLTexture t, Vector2 position, Vector2 size, Color tint, float depth) {
-		SpriteGlyph g = CreateGlyph(t, depth);
-
-		g.VTL.Position.x = position.x;
-		g.VTL.Position.y = position.y;
-		g.VTL.Position.z = depth;
-		g.VTL.UV.x = 0;
-		g.VTL.UV.y = 0;
-		g.VTL.UVRect.set(FULL_UV_RECT);
-		g.VTL.Color.set(tint);
-
-		g.VTR.Position.x = size.x + position.x;
-		g.VTR.Position.y = position.y;
-		g.VTR.Position.z = depth;
-		g.VTR.UV.x = 1;
-		g.VTR.UV.y = 0;
-		g.VTR.UVRect.set(FULL_UV_RECT);
-		g.VTR.Color.set(tint);
-
-		g.VBL.Position.x = position.x;
-		g.VBL.Position.y = size.y + position.y;
-		g.VBL.Position.z = depth;
-		g.VBL.UV.x = 0;
-		g.VBL.UV.y = 1;
-		g.VBL.UVRect.set(FULL_UV_RECT);
-		g.VBL.Color.set(tint);
-
-		g.VBR.Position.x = size.x + position.x;
-		g.VBR.Position.y = size.y + position.y;
-		g.VBR.Position.z = depth;
-		g.VBR.UV.x = 1;
-		g.VBR.UV.y = 1;
-		g.VBR.UVRect.set(FULL_UV_RECT);
-		g.VBR.Color.set(tint);
+		g.vbr.Position.x = size.x + position.x;
+		g.vbr.Position.y = size.y + position.y;
+		g.vbr.Position.z = depth;
+		g.vbr.UV.x = 1;
+		g.vbr.UV.y = 1;
+		g.vbr.UVRect.set(uvr);
+		g.vbr.Color.set(tint);
 
 		glyphs.add(g);
 	}
+	public void draw(GLTexture t, Vector2 position, Vector2 size, Color tint, float depth) {
+		SpriteGlyph g = createGlyph(t, depth);
 
-	// TODOX: Finish The Fight
-	//    public void DrawString(SpriteFont font, String s, Vector2 position, Vector2 scaling, Color tint, float depth) {
-		//        if(s == null) s = "";
-		//        font.Draw(this, s, position, scaling, tint, depth);
-		//    }
-	//    public void DrawString(SpriteFont font, String s, Vector2 position, float desiredHeight, float scaleX, Color tint, float depth) {
-		//        if(s == null) s = "";
-		//        Vector2 scaling = new Vector2(desiredHeight / font.getFontHeight());
-		//        scaling.x *= scaleX;
-		//        font.Draw(this, s, position, scaling, tint, depth);
-		//    }
-	
-	private void SortGlyphs(int spriteSortMode) {
+		g.vtl.Position.x = position.x;
+		g.vtl.Position.y = position.y;
+		g.vtl.Position.z = depth;
+		g.vtl.UV.x = 0;
+		g.vtl.UV.y = 0;
+		g.vtl.UVRect.set(FULL_UV_RECT);
+		g.vtl.Color.set(tint);
+
+		g.vtr.Position.x = size.x + position.x;
+		g.vtr.Position.y = position.y;
+		g.vtr.Position.z = depth;
+		g.vtr.UV.x = 1;
+		g.vtr.UV.y = 0;
+		g.vtr.UVRect.set(FULL_UV_RECT);
+		g.vtr.Color.set(tint);
+
+		g.vbl.Position.x = position.x;
+		g.vbl.Position.y = size.y + position.y;
+		g.vbl.Position.z = depth;
+		g.vbl.UV.x = 0;
+		g.vbl.UV.y = 1;
+		g.vbl.UVRect.set(FULL_UV_RECT);
+		g.vbl.Color.set(tint);
+
+		g.vbr.Position.x = size.x + position.x;
+		g.vbr.Position.y = size.y + position.y;
+		g.vbr.Position.z = depth;
+		g.vbr.UV.x = 1;
+		g.vbr.UV.y = 1;
+		g.vbr.UVRect.set(FULL_UV_RECT);
+		g.vbr.Color.set(tint);
+
+		glyphs.add(g);
+	}
+
+	private void sortGlyphs(int spriteSortMode) {
 		if(glyphs.size() < 1) return;
 		switch(spriteSortMode) {
 		case SpriteSortMode.Texture:
@@ -531,30 +530,30 @@ public class SpriteBatch {
 			break;
 		}
 	}
-	private void GenerateBatches() {
+	private void generateBatches() {
 		if(glyphs.size() < 1) return;
 
 		// Create Arrays
-		ByteBuffer bb = BufferUtils.createByteBuffer(6 * glyphs.size() * VertexSpriteBatch.Size);
-		SpriteBatchCall call = new SpriteBatchCall(0, glyphs.get(0).Texture, batches);
-		glyphs.get(0).VTL.AppendToBuffer(bb);
-		glyphs.get(0).VTR.AppendToBuffer(bb);
-		glyphs.get(0).VBL.AppendToBuffer(bb);
-		glyphs.get(0).VBL.AppendToBuffer(bb);
-		glyphs.get(0).VTR.AppendToBuffer(bb);
-		glyphs.get(0).VBR.AppendToBuffer(bb);
+		ByteBuffer bb = NativeMem.createByteBuffer(6 * glyphs.size() * VertexSpriteBatch.Size);
+		SpriteBatchCall call = new SpriteBatchCall(0, glyphs.get(0).texture, batches);
+		glyphs.get(0).vtl.appendToBuffer(bb);
+		glyphs.get(0).vtr.appendToBuffer(bb);
+		glyphs.get(0).vbl.appendToBuffer(bb);
+		glyphs.get(0).vbl.appendToBuffer(bb);
+		glyphs.get(0).vtr.appendToBuffer(bb);
+		glyphs.get(0).vbr.appendToBuffer(bb);
 		emptyGlyphs.add(glyphs.get(0));
 		
 		int gc = glyphs.size();
 		for(int i = 1; i < gc; i++) {
 			SpriteGlyph glyph = glyphs.get(i);
 			call = call.Append(glyph, batches);
-			glyph.VTL.AppendToBuffer(bb);
-			glyph.VTR.AppendToBuffer(bb);
-			glyph.VBL.AppendToBuffer(bb);
-			glyph.VBL.AppendToBuffer(bb);
-			glyph.VTR.AppendToBuffer(bb);
-			glyph.VBR.AppendToBuffer(bb);
+			glyph.vtl.appendToBuffer(bb);
+			glyph.vtr.appendToBuffer(bb);
+			glyph.vbl.appendToBuffer(bb);
+			glyph.vbl.appendToBuffer(bb);
+			glyph.vtr.appendToBuffer(bb);
+			glyph.vbr.appendToBuffer(bb);
 			emptyGlyphs.add(glyphs.get(i));
 		}
 		bb.flip();
@@ -571,35 +570,29 @@ public class SpriteBatch {
 					);
 		}
 		glBufferSubData(BufferTarget.ArrayBuffer, 0, bb);
-		GLBuffer.Unbind(BufferTarget.ArrayBuffer);
+		GLBuffer.unbind(BufferTarget.ArrayBuffer);
 	}
-	public void End(int spriteSortMode) {
-		SortGlyphs(spriteSortMode);
-		GenerateBatches();
+	public void end(int spriteSortMode) {
+		sortGlyphs(spriteSortMode);
+		generateBatches();
 	}
 
-	public void RenderBatch(Matrix4 mWorld, Matrix4 mCamera, BlendState bs, SamplerState ss, DepthState ds, RasterizerState rs) {
+	public void renderBatch(Matrix4 mWorld, Matrix4 mCamera, BlendState bs, SamplerState ss, DepthState ds, RasterizerState rs) {
 		// Set Up Render State
-		if(bs == null) bs = BlendState.PremultipliedAlphaBlend;
-		if(ds == null) ds = DepthState.None;
-		if(rs == null) rs = RasterizerState.CullNone;
-		if(ss == null) ss = SamplerState.LinearWrap;
-		bs.Set();
-		ds.Set();
-		rs.Set();
+		if(bs == null) bs = BlendState.PREMULTIPLIED_ALPHA_BLEND;
+		if(ds == null) ds = DepthState.NONE;
+		if(rs == null) rs = RasterizerState.CULL_NONE;
+		if(ss == null) ss = SamplerState.LINEAR_WRAP;
+		bs.set();
+		ds.set();
+		rs.set();
 
 		// Setup The Program
 		glUseProgram(idProg);
 
 		// Set Up The Matrices
-		fbUniforms.position(0);
-		fbUniforms.put(mWorld.m);
-		fbUniforms.flip();
-		glUniformMatrix4(unWorld, true, fbUniforms);
-		fbUniforms.position(0);
-		fbUniforms.put(mCamera.m);
-		fbUniforms.flip();
-		glUniformMatrix4(unVP, true, fbUniforms);
+		GLUniform.setST(unWorld, mWorld, false);
+		GLUniform.setST(unVP, mCamera, false);
 
 		glBindVertexArray(vao);
 		glEnableVertexAttribArray(0);
@@ -611,13 +604,13 @@ public class SpriteBatch {
 		int bc = batches.size();
 		for(int i = 0; i < bc; i++) {
 			SpriteBatchCall batch = batches.get(i);
-			batch.Texture.Use(TextureUnit.Texture0, unTexture);
-			ss.Set(batch.Texture.getTarget());
+			batch.Texture.use(TextureUnit.Texture0, unTexture);
+			ss.set(batch.Texture.getTarget());
 			glDrawArrays(PrimitiveType.Triangles, batch.IndexOffset, batch.Indices);
-			batch.Texture.Unuse();
+			batch.Texture.unuse();
 		}
 
-		GLProgram.Unuse();
+		GLProgram.unuse();
 		glBindVertexArray(0);
 	}
 }

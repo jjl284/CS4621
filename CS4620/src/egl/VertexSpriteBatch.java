@@ -2,7 +2,7 @@ package egl;
 
 import java.nio.ByteBuffer;
 
-import egl.GL.VertexAttribPointerType;
+import egl.GL.GLType;
 import egl.math.Color;
 import egl.math.Vector2;
 import egl.math.Vector3;
@@ -11,10 +11,10 @@ import egl.math.Vector4;
 public class VertexSpriteBatch implements IVertexType {
 	public static final int Size = 40;
 	public static final ArrayBind[] Declaration = new ArrayBind[] {
-        new ArrayBind(Semantic.Position, VertexAttribPointerType.Float, 3, 0),
-        new ArrayBind(Semantic.TexCoord, VertexAttribPointerType.Float, 2, 12),
-        new ArrayBind(Semantic.TexCoord | Semantic.Index1, VertexAttribPointerType.Float, 4, 20),
-        new ArrayBind(Semantic.Color, VertexAttribPointerType.UnsignedByte, 4, 36, true)
+        new ArrayBind(Semantic.Position, GLType.Float, 3, 0),
+        new ArrayBind(Semantic.TexCoord, GLType.Float, 2, 12),
+        new ArrayBind(Semantic.TexCoord | Semantic.Index1, GLType.Float, 4, 20),
+        new ArrayBind(Semantic.Color, GLType.UnsignedByte, 4, 36, true)
       };
 	
 	public final Vector3 Position;
@@ -40,11 +40,11 @@ public class VertexSpriteBatch implements IVertexType {
 		return 40;
 	}
 	@Override
-	public void AppendToBuffer(ByteBuffer bb) {
-		VertexUtils.AppendToBuffer(bb, Position);
-		VertexUtils.AppendToBuffer(bb, UV);
-		VertexUtils.AppendToBuffer(bb, UVRect);
-		VertexUtils.AppendToBuffer(bb, Color);
+	public void appendToBuffer(ByteBuffer bb) {
+		VertexUtils.appendToBuffer(bb, Position);
+		VertexUtils.appendToBuffer(bb, UV);
+		VertexUtils.appendToBuffer(bb, UVRect);
+		VertexUtils.appendToBuffer(bb, Color);
 	}
 	@Override
 	public ArrayBind[] getDeclaration() {
