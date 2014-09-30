@@ -11,14 +11,14 @@ public class Event<T extends EventArgs> {
 		listeners = new ArrayList<>();
 	}
 	
-	public void Add(ACEventFunc<T> f) {
+	public void add(ACEventFunc<T> f) {
 		listeners.add(f);
 	}
-	public void Remove(ACEventFunc<T> f) {
+	public void remove(ACEventFunc<T> f) {
 		listeners.remove(f);
 	}
 
 	public void Invoke(T args) {
-		for(ACEventFunc<T> f : listeners) f.Receive(sender, args);
+		for(ACEventFunc<T> f : listeners) f.receive(sender, args);
 	}
 }

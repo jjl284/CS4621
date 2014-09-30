@@ -1,5 +1,6 @@
 package blister;
 
+import java.io.OutputStreamWriter;
 import java.util.Calendar;
 
 import org.lwjgl.LWJGLException;
@@ -21,6 +22,7 @@ import blister.input.MouseMoveEventArgs;
 import blister.input.MouseState;
 import blister.input.MouseWheelEventArgs;
 import egl.GLDiagnostic;
+import egl.GLError;
 import egl.GLState;
 import egl.IDisposable;
 import ext.csharp.Event;
@@ -174,7 +176,8 @@ public abstract class MainGame implements IDisposable {
 	/**
 	 * Writes General Diagnostic Information
 	 */
-	private void initDiagnostics(){ 
+	private void initDiagnostics(){
+		GLError.setErrorLog(new OutputStreamWriter(System.err), false);
 		GLDiagnostic.init();
 		GLDiagnostic.writeln("TIME:                         " + Calendar.getInstance().getTime());
 		GLDiagnostic.writeln("");
@@ -212,14 +215,14 @@ public abstract class MainGame implements IDisposable {
 		// Keyboard Input Queue
 		while(Keyboard.next()) {
 			// Key Events
-			eKK.Key = Keyboard.getEventKey();
-			eKK.IsRepeat = Keyboard.isRepeatEvent();
+			eKK.key = Keyboard.getEventKey();
+			eKK.isRepeat = Keyboard.isRepeatEvent();
 			if(Keyboard.getEventKeyState()) {
-				eKK.KeyStates[eKK.Key] = true;
+				eKK.keyStates[eKK.key] = true;
 				KeyboardEventDispatcher.eventInput_KeyDown(eKK);
 			}
 			else {
-				eKK.KeyStates[eKK.Key] = false;
+				eKK.keyStates[eKK.key] = false;
 				KeyboardEventDispatcher.eventInput_KeyUp(eKK);
 			}
 
@@ -233,21 +236,21 @@ public abstract class MainGame implements IDisposable {
 
 		// Mouse Input Queue
 		while(Mouse.next()) {
-			ms.X = Mouse.getEventX();
-			ms.Y = Mouse.getEventX();
+			ms.x = Mouse.getEventX();
+			ms.y = Mouse.getEventX();
 
 			// Mouse Button
-			eMB.Button = 1 << Mouse.getEventButton();
+			eMB.button = 1 << Mouse.getEventButton();
 			if(Mouse.getEventButtonState()) {
-				if(!ms.IsButtonDown(eMB.Button)) {
-					ms.Buttons |= eMB.Button;
+				if(!ms.IsButtonDown(eMB.button)) {
+					ms.Buttons |= eMB.button;
 					MouseEventDispatcher.EventInput_MouseButton(eMB, true);
 					continue;
 				}
 			}
 			else {
-				if(ms.IsButtonDown(eMB.Button)) {
-					ms.Buttons &= ~eMB.Button;
+				if(ms.IsButtonDown(eMB.button)) {
+					ms.Buttons &= ~eMB.button;
 					MouseEventDispatcher.EventInput_MouseButton(eMB, false);
 					continue;
 				}
@@ -262,9 +265,9 @@ public abstract class MainGame implements IDisposable {
 			}
 
 			// Mouse Motion
-			eMM.DX = Mouse.getEventDX();
-			eMM.DY = Mouse.getEventDY();
-			if(eMM.DX != 0 || eMM.DY != 0) {
+			eMM.dx = Mouse.getEventDX();
+			eMM.dy = Mouse.getEventDY();
+			if(eMM.dx != 0 || eMM.dy != 0) {
 				MouseEventDispatcher.EventInput_MouseMotion(eMM);
 				continue;
 			}

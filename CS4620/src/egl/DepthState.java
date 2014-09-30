@@ -46,15 +46,24 @@ public class DepthState {
         true
     );
 
+    /**
+     * Should Depth Comparisons Take Place
+     */
     public boolean shouldRead;
+    /**
+     * Depth Comparison Function
+     */
     public int depthFunc;
+    /**
+     * Should Pixel Depth Be Written
+     */
     public boolean shouldWrite;
 
     /**
-     * 
-     * @param read
-     * @param depthFunction
-     * @param write
+     * State Constructor
+     * @param read Enable Depth Reading
+     * @param depthFunction {@link DepthFunction}
+     * @param write Enable Depth Writing
      */
     public DepthState(boolean read, int depthFunction, boolean write) {
     	shouldRead = read;

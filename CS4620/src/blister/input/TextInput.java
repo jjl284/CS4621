@@ -58,15 +58,15 @@ public class TextInput {
 		if(getIsActive()) return;
 		isActive = true;
 
-		KeyboardEventDispatcher.OnKeyPressed.Add(OnKP);
-		KeyboardEventDispatcher.OnReceiveChar.Add(OnRC);
+		KeyboardEventDispatcher.OnKeyPressed.add(OnKP);
+		KeyboardEventDispatcher.OnReceiveChar.add(OnRC);
 	}
 	public void Deactivate() {
 		if(!getIsActive()) return;
 		isActive = false;
 
-		KeyboardEventDispatcher.OnKeyPressed.Remove(OnKP);
-		KeyboardEventDispatcher.OnReceiveChar.Remove(OnRC);
+		KeyboardEventDispatcher.OnKeyPressed.remove(OnKP);
+		KeyboardEventDispatcher.OnReceiveChar.remove(OnRC);
 	}
 
 	public void Insert(char c) {
@@ -120,7 +120,7 @@ public class TextInput {
 	private static final OnKP_F OnKP_FS = new OnKP_F();
 	public final EventFuncBound<TextInput, KeyboardKeyEventArgs> OnKP = new EventFuncBound<>(this, OnKP_FS);
 	public void OnKeyPress(Object s, KeyboardKeyEventArgs args) {
-		switch(args.Key) {
+		switch(args.key) {
 		case Keyboard.KEY_RETURN:
 			if(text.length() < 1)
 				return;

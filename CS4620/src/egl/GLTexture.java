@@ -79,58 +79,28 @@ public class GLTexture implements IDisposable {
         }
     }
 	
-	private static final HashMap<Integer, Binding> currentBindings;
+	private static final HashMap<Integer, Binding> currentBindings = new HashMap<>();
     static {
-        currentBindings = new HashMap<Integer, Binding>();
         for(int bt : TEXTURE_TARGETS) {
             currentBindings.put(bt, new Binding(bt));
         }
     }
-    public static void Unbind(int t) {
+    public static void unbind(int t) {
         currentBindings.get(t).Unbind();
     }
 	
     private int id;
-    public int getID() {
-    	return id;
-    }
-
-    public boolean getIsCreated() {
-        return id != 0;
-    }
-
-    private int[] dimensions;
-    public int getWidth() {
-        return dimensions[0];
-    }
-    public int getHeight() {
-        return dimensions[1];
-    }
-    public int getDepth() {
-        return dimensions[2];
-    }
-
     private int target;
-    public int getTarget() {
-        return target;
-    }
-    private void setTarget(int value) {
-        target = value;
-        refBind = currentBindings.get(target);
-    }
     private Binding refBind;
-    public boolean getIsBound() {
-        return refBind.Current == this;
-    }
-
-    public int InternalFormat;
+    private int[] dimensions;
+    public int internalFormat = PixelInternalFormat.Rgba;
 	
     public GLTexture(int target, boolean init) {
         id = 0;
         dimensions = new int[] { 0, 0, 0 };
 
         setTarget(target);
-        InternalFormat = PixelInternalFormat.Rgba;
+        internalFormat = PixelInternalFormat.Rgba;
         if(init) init();
     }
     public GLTexture(int target) {
@@ -147,10 +117,37 @@ public class GLTexture implements IDisposable {
         }
     }
 
+    public int getID() {
+    	return id;
+    }
+    public boolean getIsCreated() {
+        return id != 0;
+    }
+    public int getWidth() {
+        return dimensions[0];
+    }
+    public int getHeight() {
+        return dimensions[1];
+    }
+    public int getDepth() {
+        return dimensions[2];
+    }
+    public int getTarget() {
+        return target;
+    }
+    public boolean getIsBound() {
+        return refBind.Current == this;
+    }
+    
     public GLTexture init() {
         if(getIsCreated()) return this;
         id = glGenTextures();
         return this;
+    }
+
+    private void setTarget(int value) {
+        target = value;
+        refBind = currentBindings.get(target);
     }
 
     public void bind() {
@@ -180,20 +177,20 @@ public class GLTexture implements IDisposable {
         bind();
         switch(dims) {
             case 1:
-                if(buf != null) glTexImage1D(target, 0, InternalFormat, getWidth(), 0, pixelFormat, pixelType, buf);
-                else  glTexImage1D(target, 0, InternalFormat, getWidth(), 0, pixelFormat, pixelType, 0);
+                if(buf != null) glTexImage1D(target, 0, internalFormat, getWidth(), 0, pixelFormat, pixelType, buf);
+                else  glTexImage1D(target, 0, internalFormat, getWidth(), 0, pixelFormat, pixelType, 0);
                 break;
             case 2:
                 if(mipMap)
                     glTexParameteri(target, TextureParameterName.GenerateMipmap, 1);
-                if(buf != null) glTexImage2D(target, 0, InternalFormat, getWidth(), getHeight(), 0, pixelFormat, pixelType, buf);
-                else glTexImage2D(target, 0, InternalFormat, getWidth(), getHeight(), 0, pixelFormat, pixelType, 0);
+                if(buf != null) glTexImage2D(target, 0, internalFormat, getWidth(), getHeight(), 0, pixelFormat, pixelType, buf);
+                else glTexImage2D(target, 0, internalFormat, getWidth(), getHeight(), 0, pixelFormat, pixelType, 0);
                 if(mipMap && getTarget() == TextureTarget.Texture2D)
                 	GL30.glGenerateMipmap(TextureTarget.Texture2D);
                 break;
             case 3:
-            	if(buf != null) glTexImage3D(target, 0, InternalFormat, getWidth(), getHeight(), getDepth(), 0, pixelFormat, pixelType, buf);
-            	else glTexImage3D(target, 0, InternalFormat, getWidth(), getHeight(), getDepth(), 0, pixelFormat, pixelType, 0);
+            	if(buf != null) glTexImage3D(target, 0, internalFormat, getWidth(), getHeight(), getDepth(), 0, pixelFormat, pixelType, buf);
+            	else glTexImage3D(target, 0, internalFormat, getWidth(), getHeight(), getDepth(), 0, pixelFormat, pixelType, 0);
                 break;
             default:
                 throw new Exception("Invalid Dimensions For The Texture (Must Be > 0)");

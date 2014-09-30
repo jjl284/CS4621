@@ -87,7 +87,7 @@ public class DiagnosticScreen extends GameScreen {
 		ib.setDataInitial(iBuf);
 		
 		texture = new GLTexture(TextureTarget.Texture2D, true);
-		texture.InternalFormat = PixelInternalFormat.Rgba;
+		texture.internalFormat = PixelInternalFormat.Rgba;
 		try {
 			texture.setImage2DResource("cs4620/util/Diag.png", false);
 		} catch (Exception e) {

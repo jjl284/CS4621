@@ -3,11 +3,11 @@ package blister.input;
 import ext.csharp.EventArgs;
 
 public class MouseMoveEventArgs extends EventArgs {
-	public final MouseState State;
-	public int DX;
-	public int DY;
+	public final MouseState state;
+	public int dx;
+	public int dy;
 	
 	public MouseMoveEventArgs(MouseState s) {
-		State = s;
+		state = s;
 	}
 }

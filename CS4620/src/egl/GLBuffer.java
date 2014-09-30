@@ -83,89 +83,31 @@ public class GLBuffer implements IDisposable {
         currentBindings.get(t).unbind();
     }
 
-    // OpenGL Buffer ID
+    /**
+     * OpenGL Object ID
+     */
     private int id;
     /**
-     * Returns 0 If Uninitialized
-     * @return OpenGL Buffer ID
+     * Buffer Type And Double Pointer For Checking Usage
      */
-    public int getID() {
-    	return id;
-    }
-    /**
-     * 
-     * @return True If The OpenGL Buffer Is Initialized
-     */
-    public boolean getIsCreated() {
-        return id != 0;
-    }
-
-    // Buffer Type And Double Pointer For Checking Usage
     private int target;
     /**
-     * Return This Target
-     * @return The OpenGL Buffer Bind {@link egl.GL.BufferTarget Target}
+     * Scream At The GPU Where Data Should Be Placed
      */
-    public int getTarget() {
-        return target;
-    }
-    private void setTarget(int value) {
-        target = value;
-        refBind = currentBindings.get(target);
-    }
-    private Binding refBind;
-    /**
-     * 
-     * @return True If GLBuffer Recognizes This As The Currently Bound Buffer
-     */
-    public boolean getIsBound() {
-        return refBind != null && refBind.current == this;
-    }
-
-    // Scream At The GPU Where Data Should Be Placed
     private int usageType;
     /**
-     * @see Enum {@link egl.GL.BufferUsageHint}
-     * @return Data Storage Hints For OpenGL
+     * Pointer To A Binding Target
      */
-    public int getUsageType() {
-    	return usageType;
-    }
-
-    // Element Information
+    private Binding refBind;
+    /**
+     * Buffer Element Information
+     */
     private int componentFormat, componentCount, elementByteSize;
     /**
-     * @see {@link egl.GL.GLType}
-     * @return Format Of A Single Element Of The Buffer
+     * Buffer Capacity (In Bytes) And Current Elements Count
      */
-    public int getComponentFormat() {
-    	return componentFormat;
-    }
-    /**
-     * 
-     * @return Number Of Components In A Full Element
-     */
-    public int getComponentCount() {
-    	return componentCount;
-    }
-    /**
-     * 
-     * @return Element Stride In Bytes
-     */
-    public int getElementByteSize() {
-    	return elementByteSize;
-    }
-
-    // Buffer Capacity (In Bytes) And Current Elements Count
     private int bufCapacity;
-    /**
-     * 
-     * @return Buffer Capacity On The GPU In Bytes
-     */
-	public int getBufCapacity() {
-    	return bufCapacity;
-    }
-
+    
     /**
      * Default Constructor For A Buffer
      * @param target Buffer Purpose - Enum {@link egl.GL.BufferTarget}
@@ -198,6 +140,70 @@ public class GLBuffer implements IDisposable {
     }
 
     /**
+     * Returns 0 If Uninitialized
+     * @return OpenGL Buffer ID
+     */
+    public int getID() {
+    	return id;
+    }
+    /**
+     * 
+     * @return True If The OpenGL Buffer Is Initialized
+     */
+    public boolean getIsCreated() {
+        return id != 0;
+    }
+    /**
+     * Return This Target
+     * @return The OpenGL Buffer Bind {@link egl.GL.BufferTarget Target}
+     */
+    public int getTarget() {
+        return target;
+    }
+    /**
+     * 
+     * @return True If GLBuffer Recognizes This As The Currently Bound Buffer
+     */
+    public boolean getIsBound() {
+        return refBind != null && refBind.current == this;
+    }
+    /**
+     * @see Enum {@link egl.GL.BufferUsageHint}
+     * @return Data Storage Hints For OpenGL
+     */
+    public int getUsageType() {
+    	return usageType;
+    }
+    /**
+     * @see {@link egl.GL.GLType}
+     * @return Format Of A Single Element Of The Buffer
+     */
+    public int getComponentFormat() {
+    	return componentFormat;
+    }
+    /**
+     * 
+     * @return Number Of Components In A Full Element
+     */
+    public int getComponentCount() {
+    	return componentCount;
+    }
+    /**
+     * 
+     * @return Element Stride In Bytes
+     */
+    public int getElementByteSize() {
+    	return elementByteSize;
+    }
+    /**
+     * 
+     * @return Buffer Capacity On The GPU In Bytes
+     */
+	public int getBufCapacity() {
+    	return bufCapacity;
+    }    
+    
+    /**
      * Create The OpenGL Buffer Resource In The Active Context
      * @return Self
      */
@@ -205,6 +211,15 @@ public class GLBuffer implements IDisposable {
         if(getIsCreated()) return this;
         id = glGenBuffers();
         return this;
+    }
+
+    /**
+     * Set This Buffer's Type
+     * @param value {@link BufferTarget}
+     */
+    private void setTarget(int value) {
+        target = value;
+        refBind = currentBindings.get(target);
     }
 
     /**
@@ -312,19 +327,19 @@ public class GLBuffer implements IDisposable {
         unbind();
     }
     /**
-     * @see {@link #useAsAttrib(int, int, int, boolean) UseAsAttrib(loc, offset, instDiv, false)}
+     * @see {@link #useAsAttrib(int, int, int, boolean) useAsAttrib(loc, offset, instDiv, false)}
      */
     public void useAsAttrib(int loc, int offset, int instDiv) {
     	useAsAttrib(loc, offset, instDiv, false);
     }
     /**
-     * @see {@link #useAsAttrib(int, int, int, boolean) UseAsAttrib(loc, offset, 0, false)}
+     * @see {@link #useAsAttrib(int, int, int, boolean) useAsAttrib(loc, offset, 0, false)}
      */
     public void useAsAttrib(int loc, int offset) {
     	useAsAttrib(loc, offset, 0);
     }
    /**
-    * @see {@link #useAsAttrib(int, int, int, boolean) UseAsAttrib(loc, 0, instDiv, false)}
+    * @see {@link #useAsAttrib(int, int, int, boolean) useAsAttrib(loc, 0, instDiv, false)}
     */
     public void useAsAttrib(int loc) {
     	useAsAttrib(loc, 0);
@@ -351,13 +366,13 @@ public class GLBuffer implements IDisposable {
         unbind();
     }
     /**
-     * @see {@link #useAsAttrib(ShaderInterface, int, int) UseAsAttrib(si, offset, 0)}
+     * @see {@link #useAsAttrib(ShaderInterface, int, int) useAsAttrib(si, offset, 0)}
      */
     public void useAsAttrib(ShaderInterface si, int offset) {
     	useAsAttrib(si, offset, 0);
     }
     /**
-     * @see {@link #useAsAttrib(ShaderInterface, int, int) UseAsAttrib(si, 0, 0)}
+     * @see {@link #useAsAttrib(ShaderInterface, int, int) useAsAttrib(si, 0, 0)}
      */
     public void useAsAttrib(ShaderInterface si) {
     	useAsAttrib(si, 0);
@@ -365,6 +380,10 @@ public class GLBuffer implements IDisposable {
 
     /**
      * Resize This Buffer (And Discard Buffer Data)
+     * <br/><br/>
+     * <code>
+     * glBufferData(target, bytes, 0, usageType);
+     * </code>
      * @param bytes New Capacity In Bytes
      */
     public void setSizeInBytes(int bytes) {
@@ -374,31 +393,63 @@ public class GLBuffer implements IDisposable {
         unbind();
     }
     /**
-     * @see {@link #setSizeInBytes(int) SetSizeInBytes(elements * getElementByteSize())}
+     * @see {@link #setSizeInBytes(int) setSizeInBytes(elements * getElementByteSize())}
      * @param elements Element Capacity
      */
     public void setSizeInElements(int elements) {
         setSizeInBytes(elements * elementByteSize);
     }
     
+    /**
+     * Set This Buffer's Data Equivalent To The Given Buffer
+     * <br/><br/>
+     * <code>
+     * glBufferData(target, "sizeof(data)", data, usageType);
+     * </code>
+     * @param data Buffer Data
+     */
     public void setDataInitial(ByteBuffer data) {
         bufCapacity = data.limit();
         bind();
         glBufferData(target, data, usageType);
         unbind();
     }
+    /**
+     * Set This Buffer's Data Equivalent To The Given Buffer
+     * <br/><br/>
+     * <code>
+     * glBufferData(target, "sizeof(data)", data, usageType);
+     * </code>
+     * @param data Buffer Data
+     */
     public void setDataInitial(ShortBuffer data) {
         bufCapacity = data.limit() << 1;
         bind();
         glBufferData(target, data, usageType);
         unbind();
     }
+    /**
+     * Set This Buffer's Data Equivalent To The Given Buffer
+     * <br/><br/>
+     * <code>
+     * glBufferData(target, "sizeof(data)", data, usageType);
+     * </code>
+     * @param data Buffer Data
+     */
     public void setDataInitial(IntBuffer data) {
         bufCapacity = data.limit() << 2;
         bind();
         glBufferData(target, data, usageType);
         unbind();
     }
+    /**
+     * Set This Buffer's Data Equivalent To The Given Buffer
+     * <br/><br/>
+     * <code>
+     * glBufferData(target, "sizeof(data)", data, usageType);
+     * </code>
+     * @param data Buffer Data
+     */
     public void setDataInitial(FloatBuffer data) {
         bufCapacity = data.limit() << 2;
         bind();
@@ -406,14 +457,28 @@ public class GLBuffer implements IDisposable {
         unbind();
     }
 
-    public void checkResizeInBytes(int bytes) {
+    /**
+     * If Necessary, Resizes Buffer To Fit The Appropriate Data Size
+     * <br/>
+     * (This Will Clear All Buffer Data On Resize)
+     * @param bytes Desired Byte Size
+     * @return True If This Buffer Was Resized
+     */
+    public boolean checkResizeInBytes(int bytes) {
         if(bytes <= bufCapacity / 4 || bytes > bufCapacity) {
             // Resize To Double The Desired Size
             setSizeInBytes(bytes * 2);
+            return true;
         }
+        return false;
     }
-    public void checkResizeInElements(int elements) {
-        checkResizeInBytes(elements * elementByteSize);
+    /**
+     * @see {@link #checkResizeInBytes(int) checkResizeInBytes(elements * getElementByteSize())}
+     * @param elements Desired Number Of Elements
+     * @return True If This Buffer Was Resized
+     */
+    public boolean checkResizeInElements(int elements) {
+        return checkResizeInBytes(elements * elementByteSize);
     }
 
     public void setData(ByteBuffer data, int len, int off) {
@@ -514,6 +579,12 @@ public class GLBuffer implements IDisposable {
         setData(data, len, off);
     }
 
+    /**
+     * Initialize This As A Vertex Buffer Containing Data
+     * @param data Buffer Vertex Data
+     * @param vecDim Components Per Element
+     * @return Self
+     */
     public GLBuffer initAsVertex(float[] data, int vecDim) {
         init();
         setElementFormat(GLType.Float, vecDim);
@@ -521,12 +592,22 @@ public class GLBuffer implements IDisposable {
         smartSetData(data, 0, 0);
         return this;
     }
+    /**
+     * Initialize This As An Index Buffer Containing Data
+     * @param data Buffer Index Data
+     * @return Self
+     */
     public GLBuffer initAsIndex(int[] data) {
         init();
         setAsIndexInt();
         smartSetData(data, 0, 0);
         return this;
     }
+    /**
+     * Initialize This As An Index Buffer Containing Data
+     * @param data Buffer Index Data
+     * @return Self
+     */
     public GLBuffer initAsIndex(short[] data) {
         init();
         setAsIndexShort();

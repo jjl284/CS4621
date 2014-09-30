@@ -1,7 +1,7 @@
 package egl.math;
 
 /**
- * 4x4 Matrix With Row Major Ordering
+ * 4x4 Matrix With Column Major Ordering
  * <br>Double Precision</br>
  * @author Cristian
  * 
@@ -46,20 +46,20 @@ public class Matrix4d implements Cloneable {
 			double m30, double m31, double m32, double m33
 			) {
 		m[0]  = m00;
-		m[1]  = m01;
-		m[2]  = m02;
-		m[3]  = m03;
-		m[4]  = m10;
+		m[1]  = m10;
+		m[2]  = m20;
+		m[3]  = m30;
+		m[4]  = m01;
 		m[5]  = m11;
-		m[6]  = m12;
-		m[7]  = m13;
-		m[8]  = m20;
-		m[9]  = m21;
+		m[6]  = m21;
+		m[7]  = m31;
+		m[8]  = m02;
+		m[9]  = m12;
 		m[10] = m22;
-		m[11] = m23;
-		m[12] = m30;
-		m[13] = m31;
-		m[14] = m32;
+		m[11] = m32;
+		m[12] = m03;
+		m[13] = m13;
+		m[14] = m23;
 		m[15] = m33;
 	}
 	/**
@@ -77,22 +77,22 @@ public class Matrix4d implements Cloneable {
 		this(_m.m);
 	}
 	/**
-	 * Column Constructor
-	 * @param c0 [{@link Vector4d ARR}] Column 1
-	 * @param c1 [{@link Vector4d ARR}] Column 2
-	 * @param c2 [{@link Vector4d ARR}] Column 3
-	 * @param c3 [{@link Vector4d ARR}] Column 4
+	 * Row Constructor
+	 * @param r0 [{@link Vector4d ARR}] Row 1
+	 * @param r1 [{@link Vector4d ARR}] Row 2
+	 * @param r2 [{@link Vector4d ARR}] Row 3
+	 * @param r3 [{@link Vector4d ARR}] Row 4
 	 */
-	public Matrix4d(Vector4d c0, Vector4d c1, Vector4d c2, Vector4d c3) {
+	public Matrix4d(Vector4d r0, Vector4d r1, Vector4d r2, Vector4d r3) {
 		this(
-				c0.x, c1.x, c2.x, c3.x,
-				c0.y, c1.y, c2.y, c3.y,
-				c0.z, c1.z, c2.z, c3.z,
-				c0.w, c1.w, c2.w, c3.w
+				r0.x, r0.y, r0.z, r0.w,
+				r1.x, r1.y, r1.z, r1.w,
+				r2.x, r2.y, r2.z, r2.w,
+				r3.x, r3.y, r3.z, r3.w
 				);
 	}
 	/**
-	 * Frame Constructor
+	 * Frame (Column) Constructor
 	 * @param x [{@link Vector3d DIRN}] X Axis Direction
 	 * @param y [{@link Vector3d DIRN}] Y Axis Direction
 	 * @param z [{@link Vector3d DIRN}] Z Axis Direction
@@ -100,10 +100,10 @@ public class Matrix4d implements Cloneable {
 	 */
 	public Matrix4d(Vector3d x, Vector3d y, Vector3d z, Vector3d t) {
 		this(
-				x.x, x.y, x.z, 0,
-				y.x, y.y, y.z, 0,
-				z.x, z.y, z.z, 0,
-				t.x, t.y, t.z, 1
+				x.x, y.x, z.x, t.x,
+				x.y, y.y, z.y, t.y,
+				x.z, y.z, z.z, t.z,
+				0, 0, 0, 1
 				);
 	}
 	/**
@@ -121,21 +121,22 @@ public class Matrix4d implements Cloneable {
 	@Override
 	public String toString() {
 		return 
-				"["+m[0]+", "+m[1]+", "+m[2]+", "+m[3]+"]\n"+ 
-				"["+m[4]+", "+m[5]+", "+m[6]+", "+m[7]+"]\n"+ 
-				"["+m[8]+", "+m[9]+", "+m[10]+", "+m[11]+"]\n"+ 
-				"["+m[12]+", "+m[13]+", "+m[14]+", "+m[15]+"]";
+				"["+m[0]+", "+m[4]+", "+m[8]+", "+m[12]+"]\n"+ 
+				"["+m[1]+", "+m[5]+", "+m[9]+", "+m[13]+"]\n"+ 
+				"["+m[2]+", "+m[6]+", "+m[10]+", "+m[14]+"]\n"+ 
+				"["+m[3]+", "+m[7]+", "+m[11]+", "+m[15]+"]";
 	}
 
 	/**
 	 * Element Index Calculation
 	 * @param r Row    In Range [0,SIZE)
 	 * @param c Column In Range [0,SIZE)
-	 * @return Index In Element Array (r * SIZE + c)
+	 * @return Index In Element Array (c * SIZE + r)
 	 */
 	public static int index(int r, int c) {
-		return r * SIZE + c;
+		return c * SIZE + r;
 	}
+	
 	/**
 	 * Helper To Calculate An Inner Product
 	 * @param left Left Side Matrix
@@ -214,31 +215,32 @@ public class Matrix4d implements Cloneable {
 		return new Vector3d(m[12], m[13], m[14]);
 	}
 	/**
-	 * Set A Vector To Column c Of This Matrix
-	 * @param c Column
+	 * Set A Vector To Row r Of This Matrix
+	 * @param r Row
 	 * @param out [{@link Vector4d OUT}] Vector
 	 * @return Out
 	 */
-	public Vector4d getColumn(int c, Vector4d out) {
-		return out.set(m[c], m[c + 4], m[c + 8], m[c + 12]);
+	public Vector4d getRow(int r, Vector4d out) {
+		return out.set(m[r], m[r + 4], m[r + 8], m[r + 12]);
 	}
 	/**
-	 * Obtains Column c Of This Matrix
-	 * @param c Column
+	 * Obtains Row r Of This Matrix
+	 * @param r Row
 	 * @return New Vector
 	 */
-	public Vector4d getColumn(int c) {
-		return new Vector4d(m[c], m[c + 4], m[c + 8], m[c + 12]);
+	public Vector4d getRow(int r) {
+		return new Vector4d(m[r], m[r + 4], m[r + 8], m[r + 12]);
 	}
 	/**
 	 * Set A Matrix To The XYZ-Axes Of This Matrix
-	 * @param out [{@link Matrix3d OUT}] Matrix
+	 * @param out [{@link Matrix3 OUT}] Matrix
 	 * @return Out
 	 */
 	public Matrix3d getAxes(Matrix3d out) {
-		return out.set(m[0], m[1], m[2],
-				m[4], m[5], m[6],
-				m[8], m[9], m[10]
+		return out.set(
+				m[0], m[4], m[8],
+				m[1], m[5], m[9],
+				m[2], m[6], m[10]
 				);
 	}
 	/**
@@ -246,9 +248,10 @@ public class Matrix4d implements Cloneable {
 	 * @return New Matrix
 	 */
 	public Matrix3d getAxes() {
-		return new Matrix3d(m[0], m[1], m[2],
-				m[4], m[5], m[6],
-				m[8], m[9], m[10]
+		return new Matrix3d(
+				m[0], m[4], m[8],
+				m[1], m[5], m[9],
+				m[2], m[6], m[10]
 				);
 	}
 	
@@ -279,20 +282,20 @@ public class Matrix4d implements Cloneable {
 			double m30, double m31, double m32, double m33
 			) {
 		m[0]  = m00;
-		m[1]  = m01;
-		m[2]  = m02;
-		m[3]  = m03;
-		m[4]  = m10;
+		m[1]  = m10;
+		m[2]  = m20;
+		m[3]  = m30;
+		m[4]  = m01;
 		m[5]  = m11;
-		m[6]  = m12;
-		m[7]  = m13;
-		m[8]  = m20;
-		m[9]  = m21;
+		m[6]  = m21;
+		m[7]  = m31;
+		m[8]  = m02;
+		m[9]  = m12;
 		m[10] = m22;
-		m[11] = m23;
-		m[12] = m30;
-		m[13] = m31;
-		m[14] = m32;
+		m[11] = m32;
+		m[12] = m03;
+		m[13] = m13;
+		m[14] = m23;
 		m[15] = m33;
 		return this;
 	}
@@ -319,14 +322,43 @@ public class Matrix4d implements Cloneable {
 	}
 
 	/**
-	 * Composes A Matrix Onto This
+	 * Composes A Matrix M Onto This So That M Applies After This
+	 * <pre>
+	 * This = Mat * This
+	 * </pre>
+	 * @param mat Matrix M
+	 * @return This
+	 */
+	public Matrix4d mulAfter(Matrix4d mat) {
+		return set(
+				innerProduct(mat, this, 0, 0),
+				innerProduct(mat, this, 0, 1),
+				innerProduct(mat, this, 0, 2),
+				innerProduct(mat, this, 0, 3),
+				innerProduct(mat, this, 1, 0),
+				innerProduct(mat, this, 1, 1),
+				innerProduct(mat, this, 1, 2),
+				innerProduct(mat, this, 1, 3),
+				innerProduct(mat, this, 2, 0),
+				innerProduct(mat, this, 2, 1),
+				innerProduct(mat, this, 2, 2),
+				innerProduct(mat, this, 2, 3),
+				innerProduct(mat, this, 3, 0),
+				innerProduct(mat, this, 3, 1),
+				innerProduct(mat, this, 3, 2),
+				innerProduct(mat, this, 3, 3)
+				);
+	}
+
+	/**
+	 * Composes A Matrix M Onto This So That M Applies Before This
 	 * <pre>
 	 * This = This * Mat
 	 * </pre>
-	 * @param mat Right Side Matrix
+	 * @param mat Matrix M
 	 * @return This
 	 */
-	public Matrix4d mul(Matrix4d mat) {
+	public Matrix4d mulBefore(Matrix4d mat) {
 		return set(
 				innerProduct(this, mat, 0, 0),
 				innerProduct(this, mat, 0, 1),
@@ -346,16 +378,47 @@ public class Matrix4d implements Cloneable {
 				innerProduct(this, mat, 3, 3)
 				);
 	}
+
 	/**
-	 * Multiplies This Matrix And Another Into Out
+	 * Multiplies This Matrix And A Matrix M Into Out So That M Applies After This
 	 * <pre>
-	 * Out = This * Mat
+	 * Out = Mat * This
 	 * </pre>
-	 * @param mat Right Side Matrix
+	 * @param mat Matrix M
 	 * @param out Non-Null Output Matrix
 	 * @return Out
 	 */
-	public Matrix4d mul(Matrix4d mat, Matrix4d out) {
+	public Matrix4d mulAfter(Matrix4d mat, Matrix4d out) {
+		return out.set(
+				innerProduct(mat, this, 0, 0),
+				innerProduct(mat, this, 0, 1),
+				innerProduct(mat, this, 0, 2),
+				innerProduct(mat, this, 0, 3),
+				innerProduct(mat, this, 1, 0),
+				innerProduct(mat, this, 1, 1),
+				innerProduct(mat, this, 1, 2),
+				innerProduct(mat, this, 1, 3),
+				innerProduct(mat, this, 2, 0),
+				innerProduct(mat, this, 2, 1),
+				innerProduct(mat, this, 2, 2),
+				innerProduct(mat, this, 2, 3),
+				innerProduct(mat, this, 3, 0),
+				innerProduct(mat, this, 3, 1),
+				innerProduct(mat, this, 3, 2),
+				innerProduct(mat, this, 3, 3)
+				);
+	}
+
+	/**
+	 * Multiplies This Matrix And A Matrix M Into Out So That M Applies Before This
+	 * <pre>
+	 * Out = This * Mat
+	 * </pre>
+	 * @param mat Matrix M
+	 * @param out Non-Null Output Matrix
+	 * @return Out
+	 */
+	public Matrix4d mulBefore(Matrix4d mat, Matrix4d out) {
 		return out.set(
 				innerProduct(this, mat, 0, 0),
 				innerProduct(this, mat, 0, 1),
@@ -379,7 +442,7 @@ public class Matrix4d implements Cloneable {
 	/**
 	 * Transforms A Vector In Place
 	 * <pre>
-	 * V = V * This
+	 * V = This * V
 	 * <pre>
 	 * @param v [{@link #Vec4 POS}] Vector
 	 * @return Transformed Vector
@@ -395,7 +458,7 @@ public class Matrix4d implements Cloneable {
 	/**
 	 * Transforms And Homogenizes A Position Vector In Place
 	 * <pre>
-	 * {V, w} = {V, 1} * This
+	 * {V, w} = This * {V, 1}
 	 * V = V / w
 	 * </pre>
 	 * @param v [{@link Vector3d POS}] Vector
@@ -409,22 +472,22 @@ public class Matrix4d implements Cloneable {
 				m[2] * v.x + m[6] * v.y + m[10] * v.z + m[14]
 				).div(w);
 	}
-
+	
 	/**
 	 * Transforms A Direction Vector In Place (Does Not Homogenize)
 	 * <pre>
-	 * {V, _} = {V, 0} * This
+	 * {V, _} = This * {V, 0}
 	 * </pre>
 	 * @param v [{@link Vector3d DIRN}] Vector
 	 * @return Transformed Vector
 	 */
 	public Vector3d mulDir(Vector3d v) {
 		return v.set(
-				m[0]  * v.x + m[4]  * v.y + m[8]  * v.z,
-				m[1]  * v.x + m[5]  * v.y + m[9]  * v.z,
-				m[2]  * v.x + m[6]  * v.y + m[10] * v.z);
+				m[0] * v.x + m[4] * v.y + m[8]  * v.z,
+				m[1] * v.x + m[5] * v.y + m[9]  * v.z,
+				m[2] * v.x + m[6] * v.y + m[10] * v.z);
 	}
-	
+
 	/**
 	 * Transpose In Place
 	 * @return This
@@ -441,17 +504,17 @@ public class Matrix4d implements Cloneable {
 	}
 	/**
 	 * Helper To Calculate A Cofactor
-	 * @param r Excluded Row
 	 * @param c Excluded Column
+	 * @param r Excluded Row
 	 * @return Cofactor
 	 */
-	private double coFactor(int r, int c) {
+	private double coFactor(int c, int r) {
 		Matrix3d minor = new Matrix3d();
 		int i = 0;
 		for(int ri = 0;ri < SIZE;ri++) {
-			if(ri == r) continue;
+			if(ri == c) continue;
 			for(int ci = 0;ci < SIZE;ci++) {
-				if(ci == c) continue;
+				if(ci == r) continue;
 				minor.m[i++] = m[ri * 4 + ci];
 			}
 		}
@@ -488,25 +551,13 @@ public class Matrix4d implements Cloneable {
 		if(det == 0) throw new AssertionError("Determinant Of 0");
 		double f = 1 / det;
 		return set(
-				f * cof00,
-				f * coFactor(1, 0),
-				f * coFactor(2, 0),
-				f * coFactor(3, 0),
-				f * cof01,
-				f * coFactor(1, 1),
-				f * coFactor(2, 1),
-				f * coFactor(3, 1),
-				f * cof02,
-				f * coFactor(1, 2),
-				f * coFactor(2, 2),
-				f * coFactor(3, 2),
-				f * cof03,
-				f * coFactor(1, 3),
-				f * coFactor(2, 3),
-				f * coFactor(3, 3)
+				f * cof00, f * cof01, f * cof02, f * cof03,
+				f * coFactor(1, 0), f * coFactor(1, 1), f * coFactor(1, 2), f * coFactor(1, 3),
+				f * coFactor(2, 0), f * coFactor(2, 1), f * coFactor(2, 2), f * coFactor(2, 3),
+				f * coFactor(3, 0), f * coFactor(3, 1), f * coFactor(3, 2), f * coFactor(3, 3)
 				);
 	}
-
+	
 	/**
 	 * @return A Copy Of This
 	 */
@@ -585,10 +636,10 @@ public class Matrix4d implements Cloneable {
 	/**
 	 * Create A Translation Matrix Into Out
 	 * <pre>
-	 * | 1  0  0  0 |
-	 * | 0  1  0  0 |
-	 * | 0  0  1  0 |
-	 * | x  y  z  1 |
+	 * | 1  0  0  x |
+	 * | 0  1  0  y |
+	 * | 0  0  1  z |
+	 * | 0  0  0  1 |
 	 * <pre>
 	 * @param x X Translation
 	 * @param y Y Translation
@@ -598,10 +649,10 @@ public class Matrix4d implements Cloneable {
 	 */
 	public static Matrix4d createTranslation(double x, double y, double z, Matrix4d out) {
 		return out.set(
-				1, 0, 0, 0,
-				0, 1, 0, 0,
-				0, 0, 1, 0,
-				x, y, z, 1
+				1, 0, 0, x,
+				0, 1, 0, y,
+				0, 0, 1, z,
+				0, 0, 0, 1
 				);
 	}
 	/**
@@ -635,50 +686,50 @@ public class Matrix4d implements Cloneable {
 	/**
 	 * Create A X-Axis Rotation Matrix Into Out
 	 * <pre>
-	 * | 1   0       0       0 |
-	 * | 0   cos(t)  sin(t)  0 |
-	 * | 0  -sin(t)  cos(t)  0 |
-	 * | 0   0       0       1 |
+	 * | 1  0        0       0 |
+	 * | 0  cos(t)  -sin(t)  0 |
+	 * | 0  sin(t)   cos(t)  0 |
+	 * | 0  0        0       1 |
 	 * </pre>
 	 * @param t Angle (Radians)
 	 * @param out Non-Null Output Matrix
 	 * @return Out
 	 */
 	public static Matrix4d createRotationX(double t, Matrix4d out) {
-		double cosT = (double)Math.cos(t), sinT = (double)Math.sin(t);
+		double cosT = Math.cos(t), sinT = Math.sin(t);
 		return out.set(
 				1, 0, 0, 0,
-				0, cosT, sinT, 0,
-				0, -sinT, cosT, 0,
+				0, cosT, -sinT, 0,
+				0, sinT, cosT, 0,
 				0, 0, 0, 1
 				);
 	}
 	/**
 	 * Create A Y-Axis Rotation Matrix Into Out
 	 * <pre>
-	 * | cos(t)  0  -sin(t)  0 |
-	 * | 0       1   0       0 |
-	 * | sin(t)  0   cos(t)  0 |
-	 * | 0       0   0       1 |
+	 * |  cos(t)  0  sin(t)  0 |
+	 * |  0       1  0       0 |
+	 * | -sin(t)  0  cos(t)  0 |
+	 * |  0       0  0       1 |
 	 * </pre>
 	 * @param t Angle (Radians)
 	 * @param out Non-Null Output Matrix
 	 * @return Out
 	 */
 	public static Matrix4d createRotationY(double t, Matrix4d out) {
-		double cosT = (double)Math.cos(t), sinT = (double)Math.sin(t);
+		double cosT = Math.cos(t), sinT = Math.sin(t);
 		return out.set(
-				cosT, 0, -sinT, 0,
+				cosT, 0, sinT, 0,
 				0, 1, 0, 0,
-				sinT, 0, cosT, 0,
+				-sinT, 0, cosT, 0,
 				0, 0, 0, 1
 				);
 	}
 	/**
 	 * Create A Z-Axis Rotation Matrix Into Out
 	 * <pre>
-	 * |  cos(t)  sin(t)  0  0 |
-	 * | -sin(t)  cos(t)  0  0 |
+	 * |  cos(t) -sin(t)  0  0 |
+	 * |  sin(t)  cos(t)  0  0 |
 	 * |  0       0       1  0 |
 	 * |  0       0       0  1 |
 	 * </pre>
@@ -687,10 +738,10 @@ public class Matrix4d implements Cloneable {
 	 * @return Out
 	 */
 	public static Matrix4d createRotationZ(double t, Matrix4d out) {
-		double cosT = (double)Math.cos(t), sinT = (double)Math.sin(t);
+		double cosT = Math.cos(t), sinT = Math.sin(t);
 		return out.set(
-				cosT, sinT, 0, 0,
-				-sinT, cosT, 0, 0,
+				cosT, -sinT, 0, 0,
+				sinT, cosT, 0, 0,
 				0, 0, 1, 0,
 				0, 0, 0, 1
 				);
@@ -726,10 +777,10 @@ public class Matrix4d implements Cloneable {
 	 * Let ys = cot(fov)
 	 * Let xs = ys / aspect
 	 * Let a = zfar / (znear - zfar)
-	 * | xs  0   0          0 |
-	 * | 0   ys  0          0 |
-	 * | 0   0   a         -1 |
-	 * | 0   0   znear * a  0 |
+	 * | xs  0   0      0     |
+	 * | 0   ys  0      0     |
+	 * | 0   0   a  znear * a |
+	 * | 0   0  -1      0     |
 	 * </pre>
 	 * @param fov Field Of View Y Direction In Radians From The Center Plane (0,PI/2) <pre>
 	 *        /
@@ -750,8 +801,8 @@ public class Matrix4d implements Cloneable {
 		return out.set(
 				xs, 0, 0, 0,
 				0, ys, 0, 0,
-				0, 0, a, -1,
-				0, 0, znear * a, 0
+				0, 0, a, znear * a,
+				0, 0, -1.f, 0
 				);
 	}
 	/**
@@ -774,10 +825,10 @@ public class Matrix4d implements Cloneable {
 	 * Create A Perspective Matrix Into Out
 	 * <pre>
 	 * Let a = zfar / (znear - zfar)
-	 * | 2 * znear / w  0              0          0 |
-	 * | 0              2 * znear / h  0          0 |
-	 * | 0              0              a         -1 |
-	 * | 0              0              znear * a  0 |
+	 * | 2 * znear / w  0              0      0     |
+	 * | 0              2 * znear / h  0      0     |
+	 * | 0              0              a  znear * a |
+	 * | 0              0             -1      0     |
 	 * </pre>
 	 * @param w Width Of Near View (Image) Plane
 	 * @param h Height Of Near View (Image) Plane
@@ -791,8 +842,8 @@ public class Matrix4d implements Cloneable {
 		return out.set(
 				2.f * znear / w, 0, 0, 0,
 				0, 2.f * znear / h, 0, 0,
-				0, 0, a, -1.f,
-				0, 0, znear * a, 0
+				0, 0, a, znear * a,
+				0, 0, -1.f, 0
 				);
 	}
 	/**
@@ -810,10 +861,10 @@ public class Matrix4d implements Cloneable {
 	 * Create An Orthographic Matrix Into Out
 	 * <pre>
 	 * Let a = 1 / (znear - zfar)
-	 * | 2 / w  0      0          0 |
-	 * | 0      2 / h  0          0 |
-	 * | 0      0      a          0 |
-	 * | 0      0      znear * a  1 |
+	 * | 2 / w  0      0      0     |
+	 * | 0      2 / h  0      0     |
+	 * | 0      0      a  znear * a |
+	 * | 0      0      0      1     |
 	 * </pre>
 	 * @param w Width Of View Volume
 	 * @param h Height Of View Volume
@@ -827,8 +878,8 @@ public class Matrix4d implements Cloneable {
 		return out.set(
 				2.f / w, 0, 0, 0,
 				0, 2.f / h, 0, 0,
-				0, 0, a, 0,
-				0, 0, znear * a, 1
+				0, 0, a, znear * a,
+				0, 0, 0, 1
 				);
 	}
 	/**
@@ -849,10 +900,10 @@ public class Matrix4d implements Cloneable {
 	 * Let z = normalize(eye - target)
 	 * Let x = normalize(cross(up, z))
 	 * Let y = cross(z, x)
-	 * |  x.x          y.x          z.x         0 |
-	 * |  x.y          y.y          z.y         0 |
-	 * |  x.z          y.z          z.z         0 |
-	 * | -dot(x, eye) -dot(y, eye) -dot(z, eye) 1 |
+	 * |  x.x  y.x  z.x  -dot(x, eye) |
+	 * |  x.y  y.y  z.y  -dot(y, eye) |
+	 * |  x.z  y.z  z.z  -dot(z, eye) |
+	 * |   0    0    0        1       |
 	 * </pre>
 	 * @param eye [{@link Vector3d POS}] Camera Origin
 	 * @param target [{@link Vector3d POS}] Camera Viewing Target
@@ -865,10 +916,10 @@ public class Matrix4d implements Cloneable {
 		Vector3d x = new Vector3d(up).cross(z).normalize();
 		Vector3d y = new Vector3d(z).cross(x);
 		return out.set(
-				x.x, y.x, z.x, 0,
-				x.y, y.y, z.y, 0,
-				x.z, y.z, z.z, 0,
-				-x.dot(eye), -y.dot(eye), -z.dot(eye), 1
+				x.x, x.y, x.z, -x.dot(eye),
+				y.x, y.y, y.z, -y.dot(eye),
+				z.x, z.y, z.z, -z.dot(eye),
+				0, 0, 0, 1
 				);
 	}
 	/**
@@ -887,10 +938,10 @@ public class Matrix4d implements Cloneable {
 	 * Let z = normalize(-viewDir)
 	 * Let x = normalize(cross(up, z))
 	 * Let y = cross(z, x)
-	 * |  x.x          y.x          z.x         0 |
-	 * |  x.y          y.y          z.y         0 |
-	 * |  x.z          y.z          z.z         0 |
-	 * | -dot(x, eye) -dot(y, eye) -dot(z, eye) 1 |
+	 * |  x.x  y.x  z.x  -dot(x, eye) |
+	 * |  x.y  y.y  z.y  -dot(y, eye) |
+	 * |  x.z  y.z  z.z  -dot(z, eye) |
+	 * |   0    0    0        1       |
 	 * </pre>
 	 * @param eye [{@link Vector3d POS}] Camera Origin
 	 * @param viewDir [{@link Vector3d DIRN}] Camera Viewing Direction
@@ -903,10 +954,10 @@ public class Matrix4d implements Cloneable {
 		Vector3d x = new Vector3d(up).cross(z).normalize();
 		Vector3d y = new Vector3d(z).cross(x);
 		return out.set(
-				x.x, y.x, z.x, 0,
-				x.y, y.y, z.y, 0,
-				x.z, y.z, z.z, 0,
-				-x.dot(eye), -y.dot(eye), -z.dot(eye), 1
+				x.x, x.y, x.z, -x.dot(eye),
+				y.x, y.y, y.z, -y.dot(eye),
+				z.x, z.y, z.z, -z.dot(eye),
+				0, 0, 0, 1
 				);
 	}
 	/**

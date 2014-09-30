@@ -48,22 +48,45 @@ import egl.math.Color;
 import egl.GL.BufferTarget;
 import egl.GL.GLType;
 
-public class SpriteBatch {
+public class SpriteBatch implements IDisposable {
 	/**
 	 * Default Initial Size Of Sprite Buffer
 	 */
 	public static final int INITIAL_GLYPH_CAP = 32;
 
+	/**
+	 * Texture Sorting Method
+	 * @param g1 Glyph 1
+	 * @param g2 Glyph 2
+	 * @return Sort Comparison
+	 */
 	private static int SSMTexture(SpriteGlyph g1, SpriteGlyph g2) {
 		return Integer.compare(g1.texture.getID(), g2.texture.getID());
 	}
+	/**
+	 * Depth Sorting Method For Front-To-Back
+	 * @param g1 Glyph 1
+	 * @param g2 Glyph 2
+	 * @return Sort Comparison
+	 */
 	private static int SSMFrontToBack(SpriteGlyph g1, SpriteGlyph g2) {
 		return Float.compare(g1.depth, g2.depth);
 	}
+	/**
+	 * Depth Sorting Method For Back-To-Front
+	 * @param g1 Glyph 1
+	 * @param g2 Glyph 2
+	 * @return Sort Comparison
+	 */
 	private static int SSMBackToFront(SpriteGlyph g1, SpriteGlyph g2) {
 		return Float.compare(g2.depth, g1.depth);
 	}
 
+	/**
+	 * Batched Draw Call
+	 * @author Cristian
+	 *
+	 */
 	private static class SpriteBatchCall {
 		public GLTexture Texture;
 		public int Indices;
@@ -117,7 +140,13 @@ public class SpriteBatch {
 			"    gl_FragColor = texture2D(SBTex, (vec2(fract(fUV.x), fract(fUV.y)) * fUVRect.zw) + fUVRect.xy) * fTint;\n" + 
 			"}";
 
+	/**
+	 * Default Texture Sampling Rectangle
+	 */
 	public static final Vector4 FULL_UV_RECT = new Vector4(0, 0, 1, 1);
+	/**
+	 * Default Texture Tiling
+	 */
 	public static final Vector2 UV_NO_TILE = new Vector2(1, 1);
 
 	/**
@@ -129,7 +158,7 @@ public class SpriteBatch {
 	public static Matrix4 createCameraFromWindow(float w, float h) {
 		w *= 0.5f;
 		h *= 0.5f;
-		return Matrix4.createScale(1 / w, -1 / h, 1).mul(Matrix4.createTranslation(-1, 1, 0));
+		return Matrix4.createScale(1 / w, -1 / h, 1).mulAfter(Matrix4.createTranslation(-1, 1, 0));
 	}
 
 	// Glyph Information
@@ -156,18 +185,20 @@ public class SpriteBatch {
 
 		emptyGlyphs = new ArrayDeque<SpriteGlyph>();
 	}
-	public void init() {
+	private void init() {
 		createProgram();
 		searchUniforms();
 		createVertexArray();
 	}
+	/**
+	 * Destroy OpenGL Resources This SpriteBatch Allocated
+	 */
+	@Override	
 	public void dispose() {
 		glDeleteBuffers(vbo);
 		vbo = 0;
 		glDeleteVertexArrays(vao);
 		vao = 0;
-
-		//      program.Dispose();
 		glDetachShader(idProg, idVS);
 		glDeleteShader(idVS);
 		glDetachShader(idProg, idFS);
@@ -234,6 +265,9 @@ public class SpriteBatch {
 		GLBuffer.unbind(BufferTarget.ArrayBuffer);    	
 	}
 
+	/**
+	 * Clear The Current Batch State For A New Set Of Batched Draw Calls
+	 */
 	public void begin() {
 		// Only Clear The Glyphs
 		glyphs = new ArrayList<SpriteGlyph>();
@@ -572,6 +606,10 @@ public class SpriteBatch {
 		glBufferSubData(BufferTarget.ArrayBuffer, 0, bb);
 		GLBuffer.unbind(BufferTarget.ArrayBuffer);
 	}
+	/**
+	 * Batches Draw Calls Appropriately
+	 * @param spriteSortMode {@link SpriteSortMode}
+	 */
 	public void end(int spriteSortMode) {
 		sortGlyphs(spriteSortMode);
 		generateBatches();

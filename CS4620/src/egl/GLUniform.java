@@ -6,6 +6,9 @@ import org.lwjgl.opengl.GL20;
 
 import egl.math.Matrix3;
 import egl.math.Matrix4;
+import egl.math.Vector2;
+import egl.math.Vector3;
+import egl.math.Vector4;
 
 /**
  * Aids In Eliminating Code From Setting Certain OpenGL Uniform Data
@@ -34,6 +37,30 @@ public class GLUniform {
 	 */
 	public static void setST(int unID, Matrix3 m, boolean transpose) {
 		stInstance.set(unID, m, transpose);
+	}
+	/**
+	 * Sends 2 Floats To GPU As A Program Uniform
+	 * @param unID Uniform Location
+	 * @param v Vector
+	 */
+	public static void set(int unID, Vector2 v) {
+		GL20.glUniform2f(unID, v.x, v.y);
+	}
+	/**
+	 * Sends 3 Floats To GPU As A Program Uniform
+	 * @param unID Uniform Location
+	 * @param v Vector
+	 */
+	public static void set(int unID, Vector3 v) {
+		GL20.glUniform3f(unID, v.x, v.y, v.z);
+	}
+	/**
+	 * Sends 4 Floats To GPU As A Program Uniform
+	 * @param unID Uniform Location
+	 * @param v Vector
+	 */
+	public static void set(int unID, Vector4 v) {
+		GL20.glUniform4f(unID, v.x, v.y, v.z, v.w);
 	}
 	
 	/**

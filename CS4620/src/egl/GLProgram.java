@@ -50,20 +50,7 @@ public class GLProgram implements IDisposable {
     }
     
     private int id, idVS, idFS;
-    public int getID() {
-    	return id;
-    }
-    
-    public boolean getIsCreated() {
-        return id != 0;
-    }
     private boolean isLinked;
-    public boolean getIsLinked() {
-    	return isLinked;
-    }
-    public boolean getIsInUse() {
-        return programInUse == this;
-    }
 
     private final HashMap<String, Integer> uniforms = new HashMap<>();
     private final HashMap<String, Integer> attributes = new HashMap<>();
@@ -81,11 +68,11 @@ public class GLProgram implements IDisposable {
     public GLProgram() {
     	this(false);
     }
+    @Override
     public void dispose() {
         if(!getIsCreated()) return;
 
         if(getIsInUse()) unuse();
-        id = 0;
         if(idVS != 0) {
         	glDetachShader(id, idVS);
             glDeleteShader(idVS);
@@ -96,7 +83,34 @@ public class GLProgram implements IDisposable {
             glDeleteShader(idFS);
             idFS = 0;
         }
+        
         glDeleteProgram(id);
+
+        // Reset Internal State
+        id = 0;
+        isLinked = false;
+        if(getIsInUse()) unuse();
+    }
+
+    public int getID() {
+    	return id;
+    }
+    public boolean getIsCreated() {
+        return id != 0;
+    }
+    public boolean getIsLinked() {
+    	return isLinked;
+    }
+    public boolean getIsInUse() {
+        return programInUse == this;
+    }
+    public int getAttribute(String name) {
+    	Integer i = attributes.get(name);
+    	return i == null ? GL.BadAttributeLocation : i;
+    }
+    public int getUniform(String name) {
+    	Integer i = uniforms.get(name);
+    	return i == null ? GL.BadUniformLocation : i;
     }
 
     public void init() {
@@ -129,8 +143,8 @@ public class GLProgram implements IDisposable {
         // Check Status
         int status = glGetShaderi(idS, ShaderParameter.CompileStatus);
         if(status != 1) {
-        	GLDiagnostic.writeln(GL20.glGetShaderInfoLog(idS, 1024));
-            glDeleteShader(idS);
+        	GLDiagnostic.writeln("Shader Compilation Error:\r\n" + GL20.glGetShaderInfoLog(idS, 1024));
+        	glDeleteShader(idS);
             throw new Exception("Shader Had Compilation Errors");
         }
 
@@ -211,13 +225,11 @@ public class GLProgram implements IDisposable {
         glValidateProgram(id);
         GLError.get("Program Validate");
 
-//        glDeleteShader(idVS);
-//        idVS = 0;
-//        glDeleteShader(idFS);
-//        idFS = 0;
-
         int status = glGetProgrami(id, GetProgramParameterName.LinkStatus);
         isLinked = status == 1;
+        if(!isLinked) {
+        	GLDiagnostic.writeln("Program Link Error:\r\n" + GL20.glGetProgramInfoLog(id, 1024));
+        }
         return isLinked;
     }
     public void initAttributes() {
@@ -263,15 +275,6 @@ public class GLProgram implements IDisposable {
                 uniforms.put(name, loc);
         }
     }
-
-    public int getAttribute(String name) {
-    	Integer i = attributes.get(name);
-    	return i == null ? GL.BadAttributeLocation : i;
-    }
-    public int getUniform(String name) {
-    	Integer i = uniforms.get(name);
-    	return i == null ? GL.BadUniformLocation : i;
-    }
     
     public void generateSemanticBindings(HashMap<String, Integer> dSems) {
         for(Entry<String, Integer> kvp : dSems.entrySet()) {
@@ -282,7 +285,7 @@ public class GLProgram implements IDisposable {
     }
 
     public void use() {
-        if(getIsInUse()) return;
+        if(getIsInUse() || !isLinked) return;
         programInUse = this;
         glUseProgram(id);
     }

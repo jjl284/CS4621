@@ -2,7 +2,7 @@ package egl.math;
 
 
 /**
- * 3x3 Matrix With Row Major Ordering
+ * 3x3 Matrix With Column Major Ordering
  * <br>Single Precision</br>
  * @author Cristian
  * 
@@ -39,13 +39,13 @@ public class Matrix3 implements Cloneable {
 			float m20, float m21, float m22
 			) {
 		m[0] = m00;
-		m[1] = m01;
-		m[2] = m02;
-		m[3] = m10;
+		m[1] = m10;
+		m[2] = m20;
+		m[3] = m01;
 		m[4] = m11;
-		m[5] = m12;
-		m[6] = m20;
-		m[7] = m21;
+		m[5] = m21;
+		m[6] = m02;
+		m[7] = m12;
 		m[8] = m22;
 	}
 	/**
@@ -68,35 +68,35 @@ public class Matrix3 implements Cloneable {
 	 */
 	public Matrix3(Matrix4 _m) {
 		this(
-				_m.m[0], _m.m[1], _m.m[2],
-				_m.m[4], _m.m[5], _m.m[6],
-				_m.m[8], _m.m[9], _m.m[10]
+				_m.m[0], _m.m[4], _m.m[8],
+				_m.m[1], _m.m[5], _m.m[9],
+				_m.m[2], _m.m[6], _m.m[10]
 				);
 	}
 	/**
-	 * Column Constructor
-	 * @param c0 [{@link Vector3 ARR}] Column 1
-	 * @param c1 [{@link Vector3 ARR}] Column 2
-	 * @param c2 [{@link Vector3 ARR}] Column 3
+	 * Row Constructor
+	 * @param r0 [{@link Vector3 ARR}] Row 1
+	 * @param r1 [{@link Vector3 ARR}] Row 2
+	 * @param r2 [{@link Vector3 ARR}] Row 3
 	 */
-	public Matrix3(Vector3 c0, Vector3 c1, Vector3 c2) {
+	public Matrix3(Vector3 r0, Vector3 r1, Vector3 r2) {
 		this(
-				c0.x, c1.x, c2.x,
-				c0.y, c1.y, c2.y,
-				c0.z, c1.z, c2.z
+				r0.x, r0.y, r0.z,
+				r1.x, r1.y, r1.z,
+				r2.x, r2.y, r2.z
 				);
 	}
 	/**
-	 * Frame Constructor
+	 * Frame (Column) Constructor
 	 * @param x [{@link Vector2 DIRN}] X Axis Direction
 	 * @param y [{@link Vector2 DIRN}] Y Axis Direction
 	 * @param t [{@link Vector2 POS}] Translation
 	 */
 	public Matrix3(Vector2 x, Vector2 y, Vector2 t) {
 		this(
-				x.x, x.y, 0,
-				y.x, y.y, 0,
-				t.x, t.y, 1
+				x.x, y.x, t.x,
+				x.y, y.y, t.y,
+				0, 0, 1
 				);
 	}
 	/**
@@ -113,19 +113,19 @@ public class Matrix3 implements Cloneable {
 	@Override
 	public String toString() {
 		return 
-				"["+m[0]+", "+m[1]+", "+m[2]+"]\n"+ 
-				"["+m[3]+", "+m[4]+", "+m[5]+"]\n"+ 
-				"["+m[6]+", "+m[7]+", "+m[8]+"]";
+				"["+m[0]+", "+m[3]+", "+m[6]+"]\n"+ 
+				"["+m[1]+", "+m[4]+", "+m[7]+"]\n"+ 
+				"["+m[2]+", "+m[5]+", "+m[8]+"]";
 	}
 
 	/**
 	 * Element Index Calculation
-	 * @param r Row    In Range [0,SIZE)
-	 * @param c Column In Range [0,SIZE)
-	 * @return Index In Element Array (r * SIZE + c)
+	 * @param r Column In Range [0,SIZE)
+	 * @param c Row    In Range [0,SIZE)
+	 * @return Index In Element Array (c * SIZE + r)
 	 */
 	public static int index(int r, int c) {
-		return r * SIZE + c;
+		return c * SIZE + r;
 	}
 	/**
 	 * Helper To Calculate An Inner Product
@@ -189,21 +189,21 @@ public class Matrix3 implements Cloneable {
 		return new Vector2(m[6], m[7]);
 	}
 	/**
-	 * Set A Vector To Column c Of This Matrix
-	 * @param c Column
+	 * Set A Vector To Row r Of This Matrix
+	 * @param r Row
 	 * @param out [{@link Vector3 OUT}] Vector
 	 * @return Out
 	 */
-	public Vector3 getColumn(int c, Vector3 out) {
-		return out.set(m[c], m[c + 3], m[c + 6]);
+	public Vector3 getRow(int r, Vector3 out) {
+		return out.set(m[r], m[r + 3], m[r + 6]);
 	}
 	/**
-	 * Obtains Column c Of This Matrix
-	 * @param c Column
+	 * Obtains Row r Of This Matrix
+	 * @param r Row
 	 * @return New Vector
 	 */
-	public Vector3 getColumn(int c) {
-		return new Vector3(m[c], m[c + 3], m[c + 6]);
+	public Vector3 getRow(int r) {
+		return new Vector3(m[r], m[r + 3], m[r + 6]);
 	}
 
 
@@ -226,13 +226,13 @@ public class Matrix3 implements Cloneable {
 			float m20, float m21, float m22
 			) {
 		m[0] = m00;
-		m[1] = m01;
-		m[2] = m02;
-		m[3] = m10;
+		m[1] = m10;
+		m[2] = m20;
+		m[3] = m01;
 		m[4] = m11;
-		m[5] = m12;
-		m[6] = m20;
-		m[7] = m21;
+		m[5] = m21;
+		m[6] = m02;
+		m[7] = m12;
 		m[8] = m22;
 		return this;
 	}
@@ -258,14 +258,36 @@ public class Matrix3 implements Cloneable {
 	}
 
 	/**
-	 * Composes A Matrix Onto This
+	 * Composes A Matrix M Onto This So That M Applies After This
+	 * <pre>
+	 * This = Mat * This
+	 * </pre>
+	 * @param mat Matrix M
+	 * @return This
+	 */
+	public Matrix3 mulAfter(Matrix3 mat) {
+		return set(
+				innerProduct(mat, this, 0, 0),
+				innerProduct(mat, this, 0, 1),
+				innerProduct(mat, this, 0, 2),
+				innerProduct(mat, this, 1, 0),
+				innerProduct(mat, this, 1, 1),
+				innerProduct(mat, this, 1, 2),
+				innerProduct(mat, this, 2, 0),
+				innerProduct(mat, this, 2, 1),
+				innerProduct(mat, this, 2, 2)
+				);
+	}
+
+	/**
+	 * Composes A Matrix M Onto This So That M Applies Before This
 	 * <pre>
 	 * This = This * Mat
 	 * </pre>
-	 * @param mat Right Side Matrix
+	 * @param mat Matrix M
 	 * @return This
 	 */
-	public Matrix3 mul(Matrix3 mat) {
+	public Matrix3 mulBefore(Matrix3 mat) {
 		return set(
 				innerProduct(this, mat, 0, 0),
 				innerProduct(this, mat, 0, 1),
@@ -278,16 +300,40 @@ public class Matrix3 implements Cloneable {
 				innerProduct(this, mat, 2, 2)
 				);
 	}
+
 	/**
-	 * Multiplies This Matrix And Another Into Out
+	 * Multiplies This Matrix And Another Into Out So That M Applies After This
 	 * <pre>
-	 * Out = This * Mat
+	 * Out = Mat * This
 	 * </pre>
-	 * @param mat Right Side Matrix
+	 * @param mat Matrix M
 	 * @param out Non-Null Output Matrix
 	 * @return Out
 	 */
-	public Matrix3 mul(Matrix3 mat, Matrix3 out) {
+	public Matrix3 mulAfter(Matrix3 mat, Matrix3 out) {
+		return out.set(
+				innerProduct(mat, this, 0, 0),
+				innerProduct(mat, this, 0, 1),
+				innerProduct(mat, this, 0, 2),
+				innerProduct(mat, this, 1, 0),
+				innerProduct(mat, this, 1, 1),
+				innerProduct(mat, this, 1, 2),
+				innerProduct(mat, this, 2, 0),
+				innerProduct(mat, this, 2, 1),
+				innerProduct(mat, this, 2, 2)
+				);
+	}
+
+	/**
+	 * Multiplies This Matrix And Another Into Out So That M Applies Before This
+	 * <pre>
+	 * Out = This * Mat
+	 * </pre>
+	 * @param mat Matrix M
+	 * @param out Non-Null Output Matrix
+	 * @return Out
+	 */
+	public Matrix3 mulBefore(Matrix3 mat, Matrix3 out) {
 		return out.set(
 				innerProduct(this, mat, 0, 0),
 				innerProduct(this, mat, 0, 1),
@@ -304,7 +350,7 @@ public class Matrix3 implements Cloneable {
 	/**
 	 * Transforms A Vector In Place
 	 * <pre>
-	 * V = V * This
+	 * V = This * V
 	 * <pre>
 	 * @param v [{@link #Vec3 POS}] Vector
 	 * @return Transformed Vector
@@ -319,7 +365,7 @@ public class Matrix3 implements Cloneable {
 	/**
 	 * Transforms And Homogenizes A Position Vector In Place
 	 * <pre>
-	 * {V, w} = {V, 1} * This
+	 * {V, w} = This * {V, 1}
 	 * V = V / w
 	 * </pre>
 	 * @param v [{@link Vector2 POS}] Vector
@@ -346,14 +392,14 @@ public class Matrix3 implements Cloneable {
 	}
 	/**
 	 * Helper To Calculate A Cofactor
-	 * @param r Excluded Row
 	 * @param c Excluded Column
+	 * @param r Excluded Row
 	 * @return Cofactor
 	 */
-	private float coFactor(int r, int c) {
-		switch(r) {
+	private float coFactor(int c, int r) {
+		switch(c) {
 		case 0:
-			switch(c) {
+			switch(r) {
 			case 0:
 				return m[4] * m[8] - m[5] * m[7];
 			case 1:
@@ -362,7 +408,7 @@ public class Matrix3 implements Cloneable {
 				return m[3] * m[7] - m[4] * m[6];
 			}
 		case 1:
-			switch(c) {
+			switch(r) {
 			case 0:
 				return m[2] * m[7] - m[1] * m[8];
 			case 1:
@@ -371,7 +417,7 @@ public class Matrix3 implements Cloneable {
 				return m[1] * m[6] - m[0] * m[7];
 			}
 		case 2:
-			switch(c) {
+			switch(r) {
 			case 0:
 				return m[1] * m[5] - m[2] * m[4];
 			case 1:
@@ -410,15 +456,9 @@ public class Matrix3 implements Cloneable {
 		if(det == 0) throw new AssertionError("Determinant Of 0");
 		float f = 1 / det;
 		return set(
-				f * cof00,
-				f * coFactor(1, 0),
-				f * coFactor(2, 0),
-				f * cof01,
-				f * coFactor(1, 1),
-				f * coFactor(2, 1),
-				f * cof02,
-				f * coFactor(1, 2),
-				f * coFactor(2, 2)
+				f * cof00, f * cof01, f * cof02,
+				f * coFactor(1, 0), f * coFactor(1, 1), f * coFactor(1, 2),
+				f * coFactor(2, 0), f * coFactor(2, 1), f * coFactor(2, 2)
 				);
 	}
 
@@ -497,9 +537,9 @@ public class Matrix3 implements Cloneable {
 	/**
 	 * Create A Translation Matrix Into Out
 	 * <pre>
-	 * | 1  0  0 |
-	 * | 0  1  0 |
-	 * | x  y  1 |
+	 * | 1  0  x |
+	 * | 0  1  y |
+	 * | 0  0  1 |
 	 * <pre>
 	 * @param x X Translation
 	 * @param y Y Translation
@@ -508,9 +548,9 @@ public class Matrix3 implements Cloneable {
 	 */
 	public static Matrix3 createTranslation(float x, float y, Matrix3 out) {
 		return out.set(
-				1, 0, 0,
-				0, 1, 0,
-				x, y, 1
+				1, 0, x,
+				0, 1, y,
+				0, 0, 1
 				);
 	}
 	/**
@@ -543,8 +583,8 @@ public class Matrix3 implements Cloneable {
 	/**
 	 * Create A Rotation Matrix Into Out
 	 * <pre>
-	 * |  cos(t)  sin(t)  0 |
-	 * | -sin(t)  cos(t)  0 |
+	 * |  cos(t) -sin(t)  0 |
+	 * |  sin(t)  cos(t)  0 |
 	 * |  0       0       1 |
 	 * </pre>
 	 * @param t Angle (Radians)
@@ -554,8 +594,8 @@ public class Matrix3 implements Cloneable {
 	public static Matrix3 createRotation(float t, Matrix3 out) {
 		float cosT = (float)Math.cos(t), sinT = (float)Math.sin(t);
 		return out.set(
-				cosT, sinT, 0,
-				-sinT, cosT, 0,
+				cosT, -sinT, 0,
+				sinT, cosT, 0,
 				0, 0, 1
 				);
 	}
@@ -571,8 +611,8 @@ public class Matrix3 implements Cloneable {
 	 * Create A X Rotation Matrix Into Out
 	 * <pre>
 	 * | 1   0       0      |
-	 * | 0   cos(t)  sin(t) |
-	 * | 0  -sin(t)  cos(t) |
+	 * | 0   cos(t) -sin(t) |
+	 * | 0   sin(t)  cos(t) |
 	 * </pre>
 	 * @param t Angle (Radians)
 	 * @param out Non-Null Output Matrix
@@ -582,8 +622,8 @@ public class Matrix3 implements Cloneable {
 		float cosT = (float)Math.cos(t), sinT = (float)Math.sin(t);
 		return out.set(
 				1, 0, 0,
-				0, cosT, sinT,
-				0, -sinT, cosT
+				0, cosT, -sinT,
+				0, sinT, cosT
 				);
 	}
 	/**
@@ -597,9 +637,9 @@ public class Matrix3 implements Cloneable {
 	/**
 	 * Create A Y Rotation Matrix Into Out
 	 * <pre>
-	 * | cos(t)  0  -sin(t) |
-	 * | 0       1   0      |
-	 * | sin(t)  0   cos(t) |
+	 * |  cos(t)  0   sin(t) |
+	 * |  0       1   0      |
+	 * | -sin(t)  0   cos(t) |
 	 * </pre>
 	 * @param t Angle (Radians)
 	 * @param out Non-Null Output Matrix
@@ -608,9 +648,9 @@ public class Matrix3 implements Cloneable {
 	public static Matrix3 createRotationY(float t, Matrix3 out) {
 		float cosT = (float)Math.cos(t), sinT = (float)Math.sin(t);
 		return out.set(
-				cosT, 0, -sinT,
+				cosT, 0, sinT,
 				0, 1, 0,
-				sinT, 0, cosT
+				-sinT, 0, cosT
 				);
 	}
 	/**
@@ -624,9 +664,9 @@ public class Matrix3 implements Cloneable {
 	/**
 	 * Create A Z Rotation Matrix Into Out
 	 * <pre>
-	 * |  cos(t)  sin(t)  0 |
-	 * | -sin(t)  cos(t)  0 |
-	 * |  0       0       1 |
+	 * | cos(t)  -sin(t)  0 |
+	 * | sin(t)   cos(t)  0 |
+	 * | 0        0       1 |
 	 * </pre>
 	 * @param t Angle (Radians)
 	 * @param out Non-Null Output Matrix
@@ -635,8 +675,8 @@ public class Matrix3 implements Cloneable {
 	public static Matrix3 createRotationZ(float t, Matrix3 out) {
 		float cosT = (float)Math.cos(t), sinT = (float)Math.sin(t);
 		return out.set(
-				cosT, sinT, 0,
-				-sinT, cosT, 0,
+				cosT, -sinT, 0,
+				sinT, cosT, 0,
 				0, 0, 1
 				);
 	}
@@ -654,9 +694,9 @@ public class Matrix3 implements Cloneable {
 	 * <pre>
 	 * Let w = r - l
 	 * Let h = t - b
-	 * |  2 / w         0            0 |
-	 * |  0             2 / h        0 |
-	 * | -(l + r) / w  -(b + t) / h  1 |
+	 * |  2 / w  0      -(l + r) / w |
+	 * |  0      2 / h  -(b + t) / h |
+	 * |  0      0      1            |
 	 * </pre>
 	 * @param l Left Side Of Rect
 	 * @param r Right Side Of Rect
@@ -668,9 +708,9 @@ public class Matrix3 implements Cloneable {
 	public static Matrix3 createOrthographic(float l, float r, float b, float t, Matrix3 out) {
 		float w = r - l, h = t - b;
 		return out.set(
-				2 / w, 0, 0,
-				0, 2 / h, 0,
-				-(l + r) / w, -(b + t) / h, 1);
+				2 / w, 0, -(l + r) / w,
+				0, 2 / h, -(b + t) / h,
+				0, 0, 1);
 	}
 	/**
 	 * @see {@link #createOrthographic(float, float, float, float, Matrix3) Mat3.createOrthographic(l, r, b, t, new Mat3())}

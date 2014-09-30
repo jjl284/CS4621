@@ -5,26 +5,26 @@ import org.lwjgl.input.Keyboard;
 import ext.csharp.EventArgs;
 
 public class KeyboardKeyEventArgs extends EventArgs {
-	public int Key;
-	public boolean IsRepeat;
-	public final boolean[] KeyStates;
+	public int key;
+	public boolean isRepeat;
+	public final boolean[] keyStates;
 
-	public boolean getAlt() { return KeyStates[Keyboard.KEY_LMENU] | KeyStates[Keyboard.KEY_RMENU]; 	}
-	public boolean getShift() { return KeyStates[Keyboard.KEY_LSHIFT] | KeyStates[Keyboard.KEY_RSHIFT]; 	}
-	public boolean getControl() { return KeyStates[Keyboard.KEY_LCONTROL] | KeyStates[Keyboard.KEY_RCONTROL]; 	}
+	public boolean getAlt() { return keyStates[Keyboard.KEY_LMENU] | keyStates[Keyboard.KEY_RMENU]; 	}
+	public boolean getShift() { return keyStates[Keyboard.KEY_LSHIFT] | keyStates[Keyboard.KEY_RSHIFT]; 	}
+	public boolean getControl() { return keyStates[Keyboard.KEY_LCONTROL] | keyStates[Keyboard.KEY_RCONTROL]; 	}
 
 	public KeyboardKeyEventArgs() {
-		KeyStates = new boolean[Keyboard.KEYBOARD_SIZE];
+		keyStates = new boolean[Keyboard.KEYBOARD_SIZE];
 	}
 	public void Refresh() {
-		Key = 0;
+		key = 0;
 		Keyboard.poll();
-		KeyStates[Keyboard.KEY_LMENU] = Keyboard.isKeyDown(Keyboard.KEY_LMENU);
-		KeyStates[Keyboard.KEY_RMENU] = Keyboard.isKeyDown(Keyboard.KEY_RMENU);
-		KeyStates[Keyboard.KEY_LSHIFT] = Keyboard.isKeyDown(Keyboard.KEY_LSHIFT);
-		KeyStates[Keyboard.KEY_RSHIFT] = Keyboard.isKeyDown(Keyboard.KEY_RSHIFT);
-		KeyStates[Keyboard.KEY_LCONTROL] = Keyboard.isKeyDown(Keyboard.KEY_LCONTROL);
-		KeyStates[Keyboard.KEY_RCONTROL] = Keyboard.isKeyDown(Keyboard.KEY_RCONTROL);
-		IsRepeat = false;
+		keyStates[Keyboard.KEY_LMENU] = Keyboard.isKeyDown(Keyboard.KEY_LMENU);
+		keyStates[Keyboard.KEY_RMENU] = Keyboard.isKeyDown(Keyboard.KEY_RMENU);
+		keyStates[Keyboard.KEY_LSHIFT] = Keyboard.isKeyDown(Keyboard.KEY_LSHIFT);
+		keyStates[Keyboard.KEY_RSHIFT] = Keyboard.isKeyDown(Keyboard.KEY_RSHIFT);
+		keyStates[Keyboard.KEY_LCONTROL] = Keyboard.isKeyDown(Keyboard.KEY_LCONTROL);
+		keyStates[Keyboard.KEY_RCONTROL] = Keyboard.isKeyDown(Keyboard.KEY_RCONTROL);
+		isRepeat = false;
 	}
 }

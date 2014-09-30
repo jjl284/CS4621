@@ -124,24 +124,24 @@ public class Quat extends AbstractList<Float> implements Cloneable {
 		if(z < 0.0f) z = 0.0f; else { z = (float)Math.sqrt(z / 4.0); }
 		
 		if(w >= x && w >= y && w >= z) {
-		    if(m.m[7] - m.m[5] < 0) x = -x;
-		    if(m.m[2] - m.m[3] < 0) y = -y;
-		    if(m.m[3] - m.m[1] < 0) z = -z;
-		} 
+		    if(m.m[5] - m.m[7] < 0) x = -x;
+		    if(m.m[6] - m.m[2] < 0) y = -y;
+		    if(m.m[1] - m.m[3] < 0) z = -z;
+		}
 		else if(x >= y && x >= z) {
-			if(m.m[7] - m.m[5] < 0) w = -w;
-		    if(m.m[2] + m.m[1] < 0) y = -y;
-		    if(m.m[3] + m.m[6] < 0) z = -z;
-		} 
+		    if(m.m[5] - m.m[7] < 0) w = -w;
+		    if(m.m[1] + m.m[3] < 0) y = -y;
+		    if(m.m[6] + m.m[2] < 0) z = -z;
+		}
 		else if(y >= z) {
-			if(m.m[2] - m.m[6] < 0) w = -w;
-		    if(m.m[3] + m.m[1] < 0) x = -x;
-		    if(m.m[7] + m.m[5] < 0) z = -z;
+			if(m.m[6] - m.m[2] < 0) w = -w;
+			if(m.m[1] + m.m[3] < 0) x = -x;
+			if(m.m[5] + m.m[7] < 0) z = -z;
 		}
 		else {
-			if(m.m[3] - m.m[1] < 0) w = -w;
-		    if(m.m[6] + m.m[2] < 0) x = -x;
-		    if(m.m[7] + m.m[5] < 0) y = -y;
+			if(m.m[1] - m.m[3] < 0) w = -w;
+			if(m.m[2] + m.m[6] < 0) x = -x;
+			if(m.m[5] + m.m[7] < 0) y = -y;
 		}
 		return normalize();
 	}
@@ -164,24 +164,24 @@ public class Quat extends AbstractList<Float> implements Cloneable {
 		if(z < 0.0f) z = 0.0f; else { z = (float)Math.sqrt(z / 4.0); }
 		
 		if(w >= x && w >= y && w >= z) {
-		    if(m.m[9] - m.m[6] < 0) x = -x;
-		    if(m.m[2] - m.m[4] < 0) y = -y;
-		    if(m.m[4] - m.m[1] < 0) z = -z;
-		} 
+		    if(m.m[6] - m.m[9] < 0) x = -x;
+		    if(m.m[8] - m.m[2] < 0) y = -y;
+		    if(m.m[1] - m.m[4] < 0) z = -z;
+		}
 		else if(x >= y && x >= z) {
-			if(m.m[9] - m.m[6] < 0) w = -w;
-		    if(m.m[2] + m.m[1] < 0) y = -y;
-		    if(m.m[4] + m.m[8] < 0) z = -z;
-		} 
+		    if(m.m[6] - m.m[9] < 0) w = -w;
+		    if(m.m[1] + m.m[4] < 0) y = -y;
+		    if(m.m[8] + m.m[2] < 0) z = -z;
+		}
 		else if(y >= z) {
-			if(m.m[2] - m.m[8] < 0) w = -w;
-		    if(m.m[4] + m.m[1] < 0) x = -x;
-		    if(m.m[9] + m.m[6] < 0) z = -z;
+			if(m.m[8] - m.m[2] < 0) w = -w;
+			if(m.m[1] + m.m[4] < 0) x = -x;
+			if(m.m[6] + m.m[9] < 0) z = -z;
 		}
 		else {
-			if(m.m[4] - m.m[1] < 0) w = -w;
-		    if(m.m[8] + m.m[2] < 0) x = -x;
-		    if(m.m[9] + m.m[6] < 0) y = -y;
+			if(m.m[1] - m.m[4] < 0) w = -w;
+			if(m.m[2] + m.m[8] < 0) x = -x;
+			if(m.m[6] + m.m[9] < 0) y = -y;
 		}
 		return normalize();
 	}
@@ -398,12 +398,12 @@ public class Quat extends AbstractList<Float> implements Cloneable {
 		m.m[4] = 1 - (xx + zz);
 		m.m[8] = 1 - (xx + yy);
 		// Corners
-		m.m[1] = xy - wz;
-		m.m[2] = xz + wy;
-		m.m[3] = xy + wz;
-		m.m[5] = yz - wx;
-		m.m[6] = xz - wy;
-		m.m[7] = yz + wx;
+		m.m[1] = xy + wz;
+	    m.m[3] = xy - wz;
+	    m.m[2] = xz - wy;
+	    m.m[6] = xz + wy;
+	    m.m[5] = yz + wx;
+	    m.m[7] = yz - wx;
 		return m;
 	}
 	/**
@@ -425,12 +425,12 @@ public class Quat extends AbstractList<Float> implements Cloneable {
 		m.m[5] =  1 - (xx + zz);
 		m.m[10] = 1 - (xx + yy);
 		// Corners
-		m.m[1] = xy - wz;
-		m.m[2] = xz + wy;
-		m.m[4] = xy + wz;
-		m.m[6] = yz - wx;
-		m.m[8] = xz - wy;
-		m.m[9] = yz + wx;
+	    m.m[1] = xy + wz;
+	    m.m[4] = xy - wz;
+	    m.m[2] = xz - wy;
+	    m.m[8] = xz + wy;
+	    m.m[6] = yz + wx;
+	    m.m[9] = yz - wx;
 		return m;
 	}
 

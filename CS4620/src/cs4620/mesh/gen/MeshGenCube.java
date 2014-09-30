@@ -1,8 +1,8 @@
 package cs4620.mesh.gen;
 
-import org.lwjgl.BufferUtils;
-
+import cs4620.common.BasicType;
 import cs4620.mesh.MeshData;
+import egl.NativeMem;
 
 /**
  * Generates A Cube Mesh
@@ -17,10 +17,10 @@ public class MeshGenCube extends MeshGenerator {
 		outData.indexCount = 6 * 2 * 3;
 
 		// Create Storage Spaces
-		outData.positions = BufferUtils.createFloatBuffer(outData.vertexCount * 3);
-		outData.uvs = BufferUtils.createFloatBuffer(outData.vertexCount * 2);
-		outData.normals = BufferUtils.createFloatBuffer(outData.vertexCount * 3);
-		outData.indices = BufferUtils.createIntBuffer(outData.indexCount);
+		outData.positions = NativeMem.createFloatBuffer(outData.vertexCount * 3);
+		outData.uvs = NativeMem.createFloatBuffer(outData.vertexCount * 2);
+		outData.normals = NativeMem.createFloatBuffer(outData.vertexCount * 3);
+		outData.indices = NativeMem.createIntBuffer(outData.indexCount);
 		
 		// Add Positions For 6 Faces
 		outData.positions.put(new float[]{
@@ -84,5 +84,10 @@ public class MeshGenCube extends MeshGenerator {
 			outData.indices.put(f + 3);
 			f >>= 2;
 		}
+	}
+
+	@Override
+	public BasicType getType() {
+		return BasicType.Cube;
 	}
 }

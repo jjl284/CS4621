@@ -1,8 +1,8 @@
 package cs4620.mesh.gen;
 
-import org.lwjgl.BufferUtils;
-
+import cs4620.common.BasicType;
 import cs4620.mesh.MeshData;
+import egl.NativeMem;
 
 /**
  * Generates A Cylinder Mesh
@@ -12,7 +12,7 @@ import cs4620.mesh.MeshData;
 public class MeshGenCylinder extends MeshGenerator {
 	@Override
 	public void generate(MeshData outData, MeshGenOptions opt) {
-		// TODO#A1: Add Normals And Texture Coordinates Into The Mesh
+		// TODO#A1 SOLUTION START
 
 		// Calculate Vertex And Index Count
 		outData.vertexCount = (opt.divisionsLongitude) * 4 + 2;
@@ -20,8 +20,10 @@ public class MeshGenCylinder extends MeshGenerator {
 		outData.indexCount = tris * 3;
 
 		// Create Storage Spaces
-		outData.positions = BufferUtils.createFloatBuffer(outData.vertexCount * 3);
-		outData.indices = BufferUtils.createIntBuffer(outData.indexCount);
+		outData.positions = NativeMem.createFloatBuffer(outData.vertexCount * 3);
+		outData.uvs = NativeMem.createFloatBuffer(outData.vertexCount * 2);
+		outData.normals = NativeMem.createFloatBuffer(outData.vertexCount * 3);
+		outData.indices = NativeMem.createIntBuffer(outData.indexCount);
 		
 		// Create The Vertices
 		for(int i = 0;i < opt.divisionsLongitude;i++) {
@@ -33,20 +35,32 @@ public class MeshGenCylinder extends MeshGenerator {
 			
 			// Middle Tube Top
 			outData.positions.put(x); outData.positions.put(1); outData.positions.put(z);
+			outData.normals.put(x); outData.normals.put(0); outData.normals.put(z);
+			outData.uvs.put(p); outData.uvs.put(0.5f);
 			
 			// Middle Tube Bottom
 			outData.positions.put(x); outData.positions.put(-1); outData.positions.put(z);
+			outData.normals.put(x); outData.normals.put(0); outData.normals.put(z);
+			outData.uvs.put(p); outData.uvs.put(0);
 
 			// Top Cap
 			outData.positions.put(x); outData.positions.put(1); outData.positions.put(z);
+			outData.normals.put(0); outData.normals.put(1); outData.normals.put(0);
+			outData.uvs.put((x + 1) * 0.25f + 0.5f); outData.uvs.put((1 - z) * 0.25f + 0.5f);
 
 			// Bottom Cap
 			outData.positions.put(x); outData.positions.put(-1); outData.positions.put(z);
+			outData.normals.put(0); outData.normals.put(-1); outData.normals.put(0);
+			outData.uvs.put((x + 1) * 0.25f); outData.uvs.put((z + 1) * 0.25f + 0.5f);
 		}
 		// Extra Vertices For U = 1
 		outData.positions.put(0); outData.positions.put(1); outData.positions.put(-1);
+		outData.normals.put(0); outData.normals.put(0); outData.normals.put(-1);
+		outData.uvs.put(1); outData.uvs.put(0.5f);
 		
 		outData.positions.put(0); outData.positions.put(-1); outData.positions.put(-1);
+		outData.normals.put(0); outData.normals.put(0); outData.normals.put(-1);
+		outData.uvs.put(1); outData.uvs.put(0);
 		
 		// Create The Indices For The Tube
 		for(int i = 0;i < opt.divisionsLongitude;i++) {
@@ -73,6 +87,12 @@ public class MeshGenCylinder extends MeshGenerator {
 			outData.indices.put(si + 5);
 			outData.indices.put(si + 1);
 		}
+		
+		// #SOLUTION END
 	}
 
+	@Override
+	public BasicType getType() {
+		return BasicType.Cylinder;
+	}
 }

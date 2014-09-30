@@ -8,7 +8,7 @@ public class EventFuncBound<L, T extends EventArgs> extends ACEventFunc<T> {
 		function = f;
 	}
 	@Override
-	public void Receive(Object sender, T args) {
+	public void receive(Object sender, T args) {
 		function.Receive(refObj, sender, args);
 	}
 }
