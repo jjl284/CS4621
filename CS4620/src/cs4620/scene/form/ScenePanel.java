@@ -49,6 +49,7 @@ import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTextField;
 import javax.swing.JTree;
 import javax.swing.SwingUtilities;
 import javax.swing.event.TreeSelectionEvent;
@@ -60,6 +61,7 @@ import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
 import cs4620.common.Scene;
+import cs4620.common.Scene.NameBindSceneObject;
 import cs4620.common.SceneCamera;
 import cs4620.common.SceneLight;
 import cs4620.common.SceneObject;
@@ -83,7 +85,8 @@ public class ScenePanel extends JPanel implements ValueUpdatable {
 	
 	JPanel editPanel = new JPanel(new CardLayout());
 	HashMap<DefaultMutableTreeNode, String> nodeToEditor = new HashMap<>();
-
+	JTextField txtObjectName = new JTextField();
+	
 	public ScenePanel(SceneApp a) {
 		super(new BorderLayout());
 		app = a;
@@ -109,6 +112,9 @@ public class ScenePanel extends JPanel implements ValueUpdatable {
 			}
 		});
 
+		JPanel actionPanel = new JPanel();
+		actionPanel.setLayout(new BoxLayout(actionPanel, BoxLayout.X_AXIS));
+		
 		
 		JPanel southPanel = new JPanel();
 		southPanel.setLayout(new BoxLayout(southPanel, BoxLayout.Y_AXIS));
@@ -131,9 +137,60 @@ public class ScenePanel extends JPanel implements ValueUpdatable {
 							app.scene = (Scene)o;
 							if(old != null) old.sendEvent(new SceneReloadEvent(file));
 							return;}}}}});
+		actionPanel.add(loadScene);
+		
+		JButton newObject = new JButton("Add Blank");
+		newObject.setAlignmentX(Component.CENTER_ALIGNMENT);
+		newObject.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				// Get A Good Name
+				String name = txtObjectName.getText();
+				if(name == null) return;
+				name = name.trim();
+				
+				// Create A Scene Object
+				SceneObject o;
+				if(name.toLowerCase().startsWith("camera-")) {
+					name = name.substring(7);
+					o = new SceneCamera();
+				}
+				else if (name.toLowerCase().startsWith("light-")) {
+					name = name.substring(6);
+					o = new SceneLight();
+				}
+				else {
+					o = new SceneObject();
+				}
+				if(name.length() < 1) return;
+				
+				// Add New Object If Non-existent
+				SceneObject so = app.scene.objects.get(name);
+				if(so == null) {
+					app.scene.addObject(new NameBindSceneObject(name, o));
+				}
+			}
+		});
+		actionPanel.add(newObject);
+		actionPanel.add(txtObjectName);
+		
+		JButton deleteObject = new JButton("Delete");
+		deleteObject.setAlignmentX(Component.CENTER_ALIGNMENT);
+		deleteObject.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				if(tree.isSelectionEmpty()) return;
+				TreePath path = tree.getSelectionPath();
+				if(path == null) return;
+				DefaultMutableTreeNode name = (DefaultMutableTreeNode)path.getLastPathComponent();
+				app.scene.removeObject((String)name.getUserObject());
+			}
+		});
+		actionPanel.add(deleteObject);
+		
 		
 		add(scrollPane);
-		southPanel.add(loadScene);
+		southPanel.add(actionPanel);
 		southPanel.add(editPanel);
 		add(southPanel, BorderLayout.SOUTH);
 	}

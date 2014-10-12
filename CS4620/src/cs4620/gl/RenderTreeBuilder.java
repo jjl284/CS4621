@@ -2,6 +2,7 @@ package cs4620.gl;
 
 import java.util.HashMap;
 
+import cs4620.common.Cubemap;
 import cs4620.common.Material;
 import cs4620.common.Mesh;
 import cs4620.common.Scene;
@@ -34,7 +35,7 @@ public class RenderTreeBuilder {
 		// Resources
 		buildTextures(scene, env);
 		buildMeshes(scene, env);
-
+		buildCubemaps(scene, env);
 		// Render-able State Is Created Here
 		buildMaterials(scene, env);
 		buildTree(scene, env);
@@ -118,8 +119,22 @@ public class RenderTreeBuilder {
 	 * @param env  The environment containing the hierarchy to be processed.
 	 */
 	public static void rippleTransformations(RenderEnvironment env) {
-		// TODO#A3
+		// TODO#A3 SOLUTION START
+		rippleTransformationsImpl(env.root);
+		for(RenderCamera rc : env.cameras) {
+			rc.updateCameraMatrix(env.viewportSize);
+		}
 	}
+	private static void rippleTransformationsImpl(RenderObject ro) {
+		if(ro.parent != null) {
+			ro.mWorldTransform.set(ro.sceneObject.transformation).mulAfter(ro.parent.mWorldTransform);
+			ro.mWorldTransformIT.set(ro.mWorldTransform.getAxes()).invert().transpose();
+		}
+		for(RenderObject cro : ro.children) {
+			rippleTransformationsImpl(cro);
+		}
+	}
+	// SOLUTION END
 	
 	/**
 	 * Make a RenderMaterial for each Material in <scene>.
@@ -140,6 +155,12 @@ public class RenderTreeBuilder {
 	public static void buildMeshes(Scene scene, RenderEnvironment env) {
 		for(Mesh m : scene.meshes) {
 			env.addMesh(m);
+		}
+	}
+	
+	public static void buildCubemaps(Scene scene, RenderEnvironment env) {
+		for(Cubemap c : scene.cubemaps) {
+			env.addCubemap(c);
 		}
 	}
 

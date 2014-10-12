@@ -12,6 +12,16 @@ public class RenderCamera extends RenderObject {
 	public final SceneCamera sceneCamera;
 	
 	/**
+	 * The view transformation matrix
+	 */
+	public final Matrix4 mView = new Matrix4();
+	
+	/**
+	 * The projection matrix
+	 */
+	public final Matrix4 mProj = new Matrix4();
+	
+	/**
 	 * The viewing/projection matrix (The product of the view and projection matrices)
 	 */
 	public final Matrix4 mViewProjection = new Matrix4();
@@ -46,6 +56,37 @@ public class RenderCamera extends RenderObject {
 		// The other camera parameters are found in the scene camera (this.sceneCamera).
 		// Look through the methods in Matrix4 before you type in any matrices from the book or the OpenGL specification.
 		
-		// TODO#A3
+		// TODO#A3 SOLUTION START
+
+		// Create viewing matrix
+		mView.set(mWorldTransform).invert();
+
+		// Correct Image Aspect Ratio By Enlarging Image
+		Vector2 iSize = new Vector2((float)sceneCamera.imageSize.x, (float)sceneCamera.imageSize.y);
+		float viewAsp = viewportSize.x / viewportSize.y;
+		float camAsp = iSize.x / iSize.y;
+		if(viewAsp > camAsp) iSize.mul(viewAsp / camAsp, 1);
+		else iSize.mul(1, camAsp / viewAsp);			
+
+		// Create Projection
+		if(sceneCamera.isPerspective) {
+			Matrix4.createPerspective(
+					iSize.x, iSize.y, 
+					(float)sceneCamera.zPlanes.x, (float)sceneCamera.zPlanes.y,
+					mProj
+					);
+		}
+		else {
+			Matrix4.createOrthographic(
+					iSize.x, iSize.y, 
+					(float)sceneCamera.zPlanes.x, (float)sceneCamera.zPlanes.y,
+					mProj
+					);
+		}
+		
+		// Set the view projection matrix using the view and projection matrices
+		mViewProjection.set(mView).mulAfter(mProj);
+		
+		// SOLUTION END
 	}	
 }

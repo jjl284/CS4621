@@ -7,10 +7,12 @@ import java.util.Map.Entry;
 
 import org.lwjgl.BufferUtils;
 
+import cs4620.common.Cubemap;
 import cs4620.common.Material;
 import cs4620.common.Mesh;
 import cs4620.common.SceneObject;
 import cs4620.common.Texture;
+import cs4620.common.texture.TexCubeMap;
 import cs4620.mesh.MeshConverter;
 import cs4620.mesh.MeshData;
 import cs4620.mesh.OBJMesh;
@@ -58,6 +60,8 @@ public class RenderEnvironment implements IDisposable {
 	 */
 	public final Vector2 viewportSize = new Vector2();
 
+	public TexCubeMap cubemap = new TexCubeMap();
+	
 	public RenderEnvironment(Vector2 viewSize) {
 		viewportSize.set(viewSize);
 	}
@@ -81,6 +85,7 @@ public class RenderEnvironment implements IDisposable {
 			try {
 				rt.setImage2D(t.file, false);
 			} catch (Exception e) {
+				System.err.println("Problem when loading texture from file: " + e.getMessage());
 				rt.dispose();
 				return;
 			}
@@ -120,6 +125,14 @@ public class RenderEnvironment implements IDisposable {
 		return true;
 	}
 
+	public void addCubemap(Cubemap c) {
+		try {
+			cubemap.createCubeMap(c.file);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
 	public void addMesh(Mesh m) {
 		MeshData md = new MeshData();
 		switch (m.type) {

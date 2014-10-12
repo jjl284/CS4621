@@ -35,6 +35,14 @@ public class Colord extends Vector3d {
 	}
 	
 	/**
+	 * Construct a Colord from a Vector3d, it should have values between 0 and 1!
+	 * @param v The Vector3d to copy.
+	 */
+	public Colord(Vector3d v) {
+		super(v);
+	}
+	
+	/**
 	 * Default constructor. Returns black.
 	 */
 	public Colord() {

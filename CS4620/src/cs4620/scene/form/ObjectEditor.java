@@ -5,7 +5,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
-import java.util.Locale;
 
 import javax.swing.BoxLayout;
 import javax.swing.JFormattedTextField;
@@ -30,7 +29,12 @@ public class ObjectEditor extends JPanel implements ValueUpdatable {
 	 * UID
 	 */
 	private static final long serialVersionUID = 3903094708323383337L;
-
+	
+	protected static final DecimalFormat decimalFormat = (DecimalFormat)NumberFormat.getNumberInstance();
+	static {
+		decimalFormat.setGroupingUsed(false);
+	}
+	
 	protected Scene scene;
 	protected SceneObject myObject;
 	
@@ -165,9 +169,6 @@ public class ObjectEditor extends JPanel implements ValueUpdatable {
 			//MATRIX UPDATE PANEL
 			JPanel matrixUpdateFrame = new JPanel();
 			matrixUpdateFrame.setLayout(new GridLayout(4,4));
-			NumberFormat numberFormat = NumberFormat.getNumberInstance(Locale.getDefault());
-			DecimalFormat decimalFormat = (DecimalFormat) numberFormat;
-			decimalFormat.setGroupingUsed(false);
 			ActionListener al = new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent arg0) {

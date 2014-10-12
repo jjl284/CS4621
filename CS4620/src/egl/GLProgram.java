@@ -119,7 +119,7 @@ public class GLProgram implements IDisposable {
         id = glCreateProgram();
     }
 
-    public void addShader(int st, String src) throws Exception {
+    public void addShader(String materialName, int st, String src) throws Exception {
         if(getIsLinked()) throw new Exception("Program Is Already Linked");
 
         switch(st) {
@@ -143,7 +143,9 @@ public class GLProgram implements IDisposable {
         // Check Status
         int status = glGetShaderi(idS, ShaderParameter.CompileStatus);
         if(status != 1) {
-        	GLDiagnostic.writeln("Shader Compilation Error:\r\n" + GL20.glGetShaderInfoLog(idS, 1024));
+        	String errorMsg = "Shader Compilation Error for " + materialName + " material:\r\n" + GL20.glGetShaderInfoLog(idS, 1024);
+        	GLDiagnostic.writeln(errorMsg);
+        	System.err.println(errorMsg);
         	glDeleteShader(idS);
             throw new Exception("Shader Had Compilation Errors");
         }
@@ -179,23 +181,23 @@ public class GLProgram implements IDisposable {
             case ShaderType.FragmentShader: idFS = idS; break;
         }
     }
-    public void addShaderFile(int st, String file) throws Exception {
+    public void addShaderFile(String materialName, int st, String file) throws Exception {
     	BufferedReader reader = IOUtils.openReaderFile(file);
     	if(reader == null) throw new Exception("Shader File \"" + file + "\" Was Not Found");
 
     	String src = IOUtils.readFull(reader);
     	if(src == null) throw new Exception("Shader File \"" + file + "\" Could Not Be Read");
     	
-        addShader(st, src);
+        addShader(materialName, st, src);
     }
-    public void addShaderResource(int st, String name) throws Exception {
+    public void addShaderResource(String materialName, int st, String name) throws Exception {
     	BufferedReader reader = IOUtils.openReaderResource(name);
     	if(reader == null) throw new Exception("Shader Resource \"" + name + "\" Was Not Found");
 
     	String src = IOUtils.readFull(reader);
     	if(src == null) throw new Exception("Shader Resource \"" + name + "\" Could Not Be Read");
     	
-        addShader(st, src);
+        addShader(materialName, st, src);
     }
 
     public void setAttributes(HashMap<String, Integer> attr) throws Exception {
@@ -217,7 +219,7 @@ public class GLProgram implements IDisposable {
             GLError.get("Program Attr Bind");
         }
     }
-    public boolean link() {
+    public boolean link(String materialName) {
         if(getIsLinked()) return false;
 
         glLinkProgram(id);
@@ -228,7 +230,9 @@ public class GLProgram implements IDisposable {
         int status = glGetProgrami(id, GetProgramParameterName.LinkStatus);
         isLinked = status == 1;
         if(!isLinked) {
-        	GLDiagnostic.writeln("Program Link Error:\r\n" + GL20.glGetProgramInfoLog(id, 1024));
+        	String errorMsg = "Program Link Error for " + materialName + " material:\r\n" + GL20.glGetProgramInfoLog(id, 1024);
+        	GLDiagnostic.writeln(errorMsg);
+        	System.err.println(errorMsg);
         }
         return isLinked;
     }
@@ -290,14 +294,14 @@ public class GLProgram implements IDisposable {
         glUseProgram(id);
     }
 
-    public GLProgram quickCreate(String vsFile, String fsFile, HashMap<String, Integer> attr) {
+    public GLProgram quickCreate(String materialName, String vsFile, String fsFile, HashMap<String, Integer> attr) {
         init();
         try {
-            addShaderFile(ShaderType.VertexShader, vsFile);
-            addShaderFile(ShaderType.FragmentShader, fsFile);
+            addShaderFile(materialName, ShaderType.VertexShader, vsFile);
+            addShaderFile(materialName, ShaderType.FragmentShader, fsFile);
             if(attr != null)
                 setAttributes(attr);
-            link();
+            link(materialName);
         }
         catch(Exception e) {
             return this;
@@ -306,38 +310,40 @@ public class GLProgram implements IDisposable {
         initUniforms();
         return this;
     }
-    public GLProgram quickCreateSource(String vsSrc, String fsSrc, HashMap<String, Integer> attr) {
+    public GLProgram quickCreateSource(String materialName, String vsSrc, String fsSrc, HashMap<String, Integer> attr) {
         init();
         try {
-            addShader(ShaderType.VertexShader, vsSrc);
-            addShader(ShaderType.FragmentShader, fsSrc);
+            addShader(materialName, ShaderType.VertexShader, vsSrc);
+            addShader(materialName, ShaderType.FragmentShader, fsSrc);
             if(attr != null)
                 setAttributes(attr);
-            link();
+            link(materialName);
         }
         catch(Exception e) {
-        	System.out.println("Shader error:" + e.getMessage());
             return this;
         }
         initAttributes();
         initUniforms();
         return this;
     }
-    public GLProgram quickCreateResource(String vsRes, String fsRes, HashMap<String, Integer> attr) {
+    public GLProgram quickCreateResource(String materialName, String vsRes, String fsRes, HashMap<String, Integer> attr) {
         init();
         try {
-            addShaderResource(ShaderType.VertexShader, vsRes);
-            addShaderResource(ShaderType.FragmentShader, fsRes);
+            addShaderResource(materialName, ShaderType.VertexShader, vsRes);
+            addShaderResource(materialName, ShaderType.FragmentShader, fsRes);
             if(attr != null)
                 setAttributes(attr);
-            link();
+            link(materialName);
         }
         catch(Exception e) {
-        	System.out.println("Shader error:" + e.getMessage());
             return this;
         }
         initAttributes();
         initUniforms();
         return this;
+    }
+    
+    public HashMap<String, Integer> getUniforms() {
+    	return (HashMap<String, Integer>)this.uniforms.clone();
     }
 }

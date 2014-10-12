@@ -59,7 +59,7 @@ public class DiagnosticScreen extends GameScreen {
 	@Override
 	public void build() {
 		program = new GLProgram();
-		program.quickCreateResource("cs4620/util/Diag.vert", "cs4620/util/Diag.frag", null);
+		program.quickCreateResource("Diag", "cs4620/util/Diag.vert", "cs4620/util/Diag.frag", null);
 		
 		fxsi = new ShaderInterface(new ArrayBind[]{
 				new ArrayBind(Semantic.Position, GLType.Float, 3, 0),

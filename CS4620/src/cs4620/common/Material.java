@@ -8,11 +8,14 @@ import egl.math.Color;
 public class Material extends ACUniqueObject implements IXMLDocWriteable {
 	public static final String T_AMBIENT = "Ambient";
 	public static final String T_NORMAL = "Normal";
+	public static final String T_GOURAUD = "Gouraud";
 	public static final String T_LAMBERTIAN = "Lambertian";
 	public static final String T_PHONG = "Phong";
 	public static final String T_GLASS = "Glass";
 	public static final String T_GLAZED = "Glazed";
+	public static final String T_COOKTORRANCE = "CookTorrance";
 	public static final String T_NORMAL_MAPPED = "NormalMapped";
+	public static final String T_DISPMAPPED = "DispMapped";
 
 	public static class InputProvider implements IXMLDocWriteable {
 		public static enum Type {
@@ -67,11 +70,21 @@ public class Material extends ACUniqueObject implements IXMLDocWriteable {
 	public InputProvider inputDiffuse = new InputProvider();
 	public InputProvider inputNormal = new InputProvider();
 	public InputProvider inputSpecular = new InputProvider();
+	
+	// Shininess of the surface, used with Blinn-Phong materials
+	public float shininess;
+	// Roughness of the surface, used with Cook-Torrance materials
+	public float roughness;
+	// Displacement magnitude, used with displacement mapped materials
+	public float dispMagnitude;
 
 	public Material() {
 		inputDiffuse.setColor(Color.LightGray);
 		inputNormal.setColor(new Color(128, 128, 255, 255));
 		inputSpecular.setColor(Color.White);
+		shininess = 50f;
+		roughness = 0.3f;
+		dispMagnitude = 0.3f;
 	}
 
 	public void setType(String t) {
@@ -85,6 +98,15 @@ public class Material extends ACUniqueObject implements IXMLDocWriteable {
 	}
 	public void setSpecular(InputProvider p) {
 		inputSpecular = p;
+	}
+	public void setShininess(float shininess) {
+		this.shininess = shininess;
+	}
+	public void setRoughness(float roughness) {
+		this.roughness = roughness;
+	}
+	public void setDispMagnitude(float dispMagnitude) {
+		this.dispMagnitude = dispMagnitude;
 	}
 
 	@Override
@@ -103,6 +125,18 @@ public class Material extends ACUniqueObject implements IXMLDocWriteable {
 		
 		e = doc.createElement("specular");
 		inputSpecular.saveData(doc, e);
+		eData.appendChild(e);
+		
+		e = doc.createElement("shininess");
+		e.appendChild(doc.createTextNode(Float.toString(shininess)));
+		eData.appendChild(e);
+		
+		e = doc.createElement("roughness");
+		e.appendChild(doc.createTextNode(Float.toString(roughness)));
+		eData.appendChild(e);
+		
+		e = doc.createElement("dispMagnitude");
+		e.appendChild(doc.createTextNode(Float.toString(dispMagnitude)));
 		eData.appendChild(e);
 	}
 }

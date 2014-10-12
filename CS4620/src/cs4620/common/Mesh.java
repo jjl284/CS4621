@@ -18,8 +18,8 @@ public class Mesh extends ACUniqueObject implements IXMLDocWriteable {
 	public final MeshGenOptions genOptions = new MeshGenOptions();
 	
 	public Mesh() {
-		genOptions.divisionsLatitude = 8;
-		genOptions.divisionsLongitude = 12;
+		genOptions.divisionsLatitude = 80;
+		genOptions.divisionsLongitude = 120;
 		genOptions.innerRadius = 0.25f;
 	}
 	

@@ -85,9 +85,8 @@ public class Renderer implements IDisposable {
 			if(material != p.material) {
 				material = p.material;
 				material.program.use();
-				material.useProviders();
-				material.useCamera(camera);
-				material.useLights(lights, 0, cc);
+				material.useMaterialProperties();
+				material.useCameraAndLights(camera, lights, 0, cc);
 			}
 			if(mesh != p.mesh) {
 				if(mesh != null) mesh.iBuffer.unbind();

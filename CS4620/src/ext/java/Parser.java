@@ -348,6 +348,8 @@ public class Parser {
 						parameterType = Float.class;
 					} else if (parameterType == Double.TYPE) {
 						parameterType = Double.class;
+					} else if (parameterType == Boolean.TYPE) {
+						parameterType = Boolean.class;
 					} else {
 						throw new Error("Cannot parse primitives of type "
 								+ parameterType);

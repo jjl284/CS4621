@@ -18,15 +18,16 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import egl.math.Vector3;
-
 import cs4620.common.event.SceneCollectionModifiedEvent;
 import cs4620.common.event.SceneDataType;
 import cs4620.common.event.SceneEvent;
 import cs4620.common.event.SceneEventQueue;
 import cs4620.common.texture.TexGenCheckerBoard;
+import cs4620.common.texture.TexGenSphereNormalMap;
 import cs4620.common.texture.TexGenUVGrid;
 import cs4620.mesh.gen.MeshGenCube;
 import cs4620.mesh.gen.MeshGenCylinder;
+import cs4620.mesh.gen.MeshGenPlane;
 import cs4620.mesh.gen.MeshGenSphere;
 
 
@@ -58,6 +59,15 @@ public class Scene {
 			return new Texture();
 		}
 	}, "__Texture__");
+	/**
+	 * Container Of Unique Cube Map	
+	 */
+	public final UniqueContainer<Cubemap> cubemaps = new UniqueContainer<Cubemap>(new UniqueContainer.IAllocator<Cubemap>() {
+		@Override
+		public Cubemap generate() {
+			return new Cubemap();
+		}
+	}, "__Cubemap__");
 	/**
 	 * Container Of Unique Materials
 	 */
@@ -95,6 +105,9 @@ public class Scene {
 		m = new Mesh();
 		m.setGenerator(new MeshGenCube());
 		addMesh(new NameBindMesh("Cube", m));
+		m = new Mesh();
+		m.setGenerator(new MeshGenPlane());
+		addMesh(new NameBindMesh("Plane", m));
 
 		// Add Simple Generated Textures
 		Texture t = new Texture();
@@ -103,7 +116,10 @@ public class Scene {
 		t = new Texture();
 		t.setGenerator(new TexGenUVGrid());
 		addTexture(new NameBindTexture("UV", t));
-
+		t = new Texture();
+		t.setGenerator(new TexGenSphereNormalMap());
+		addTexture(new NameBindTexture("NormalMapped", t));
+		
 		// Add Generic Material
 		Material mat = new Material();
 		mat.setType(Material.T_AMBIENT);
@@ -169,18 +185,53 @@ public class Scene {
 			data = d;
 		}
 	}
+	
+	public static class NameBindCubemap {
+		String name = null;
+		Cubemap data = null;
+		public NameBindCubemap() {
+		}
+		
+		public NameBindCubemap(String s, Cubemap d) {
+			setName(s);
+			setData(d);
+		}
+
+		public void setName(String s) {
+			name = s;
+		}
+		public void setData(Cubemap d) {
+			data = d;
+		}
+	}
+	
 	public void addTexture(NameBindTexture o) {
 		textures.add(o.data);
 		textures.setName(o.data, o.name);
 
 		sendEvent(new SceneCollectionModifiedEvent(SceneDataType.Texture, o.name, true));
 	}
+	
+	public void addCubemap(NameBindCubemap o) {
+		cubemaps.add(o.data);
+		cubemaps.setName(o.data, o.name);
+		
+		sendEvent(new SceneCollectionModifiedEvent(SceneDataType.Cubemap, o.name, true));
+	}
+	
 	public void removeTexture(String name) {
 		textures.remove(name);
 
 		sendEvent(new SceneCollectionModifiedEvent(SceneDataType.Texture, name, false));
 	}
 
+	public void removeCubemap(String name) {
+		cubemaps.remove(name);
+
+		sendEvent(new SceneCollectionModifiedEvent(SceneDataType.Cubemap, name, false));
+	}
+	
+	
 	public static class NameBindMaterial { 
 		String name = null;
 		Material data = null;
@@ -239,7 +290,10 @@ public class Scene {
 		// Can't Delete The Root
 		if(name.equals(ROOT_NODE_NAME)) return;
 		objects.remove(name);
-
+		for(SceneObject o : objects) {
+			if(o.parent != null && o.parent.equals(name)) o.parent = ROOT_NODE_NAME;
+		}
+		
 		sendEvent(new SceneCollectionModifiedEvent(SceneDataType.Object, name, false));
 	}	
 	
@@ -261,6 +315,22 @@ public class Scene {
 			if(DEFAULT_TEXTURES.contains(o.getID().name)) continue;
 
 			Element e = doc.createElement("texture");
+			Element tName = doc.createElement("name");
+			tName.appendChild(doc.createTextNode(o.getID().name));
+			e.appendChild(tName);
+
+			Element eData = doc.createElement("data");
+			o.saveData(doc, eData);
+			e.appendChild(eData);
+			
+			rootElement.appendChild(e);
+		}
+		
+		// Cube maps
+		for(Cubemap o : cubemaps) {
+			if(DEFAULT_TEXTURES.contains(o.getID().name)) continue;
+
+			Element e = doc.createElement("cubemap");
 			Element tName = doc.createElement("name");
 			tName.appendChild(doc.createTextNode(o.getID().name));
 			e.appendChild(tName);

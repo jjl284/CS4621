@@ -5,5 +5,6 @@ public enum SceneDataType {
 	Texture,
 	Material,
 	Object,
+	Cubemap,
 	None
 }

@@ -2,8 +2,6 @@ package cs4620.scene.form;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
 
 import javax.swing.BoxLayout;
 import javax.swing.JCheckBox;
@@ -25,7 +23,6 @@ public class CameraEditor extends ObjectEditor implements ValueUpdatable{
 	 */
 	private static final long serialVersionUID = 7940833711375708510L;
 
-	private static final DecimalFormat decimalFormat = (DecimalFormat)NumberFormat.getNumberInstance();
 
 	SceneCamera myCamera;
 	

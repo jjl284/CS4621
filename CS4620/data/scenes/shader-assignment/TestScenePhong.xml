@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<scene>
+	<texture>
+		<name>EarthTexture</name>
+		<data>
+			<file>data/textures/Earth.png</file>
+		</data>
+	</texture>
+
+	<material>
+		<name>EarthMaterial</name>
+		<data>
+			<type>Phong</type>
+			<diffuse>
+				<texture>EarthTexture</texture>
+			</diffuse>
+			<shininess>50</shininess>
+		</data>
+	</material>
+
+	<object>
+		<name>Earth</name>
+		<data>
+			<mesh>Sphere</mesh>
+			<material>EarthMaterial</material>
+		</data>
+	</object>
+	
+	<object>
+		<name>Camera</name>
+		<data type="SceneCamera">
+			<zPlanes>0.02 1000.0</zPlanes>
+			<perspective>0.01 0.01</perspective>
+
+			<translation>0 0 10</translation>
+		</data>
+	</object>
+
+	<object>
+		<name>Light0</name>
+		<data type="SceneLight">
+			<translation>3 10 0</translation>
+			<intensity>1.5 1.5 1.5</intensity>
+		</data>
+	</object>
+	<object>
+		<name>Light1</name>
+		<data type="SceneLight">
+			<translation>-5 -10 6</translation>
+			<intensity>1.5 1.5 1.5</intensity>
+		</data>
+	</object>
+	<object>
+		<name>AmbientLight</name>
+		<data type="SceneLight">
+			<intensity>0.001 0.001 0.001</intensity>
+			<isAmbient>true</isAmbient>
+		</data>
+	</object>
+</scene>

@@ -100,12 +100,17 @@ public class RenderController implements IDisposable {
 		
 		if(isTreeModified) {
 			RenderTreeBuilder.buildTree(scene, env);
-			SceneObject so = camController.camera.sceneObject;
-			for(RenderCamera cam : env.cameras ) {
-				if(cam.sceneObject == so) {
-					camController.camera = cam;
-					break;
-				}
+			if(camController.camera != null) {
+				SceneObject so = camController.camera.sceneObject;
+				for(RenderCamera cam : env.cameras ) {
+					if(cam.sceneObject == so) {
+						camController.camera = cam;
+						break;
+					}
+				}				
+			}
+			else if(env.cameras.size() > 0) {
+				camController.camera = env.cameras.get(0);
 			}
 		}
 		else if(areTransformsModified) {
