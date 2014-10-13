@@ -10,7 +10,7 @@
 	<texture>
 		<name>SphereNormalMapTexture</name>
 		<data>
-			<file>data/textures/normalmaps/earthNormalMap_1k.png</file>
+			<file>data/textures/normalmaps/earthNormalMap_1k_fixed.png</file>
 		</data>
 	</texture>
 
