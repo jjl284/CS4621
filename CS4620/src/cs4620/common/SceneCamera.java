@@ -9,7 +9,7 @@ public class SceneCamera extends SceneObject {
 	public final Vector2d zPlanes = new Vector2d(0.01, 1000.0);
 	public final Vector2d imageSize = new Vector2d(0.02, 0.02);
 	public boolean isPerspective = true;
-	public float exposure = 50.0f;
+	public float exposure = 2.0f;
 	
 	public void setZPlanes(Vector2d v) {
 		zPlanes.set(v);

@@ -55,7 +55,8 @@
 		<data>
 			<mesh>Sphere</mesh>
 			<material>NormalMappedMaterial</material>
-			<translation>-1 0 0</translation>
+			<scale>0.5 0.5 0.5</scale>
+			<translation>-0.5 0 0</translation>
 			
 		</data>
 	</object>
@@ -64,7 +65,8 @@
 		<data>
 			<mesh>Sphere</mesh>
 			<material>EarthNormalMappedMaterial</material>
-			<translation>1 0 0</translation>
+			<scale>0.5 0.5 0.5</scale>
+			<translation>0.5 0 0</translation>
 			
 		</data>
 	</object>
@@ -72,7 +74,6 @@
 	<object>
 		<name>Camera</name>
 		<data type="SceneCamera">
-			<exposure>50</exposure>
 			<zPlanes>0.02 1000.0</zPlanes>
 			<perspective>0.01 0.01</perspective>
 
@@ -81,43 +82,45 @@
 	</object>
 
 	<object>
-		<name>Light0</name>
-		<data type="SceneLight">
-			<translation>3 20 0</translation>
-			<intensity>10 10 10</intensity>
-		</data>
-	</object>
-	<object>
 		<name>LightObj0</name>
 		<data>
 			<mesh>Sphere</mesh>
-			<translation>3 20 0</translation>
 			<scale>0.1 0.1 0.1</scale>
-			
+			<translation>0.75 1.5 0</translation>
+
+			<material>Ambient</material>
+		</data>
+	</object>
+	<object>
+		<name>Light0</name>
+		<data type="SceneLight">
+			<parent>LightObj0</parent>
+			<intensity>1 1 1</intensity>
+		</data>
+	</object>
+	
+	<object>
+		<name>LightObj1</name>
+		<data>
+			<mesh>Sphere</mesh>
+			<scale>0.1 0.1 0.1</scale>
+			<translation>-0.75 -1.5 2</translation>
+
 			<material>Ambient</material>
 		</data>
 	</object>
 	<object>
 		<name>Light1</name>
 		<data type="SceneLight">
-			<translation>-5 -20 6</translation>
-			<intensity>10 10 10</intensity>
+			<parent>LightObj1</parent>
+			<intensity>1 1 1</intensity>
 		</data>
 	</object>
-	<object>
-		<name>LightObj1</name>
-		<data>
-			<mesh>Sphere</mesh>
-			<translation>-5 -20 6</translation>
-			<scale>0.1 0.1 0.1</scale>
-			
-			<material>Ambient</material>
-		</data>
-	</object>
+	
 	<object>
 		<name>AmbientLight</name>
 		<data type="SceneLight">
-			<intensity>0.001 0.001 0.001</intensity>
+			<intensity>0.05 0.05 0.05</intensity>
 			<isAmbient>true</isAmbient>
 		</data>
 	</object>
