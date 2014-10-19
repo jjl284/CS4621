@@ -156,16 +156,9 @@ public class RenderMaterial implements IDisposable {
 		vsSrc = this.addSpecProviders(vsSrc);
 		fsSrc = this.addSpecProviders(fsSrc);
 		
-		// TODO: check compatibility on linux, mac osx, windows 8!!!
-		// Unfortunately Mac OS X behaves differently
-		String osName = System.getProperty("os.name");
-		System.out.println("os name: " + osName);
-		
-		String arrSuffix = "";
-		if (osName.compareTo("Mac OS X") == 0) {
-			arrSuffix = "[0]";
-		}
-		
+		// Unfortunately some drivers behave differently
+		String arrSuffix = "[0]";
+
 		// Create The Program
 		program.quickCreateSource(sceneMaterial.materialType, vsSrc, fsSrc, null);
 		
@@ -188,8 +181,17 @@ public class RenderMaterial implements IDisposable {
 		
 		// Lighting info
 		unLCount = program.getUniform("numLights");
-		unLPos = program.getUniform("lightPosition" + arrSuffix);
-		unLIntensity = program.getUniform("lightIntensity" + arrSuffix);
+		
+		// Try with and without suffix...
+		unLPos = program.getUniform("lightPosition");
+		if (unLPos == GL.BadUniformLocation) {
+			unLPos = program.getUniform("lightPosition" + arrSuffix);
+		}
+		unLIntensity = program.getUniform("lightIntensity");
+		if (unLIntensity == GL.BadUniformLocation) {
+			unLIntensity = program.getUniform("lightIntensity" + arrSuffix);
+		}
+		
 		unAmbientLIntensity = program.getUniform("ambientLightIntensity");
 		
 		// Camera info
