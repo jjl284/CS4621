@@ -9,7 +9,6 @@ Contributors:
 Elly Nakahara
 Jacqueline Law
 John Odejar
-Joshua Krongelb
 Natalie Diebold
 
 Frameworks:
