@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/LWJGL"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/XPP3"/>
+	<classpathentry kind="lib" path="C:/Users/Sachiko/Documents/GitHub/CS4621/TWL/TWLEffects.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Sachiko/Documents/GitHub/CS4621/TWL/TWL.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Sachiko/Documents/GitHub/CS4621/TWL/external-libs/lwjgl.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Sachiko/Documents/GitHub/CS4621/TWL/external-libs/lwjgl_util_applet.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Sachiko/Documents/GitHub/CS4621/TWL/external-libs/lzma.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Sachiko/Documents/GitHub/CS4621/TWL/external-libs/xpp3-1.1.4c.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
