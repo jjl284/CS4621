@@ -26,3 +26,9 @@ local.properties
 
 # PDT-specific
 .buildpath
+
+# OS generated files
+.DS_Store?
+ehthumbs.db
+Icon?
+Thumbs.db
