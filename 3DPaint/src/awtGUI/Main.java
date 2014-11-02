@@ -1,9 +1,16 @@
 package awtGUI;
 
+import java.awt.BorderLayout;
+import java.awt.Button;
+import java.awt.Canvas;
+import java.awt.Checkbox;
+import java.awt.CheckboxMenuItem;
 import java.awt.Color;
 import java.awt.Container;
 import java.awt.FlowLayout;
 import java.awt.Frame;
+import java.awt.GridBagLayout;
+import java.awt.GridBagConstraints;
 import java.awt.GridLayout;
 import java.awt.Label;
 import java.awt.Menu;
@@ -11,8 +18,24 @@ import java.awt.MenuBar;
 import java.awt.MenuItem;
 import java.awt.Panel;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent; 
+
+import javax.swing.BoxLayout;
+import javax.swing.ButtonGroup;
+import javax.swing.JColorChooser;
+import javax.swing.JFrame;
+import javax.swing.JButton;
+import javax.swing.JRadioButton;
+import javax.swing.JTextField;
+import javax.swing.JSlider;
+import javax.swing.JToolBar;
 
 import org.lwjgl.LWJGLException;
 import org.lwjgl.opengl.AWTGLCanvas;
@@ -27,16 +50,19 @@ public class Main extends Frame {
 	
 	public int MAIN_WIDTH = 800;
 	public int MAIN_HEIGHT = 600;
-	
-	
+
 	// TODO: Initialize everything here
 	public Main() throws LWJGLException {
-		setTitle("3DPaint Application");
-		setBackground(Color.BLACK);
-		
 		awtCanvas = new AWTGLCanvas();
 		awtCanvas.setSize(MAIN_WIDTH, MAIN_HEIGHT);
 		add(awtCanvas);
+	}
+
+	private void run() { //parallel to initialize in DemoBox
+		setTitle("3DPaint Application");
+		setBackground(Color.BLACK);
+		setLayout(new BoxLayout(this,BoxLayout.Y_AXIS));
+		
 		
 		addWindowListener(new WindowAdapter() {
 			public void windowClosing(WindowEvent e) {
@@ -44,12 +70,11 @@ public class Main extends Frame {
 				System.exit(0);
 			}
 		});
-		
-		setLayout(new GridLayout(1, 3)); // Change this later
+
 		
 		init_MenuBar(); // Add the menu bar to the frame
-		
 		init_Panels(); // Add panels to the frame (or just make separate frames)
+
 		
 		//TODO: Extract these to their own classes
 		// Other Panels on Screen
@@ -59,44 +84,54 @@ public class Main extends Frame {
 		
 		setResizable(true);
 		
-		pack(); // put all the elements together on the frame
-		
-		setVisible(true); 
-	}
-
+		pack(); // put all the elements together on the frame		
+	} 
+	
 	// TODO: Create actual menu names and functions
 	private void init_MenuBar() {
 		// Top Menu Bar
 		MenuBar menubar = new MenuBar();
 	   
-	    // Create the menu
-	    Menu menu=new Menu("Menu");
-	   
-	    // Create the submenu
-	    Menu submenu=new Menu("Sub Menu");
+	    // Create the menus (File, Shading, Mode)
+	    Menu mFile=new Menu("File");
+	    Menu mShading=new Menu("Shading");
+	    Menu mMode=new Menu("Mode");
+	    Menu mToolbars = new Menu("Toolbars");
+	    
 	   
 	    // Create MenuItems
-	    MenuItem m1=new MenuItem("Menu Item 1");
-	    MenuItem m2=new MenuItem("Menu Item 2");
-	    MenuItem m3=new MenuItem("Menu Item 3");
+	    MenuItem mbImp=new MenuItem("Import");
+	    MenuItem mbExp=new MenuItem("Export");
 	   
-	    MenuItem m4=new MenuItem("Menu Item 4");
-	    MenuItem m5=new MenuItem("Menu Item 5");
+	    MenuItem mbBP=new MenuItem("Blinn-Phong");
+	    MenuItem mbLamb=new MenuItem("Lambertian");
+	    MenuItem mbCT=new MenuItem("Cook-Torrance");
+
+	    MenuItem mbEdit=new MenuItem("Edit");
+	    MenuItem mbView=new MenuItem("View");
 	   
+	    MenuItem cEdit = new CheckboxMenuItem("Edit Bar");
+	    MenuItem cColor=  new CheckboxMenuItem("Color Bar");
+	    MenuItem cManip = new CheckboxMenuItem("Manipulator Bar");
+	    
 	    // Attach menu items to menu
-	    menu.add(m1);
-	    menu.add(m2);
-	    menu.add(m3);
+	    mFile.add(mbImp);
+	    mFile.add(mbExp);
 	   
 	    // Attach menu items to submenu
-	    submenu.add(m4);
-	    submenu.add(m5);
-	   
-	    // Attach submenu to menu
-	    menu.add(submenu);
-	   
+	    mShading.add(mbBP);
+	    mShading.add(mbLamb);
+	    mShading.add(mbCT);
+	    mMode.add(mbEdit);
+	    mMode.add(mbView);
+	    mToolbars.add(cEdit);
+	    mToolbars.add(cColor);
+	    mToolbars.add(cManip);
 	    // Attach menu to menu bar
-	    menubar.add(menu);
+	    menubar.add(mFile);
+	    menubar.add(mShading);
+	    menubar.add(mMode);
+	    menubar.add(mToolbars);
 	   
 	    // Set menu bar to the frame
 	    setMenuBar(menubar);
@@ -104,23 +139,85 @@ public class Main extends Frame {
 	
 	// TODO: Create actual panels we're using
 	private void init_Panels() {
-		Label msglabel = new Label();
-		msglabel.setAlignment(Label.CENTER);
-		msglabel.setText("I am a message on a panel inside a panel");
+	    //MANIP PANEL
+		JRadioButton zoom = new JRadioButton();
+		zoom.setText("Zoom");
+		JRadioButton rotate = new JRadioButton();
+		rotate.setText("Rotate");
+		JRadioButton pan = new JRadioButton();
+		pan.setText("Pan");
+		JToolBar pManip = new JToolBar("Manipulator");
+		ButtonGroup manipGroup = new ButtonGroup();
+		manipGroup.add(zoom);
+		manipGroup.add(rotate);
+		manipGroup.add(pan);
+		pManip.add(zoom);
+		pManip.add(rotate);
+		pManip.add(pan);
+		add(pManip);
+		pManip.setVisible(true);
 		
-		Container controlPanel = new Panel();
-		controlPanel.setLayout(new FlowLayout());
-		controlPanel.setBackground(Color.blue);
-		controlPanel.setSize(300, 300);
-		
-		Panel panel = new Panel();
-	    panel.setBackground(Color.magenta);
-	    panel.setLayout(new FlowLayout());        
-	    panel.add(msglabel);
-	    panel.setSize(200, 200);
+		//EDIT PANEL
+		Button bUndo =new Button("undo");
+		Button bRedo =new Button("redo");
+		Button bIncSize =new Button("Size +");
+		Button bdecSize =new Button("Size -");
+		JSlider bSize = new JSlider(JSlider.HORIZONTAL,1,50,12);
+		bSize.addMouseListener(new MouseListener(){
 
-	    controlPanel.add(panel);
-	    add(controlPanel);
+			@Override
+			public void mouseClicked(MouseEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void mouseEntered(MouseEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void mouseExited(MouseEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void mousePressed(MouseEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void mouseReleased(MouseEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+		});
+		JTextField txtSize = new JTextField("12");
+		JToolBar editPanel = new JToolBar("Editor Bar");
+		editPanel.setLayout(new BoxLayout(editPanel,BoxLayout.X_AXIS));
+		editPanel.setBackground(Color.gray);
+		
+		editPanel.add(bUndo);
+		editPanel.add(bRedo);
+		editPanel.add(bIncSize);
+		editPanel.add(bdecSize);
+		editPanel.add(bSize);
+		editPanel.add(txtSize);
+	    
+		add(editPanel);
+	    editPanel.setVisible(true);
+	    
+	    //COLOR PANEL
+		JColorChooser pallet = new JColorChooser();
+		JToolBar pColor = new JToolBar("Pallet");
+		pColor.add(pallet);
+		add(pColor);
+		pColor.setVisible(true);
+		
+
 	}
 	
 	/**
@@ -128,7 +225,9 @@ public class Main extends Frame {
 	 * @param args
 	 */
 	public static void main(String[] args) throws LWJGLException {
-		new Main();
-	} 
+		Main app = new Main();
+		app.run();
+		app.setVisible(true);
+	}
 
 }
