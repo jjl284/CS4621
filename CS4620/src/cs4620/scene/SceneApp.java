@@ -1,5 +1,9 @@
 package cs4620.scene;
 
+import java.awt.Canvas;
+
+import org.lwjgl.LWJGLException;
+
 import blister.FalseFirstScreen;
 import blister.MainGame;
 import blister.ScreenList;
@@ -24,7 +28,12 @@ public class SceneApp extends MainGame {
 	
 	public SceneApp() {
 		super("CS 4620 Mesh Workspace", 800, 600);
-		
+		scene = new Scene();
+		otherWindow = new ControlWindow(this);
+	}
+	
+	public SceneApp(String title, Canvas canvas) throws LWJGLException {
+		super(title, 800, 600, canvas);
 		scene = new Scene();
 		otherWindow = new ControlWindow(this);
 	}

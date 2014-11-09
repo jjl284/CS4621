@@ -40,22 +40,31 @@ import javax.swing.JToolBar;
 import org.lwjgl.LWJGLException;
 import org.lwjgl.opengl.AWTGLCanvas;
 
+
 public class Main extends Frame {
 
 	// TODO: implement methods needed for AWTGLCanvas such as add/removeNotify()
 	// TODO: Put all global variables here
 	
 	/** AWT GL Canvas */
-	private AWTGLCanvas awtCanvas;
+	//private AWTGLCanvas awtCanvas;
 	
-	public int MAIN_WIDTH = 800;
-	public int MAIN_HEIGHT = 600;
+	private static PaintCanvas paintCanvas;
+	
+	public static int MAIN_WIDTH = 800;
+	public static int MAIN_HEIGHT = 600;
 
 	// TODO: Initialize everything here
 	public Main() throws LWJGLException {
-		awtCanvas = new AWTGLCanvas();
-		awtCanvas.setSize(MAIN_WIDTH, MAIN_HEIGHT);
-		add(awtCanvas);
+		//awtCanvas = new AWTGLCanvas();
+		//awtCanvas.setSize(MAIN_WIDTH, MAIN_HEIGHT);
+		//add(awtCanvas);
+		
+		PaintCanvas paintCanvas = new PaintCanvas();
+		paintCanvas.setVisible(true);
+		paintCanvas.setBackground(Color.CYAN);
+		paintCanvas.setSize(MAIN_WIDTH, MAIN_HEIGHT);
+		add(paintCanvas);
 	}
 
 	private void run() { //parallel to initialize in DemoBox
@@ -67,6 +76,7 @@ public class Main extends Frame {
 		addWindowListener(new WindowAdapter() {
 			public void windowClosing(WindowEvent e) {
 				dispose();
+
 				System.exit(0);
 			}
 		});
@@ -228,6 +238,10 @@ public class Main extends Frame {
 		Main app = new Main();
 		app.run();
 		app.setVisible(true);
+		
+		PaintSceneApp sceneApp = new PaintSceneApp(paintCanvas);
+		sceneApp.run();
+		sceneApp.dispose();
 	}
 
 }

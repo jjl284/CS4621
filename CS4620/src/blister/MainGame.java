@@ -1,5 +1,6 @@
 package blister;
 
+import java.awt.Canvas;
 import java.io.OutputStreamWriter;
 import java.util.Calendar;
 
@@ -58,6 +59,8 @@ public abstract class MainGame implements IDisposable {
 	private final MouseWheelEventArgs eMW;
 	private final MouseMoveEventArgs eMM;
 	private final WindowResizeArgs eWR;
+	
+	private Canvas canvas;
 
 	/**
 	 * List Of Screens That Must Be Built
@@ -93,6 +96,34 @@ public abstract class MainGame implements IDisposable {
 	 * @param h Desired Window Height
 	 */
 	public MainGame(String title, int w, int h) {
+		Display.setVSyncEnabled(true);
+		// Display.setResizable(true);
+		Display.setTitle(title);
+
+		eKP = new KeyPressEventArgs();
+		eKK = new KeyboardKeyEventArgs();
+		ms = new MouseState();
+		eMB = new MouseButtonEventArgs(ms);
+		eMW = new MouseWheelEventArgs(ms);
+		eMM = new MouseMoveEventArgs(ms);
+		eWR = new WindowResizeArgs(0, 0, w, h);
+
+		curTime = new GameTime();
+		lastTime = new GameTime();
+	}
+	
+	/**
+	 * Constructor That Creates A Window For The Game
+	 * @param title Window Title
+	 * @param w Desired Window Width
+	 * @param h Desired Window Height
+	 * @throws LWJGLException 
+	 */
+	public MainGame(String title, int w, int h, Canvas pCanvas) throws LWJGLException {
+		canvas = pCanvas;
+		if(canvas != null) {
+			Display.setParent(canvas);
+		}
 		Display.setVSyncEnabled(true);
 		// Display.setResizable(true);
 		Display.setTitle(title);

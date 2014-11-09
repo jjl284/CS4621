@@ -3,6 +3,9 @@
 	<name>3DPaint</name>
 	<comment></comment>
 	<projects>
+		<project>CS4620</project>
+		<project>twl</project>
+		<project>twlexamples</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>
