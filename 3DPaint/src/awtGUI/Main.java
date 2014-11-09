@@ -1,12 +1,12 @@
 package awtGUI;
 
-import java.awt.BorderLayout;
 import java.awt.Button;
 import java.awt.Canvas;
 import java.awt.Checkbox;
 import java.awt.CheckboxMenuItem;
 import java.awt.Color;
 import java.awt.Container;
+import java.awt.FileDialog;
 import java.awt.FlowLayout;
 import java.awt.Frame;
 import java.awt.GridBagLayout;
@@ -26,6 +26,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent; 
+import java.io.File;
 
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
@@ -36,10 +37,17 @@ import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 import javax.swing.JSlider;
 import javax.swing.JToolBar;
+import javax.swing.SwingUtilities;
 
 import org.lwjgl.LWJGLException;
 import org.lwjgl.opengl.AWTGLCanvas;
 
+import cs4620.common.Scene;
+import cs4620.common.event.SceneReloadEvent;
+import cs4620.scene.ViewScreen;
+import cs4620.scene.form.ControlWindow;
+import cs4620.scene.form.ScenePanel;
+import ext.java.Parser;
 
 public class Main extends Frame {
 
@@ -47,9 +55,9 @@ public class Main extends Frame {
 	// TODO: Put all global variables here
 	
 	/** AWT GL Canvas */
-	//private AWTGLCanvas awtCanvas;
-	
 	private static PaintCanvas paintCanvas;
+	//private AWTGLCanvas awtCanvas;
+	public Scene scene;
 	
 	public static int MAIN_WIDTH = 800;
 	public static int MAIN_HEIGHT = 600;
@@ -65,6 +73,8 @@ public class Main extends Frame {
 		paintCanvas.setBackground(Color.CYAN);
 		paintCanvas.setSize(MAIN_WIDTH, MAIN_HEIGHT);
 		add(paintCanvas);
+
+		scene = new Scene();
 	}
 
 	private void run() { //parallel to initialize in DemoBox
@@ -108,10 +118,35 @@ public class Main extends Frame {
 	    Menu mMode=new Menu("Mode");
 	    Menu mToolbars = new Menu("Toolbars");
 	    
-	   
+	   final Main main = this;
 	    // Create MenuItems
 	    MenuItem mbImp=new MenuItem("Import");
+		mbImp.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				FileDialog fd = new FileDialog(main);
+				fd.setVisible(true);
+				for(File f : fd.getFiles()) {
+					String file = f.getAbsolutePath();
+					if(file != null) {
+						Parser p = new Parser();
+						Object o = p.parse(file, Scene.class);
+						if(o != null) {
+							Scene old = scene;
+							scene = (Scene)o;
+							if(old != null) old.sendEvent(new SceneReloadEvent(file));
+							System.out.println("SCENE "+scene.getClass().toString());
+							return;}}}}});
+		
 	    MenuItem mbExp=new MenuItem("Export");
+	    mbExp.addActionListener(new ActionListener(){
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				// TODO Auto-generated method stub
+				System.out.println("EXP clicked");
+
+			}});
 	   
 	    MenuItem mbBP=new MenuItem("Blinn-Phong");
 	    MenuItem mbLamb=new MenuItem("Lambertian");
@@ -120,10 +155,13 @@ public class Main extends Frame {
 	    MenuItem mbEdit=new MenuItem("Edit");
 	    MenuItem mbView=new MenuItem("View");
 	   
-	    MenuItem cEdit = new CheckboxMenuItem("Edit Bar");
-	    MenuItem cColor=  new CheckboxMenuItem("Color Bar");
-	    MenuItem cManip = new CheckboxMenuItem("Manipulator Bar");
+	    CheckboxMenuItem cEdit = new CheckboxMenuItem("Edit Bar",true);
+	    CheckboxMenuItem cColor=  new CheckboxMenuItem("Color Bar",true);
+	    CheckboxMenuItem cManip = new CheckboxMenuItem("Manipulator Bar",true);
 	    
+	    cEdit.addActionListener(new ToolbarActionListener("Edit Bar", cEdit.getState(), main));
+	    cColor.addActionListener(new ToolbarActionListener("Color Bar", cColor.getState(), main));
+	    cManip.addActionListener(new ToolbarActionListener("Manipulator Bar", cManip.getState(), main));
 	    // Attach menu items to menu
 	    mFile.add(mbImp);
 	    mFile.add(mbExp);
@@ -150,84 +188,20 @@ public class Main extends Frame {
 	// TODO: Create actual panels we're using
 	private void init_Panels() {
 	    //MANIP PANEL
-		JRadioButton zoom = new JRadioButton();
-		zoom.setText("Zoom");
-		JRadioButton rotate = new JRadioButton();
-		rotate.setText("Rotate");
-		JRadioButton pan = new JRadioButton();
-		pan.setText("Pan");
-		JToolBar pManip = new JToolBar("Manipulator");
-		ButtonGroup manipGroup = new ButtonGroup();
-		manipGroup.add(zoom);
-		manipGroup.add(rotate);
-		manipGroup.add(pan);
-		pManip.add(zoom);
-		pManip.add(rotate);
-		pManip.add(pan);
-		add(pManip);
-		pManip.setVisible(true);
+		ManipPanel mp = new ManipPanel();
+		add(mp);
+		mp.setVisible(true);
+		
 		
 		//EDIT PANEL
-		Button bUndo =new Button("undo");
-		Button bRedo =new Button("redo");
-		Button bIncSize =new Button("Size +");
-		Button bdecSize =new Button("Size -");
-		JSlider bSize = new JSlider(JSlider.HORIZONTAL,1,50,12);
-		bSize.addMouseListener(new MouseListener(){
-
-			@Override
-			public void mouseClicked(MouseEvent arg0) {
-				// TODO Auto-generated method stub
-				
-			}
-
-			@Override
-			public void mouseEntered(MouseEvent arg0) {
-				// TODO Auto-generated method stub
-				
-			}
-
-			@Override
-			public void mouseExited(MouseEvent arg0) {
-				// TODO Auto-generated method stub
-				
-			}
-
-			@Override
-			public void mousePressed(MouseEvent arg0) {
-				// TODO Auto-generated method stub
-				
-			}
-
-			@Override
-			public void mouseReleased(MouseEvent arg0) {
-				// TODO Auto-generated method stub
-				
-			}
-		});
-		JTextField txtSize = new JTextField("12");
-		JToolBar editPanel = new JToolBar("Editor Bar");
-		editPanel.setLayout(new BoxLayout(editPanel,BoxLayout.X_AXIS));
-		editPanel.setBackground(Color.gray);
-		
-		editPanel.add(bUndo);
-		editPanel.add(bRedo);
-		editPanel.add(bIncSize);
-		editPanel.add(bdecSize);
-		editPanel.add(bSize);
-		editPanel.add(txtSize);
-	    
-		add(editPanel);
-	    editPanel.setVisible(true);
+		EditPanel ep = new EditPanel();
+		add(ep);
+	    ep.setVisible(true);
 	    
 	    //COLOR PANEL
-		JColorChooser pallet = new JColorChooser();
-		JToolBar pColor = new JToolBar("Pallet");
-		pColor.add(pallet);
-		add(pColor);
-		pColor.setVisible(true);
-		
-
+		ColorPanel cp = new ColorPanel();
+		add(cp);
+		cp.setVisible(true);
 	}
 	
 	/**

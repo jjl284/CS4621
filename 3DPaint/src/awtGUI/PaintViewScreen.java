@@ -80,7 +80,7 @@ public class PaintViewScreen extends GameScreen {
 	/**
 	 * Add Scene Data Hotkeys
 	 */
-	private final ACEventFunc<KeyboardKeyEventArgs> onKeyPress = new ACEventFunc<KeyboardKeyEventArgs>() {
+	/*private final ACEventFunc<KeyboardKeyEventArgs> onKeyPress = new ACEventFunc<KeyboardKeyEventArgs>() {
 		@Override
 		public void receive(Object sender, KeyboardKeyEventArgs args) {
 			switch (args.key) {
@@ -115,7 +115,7 @@ public class PaintViewScreen extends GameScreen {
 				break;
 			}
 		}
-	};
+	};*/
 	
 	@Override
 	public void onEntry(GameTime gameTime) {
@@ -128,7 +128,7 @@ public class PaintViewScreen extends GameScreen {
 		manipController = new PaintManipController(rController.env, app.scene);
 		gridRenderer = new GridRenderer();
 		
-		KeyboardEventDispatcher.OnKeyPressed.add(onKeyPress);
+		//KeyboardEventDispatcher.OnKeyPressed.add(onKeyPress);
 		manipController.hook();
 		
 		
@@ -139,7 +139,7 @@ public class PaintViewScreen extends GameScreen {
 	}
 	@Override
 	public void onExit(GameTime gameTime) {
-		KeyboardEventDispatcher.OnKeyPressed.remove(onKeyPress);
+		//KeyboardEventDispatcher.OnKeyPressed.remove(onKeyPress);
 		rController.dispose();
 		manipController.dispose();
 	}
