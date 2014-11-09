@@ -46,8 +46,7 @@ public class PaintSceneApp extends MainGame {
 	public static int MAIN_HEIGHT = 600;
 	
 	private Frame mainFrame;
-	private static PaintCanvas paintCanvas;
-	
+	private PaintCanvas paintCanvas;
 	public Scene scene;
 	
 	/**
@@ -56,26 +55,26 @@ public class PaintSceneApp extends MainGame {
 	 * @throws LWJGLException
 	 */
 	public PaintSceneApp(PaintCanvas canvas) throws LWJGLException {
-		super("3D Paint Scene Mesh", Main.MAIN_WIDTH, Main.MAIN_HEIGHT, canvas);
+		super("3D Paint Scene Mesh", MAIN_WIDTH, MAIN_HEIGHT, canvas);
 		//otherWindow = new ControlWindow(this);
 		
 		mainFrame = new Frame();
 		mainFrame.setTitle("3DPaint Application");
 		mainFrame.setBackground(Color.BLACK);
 		mainFrame.setLayout(new BoxLayout(mainFrame,BoxLayout.Y_AXIS));
-		/*mainFrame.addWindowListener(new WindowAdapter() {
+		mainFrame.addWindowListener(new WindowAdapter() {
 			public void windowClosing(WindowEvent e) {
-				dispose();
-
-				System.exit(0);
+				exit();
+				//System.exit(0); this is already done in MainGame's exit()
 			}
-		});*/
+		});
 		mainFrame.setVisible(true);
 		
 		paintCanvas = canvas;
 		paintCanvas.setVisible(true);
-		paintCanvas.setBackground(Color.CYAN);
 		paintCanvas.setSize(MAIN_WIDTH, MAIN_HEIGHT);
+		paintCanvas.setFocusable(true);
+		paintCanvas.setIgnoreRepaint(true);
 		mainFrame.add(paintCanvas);
 		
 		scene = new Scene();
@@ -212,6 +211,7 @@ public class PaintSceneApp extends MainGame {
 		//if(otherWindow != null) {
 			//tWindow.interrupt();
 		//}
+		mainFrame.dispose();
 		super.exit();
 	}
 	

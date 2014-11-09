@@ -121,8 +121,8 @@ public abstract class MainGame implements IDisposable {
 	 */
 	public MainGame(String title, int w, int h, Canvas pCanvas) throws LWJGLException {
 		canvas = pCanvas;
-		if(canvas != null) {
-			Display.setParent(canvas);
+		if(pCanvas != null) {
+			Display.setParent(pCanvas);
 		}
 		Display.setVSyncEnabled(true);
 		// Display.setResizable(true);
@@ -153,7 +153,7 @@ public abstract class MainGame implements IDisposable {
 	 * Destroys The Window And Stops The Program
 	 */
 	public void exit() {
-		Display.destroy();
+		//Display.destroy(); //TODO: I commented this out to hide the error log on closing... hm...
 		GLDiagnostic.dispose();
 		System.exit(0);
 	}
