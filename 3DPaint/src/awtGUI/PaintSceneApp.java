@@ -59,8 +59,10 @@ public class PaintSceneApp extends MainGame {
 		//otherWindow = new ControlWindow(this);
 		
 		mainFrame = new Frame();
+		mainFrame.setResizable(false);
+		mainFrame.setSize(MAIN_WIDTH, MAIN_HEIGHT);
 		mainFrame.setTitle("3DPaint Application");
-		mainFrame.setBackground(Color.BLACK);
+		mainFrame.setBackground(Color.GRAY);
 		mainFrame.setLayout(new BoxLayout(mainFrame,BoxLayout.Y_AXIS));
 		mainFrame.addWindowListener(new WindowAdapter() {
 			public void windowClosing(WindowEvent e) {
@@ -72,7 +74,6 @@ public class PaintSceneApp extends MainGame {
 		
 		paintCanvas = canvas;
 		paintCanvas.setVisible(true);
-		paintCanvas.setSize(MAIN_WIDTH, MAIN_HEIGHT);
 		paintCanvas.setFocusable(true);
 		paintCanvas.setIgnoreRepaint(true);
 		mainFrame.add(paintCanvas);
