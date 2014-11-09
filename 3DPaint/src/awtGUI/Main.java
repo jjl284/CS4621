@@ -58,7 +58,7 @@ public class Main extends Frame {
 	/** AWT GL Canvas */
 	private AWTGLCanvas awtCanvas;
 	public Scene scene;
-	public ViewScreen viewScreen;
+
 	
 	public int MAIN_WIDTH = 800;
 	public int MAIN_HEIGHT = 600;
@@ -69,7 +69,6 @@ public class Main extends Frame {
 		awtCanvas.setSize(MAIN_WIDTH, MAIN_HEIGHT);
 		add(awtCanvas);
 		scene = new Scene();
-		viewScreen= new ViewScreen();
 	}
 
 	private void run() { //parallel to initialize in DemoBox
@@ -132,6 +131,14 @@ public class Main extends Frame {
 							System.out.println("SCENE "+scene.getClass().toString());
 							return;}}}}});
 	    MenuItem mbExp=new MenuItem("Export");
+	    mbExp.addActionListener(new ActionListener(){
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				// TODO Auto-generated method stub
+				System.out.println("EXP clicked");
+
+			}});
 	   
 	    MenuItem mbBP=new MenuItem("Blinn-Phong");
 	    MenuItem mbLamb=new MenuItem("Lambertian");
@@ -140,13 +147,13 @@ public class Main extends Frame {
 	    MenuItem mbEdit=new MenuItem("Edit");
 	    MenuItem mbView=new MenuItem("View");
 	   
-	    MenuItem cEdit = new CheckboxMenuItem("Edit Bar");
-	    MenuItem cColor=  new CheckboxMenuItem("Color Bar");
-	    MenuItem cManip = new CheckboxMenuItem("Manipulator Bar");
+	    CheckboxMenuItem cEdit = new CheckboxMenuItem("Edit Bar",true);
+	    CheckboxMenuItem cColor=  new CheckboxMenuItem("Color Bar",true);
+	    CheckboxMenuItem cManip = new CheckboxMenuItem("Manipulator Bar",true);
 	    
-	    cEdit.addActionListener(new ToolbarActionListener("Edit Bar", cEdit.isEnabled(), main));
-	    cColor.addActionListener(new ToolbarActionListener("Color Bar", cColor.isEnabled(), main));
-	    cManip.addActionListener(new ToolbarActionListener("Manipulator Bar", cManip.isEnabled(), main));
+	    cEdit.addActionListener(new ToolbarActionListener("Edit Bar", cEdit.getState(), main));
+	    cColor.addActionListener(new ToolbarActionListener("Color Bar", cColor.getState(), main));
+	    cManip.addActionListener(new ToolbarActionListener("Manipulator Bar", cManip.getState(), main));
 	    // Attach menu items to menu
 	    mFile.add(mbImp);
 	    mFile.add(mbExp);
@@ -179,12 +186,12 @@ public class Main extends Frame {
 		
 		
 		//EDIT PANEL
-	    EditPanel ep = new EditPanel();
+		EditPanel ep = new EditPanel();
 		add(ep);
 	    ep.setVisible(true);
 	    
 	    //COLOR PANEL
-	    ColorPanel cp = new ColorPanel();
+		ColorPanel cp = new ColorPanel();
 		add(cp);
 		cp.setVisible(true);
 		

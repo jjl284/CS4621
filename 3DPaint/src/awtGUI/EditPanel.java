@@ -15,7 +15,6 @@ public class EditPanel extends JToolBar {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-
 	public EditPanel(){
 		Button bUndo =new Button("undo");
 		Button bRedo =new Button("redo");

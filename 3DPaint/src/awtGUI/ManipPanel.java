@@ -1,6 +1,7 @@
 package awtGUI;
 
 import java.awt.Component;
+import java.awt.event.ComponentListener;
 
 import javax.swing.ButtonGroup;
 import javax.swing.JRadioButton;
