@@ -74,20 +74,14 @@ public class PaintSceneApp extends MainGame implements ActionListener, ChangeLis
 	
 	private JButton colorButton;
 	
+	private JRadioButton edit;
+	private JRadioButton view;
+	
 	private JSlider toolSizeSlider;
 	private final int sliderMin = 0;
 	private final int sliderMax = 50;
 	private final int sliderInit = 0;
-	private int iconSize = 48;
-	
-	//this variable will have to be deleted 
-	//and paintCanvas will have to have a tool size field
-	private int activeToolSize = sliderInit;
-	
-	//this variable will have to be deleted 
-	//and paintCanvas will have to have a active color field
-	private Color activeColor = Color.BLACK;
-	
+	private int iconSize = 48;	
 	
 	/**
 	 * Constructor
@@ -174,15 +168,32 @@ public class PaintSceneApp extends MainGame implements ActionListener, ChangeLis
 			}});
 	   
 	    MenuItem mbBP=new MenuItem("Blinn-Phong");
+	    mbBP.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent arg0) {
+				paintCanvas.setShading(Shading.PHONG);			
+			}});
 	    MenuItem mbLamb=new MenuItem("Lambertian");
+	    mbLamb.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent arg0) {
+				paintCanvas.setShading(Shading.LAMBERTIAN);			
+			}});
 	    MenuItem mbCT=new MenuItem("Cook-Torrance");
-
-	    MenuItem mbUndo=new MenuItem("Undo");
-	    MenuItem mbRedo=new MenuItem("Redo");
+	    mbCT.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent arg0) {
+				paintCanvas.setShading(Shading.CT);			
+			}});
 	    
-	    MenuItem mbEdit=new MenuItem("Edit");
-	    MenuItem mbView=new MenuItem("View");
-	   
+	    MenuItem mbUndo=new MenuItem("Undo");
+	    mbUndo.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent arg0) {
+				paintCanvas.LoadPrevState(paintCanvas.currState);				
+			}});
+	    MenuItem mbRedo=new MenuItem("Redo");
+	    mbRedo.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent arg0) {
+				paintCanvas.LoadNextState(paintCanvas.currState);				
+			}});
+	    
 	    CheckboxMenuItem cShow = new CheckboxMenuItem("Show",true);
 	    //CheckboxMenuItem cEdit = new CheckboxMenuItem("Edit Bar",true);
 	    //CheckboxMenuItem cColor=  new CheckboxMenuItem("Color Bar",true);
@@ -240,7 +251,7 @@ public class PaintSceneApp extends MainGame implements ActionListener, ChangeLis
 		statusPanel.setBorder(new BevelBorder(BevelBorder.LOWERED));
 		statusPanel.setPreferredSize(new Dimension(getWidth(),18));
 		statusPanel.setLayout(new GridLayout(1,1));
-		toolSizeLabel = new JLabel ("    "+String.valueOf(activeToolSize));
+		toolSizeLabel = new JLabel ("    "+String.valueOf(paintCanvas.activeToolSize));
 
 		statusPanel.add(toolSizeLabel);
 		
@@ -265,14 +276,14 @@ public class PaintSceneApp extends MainGame implements ActionListener, ChangeLis
 		eraser.addActionListener(this);
 		
 		colorButton = new JButton();
-		colorButton.setIcon(iconOfColor(activeColor, iconSize));
+		colorButton.setIcon(iconOfColor(paintCanvas.activeColor, iconSize));
 		colorButton.addActionListener(this);
 		
 
 		ButtonGroup modeGroup = new ButtonGroup();
-		JRadioButton edit = new JRadioButton();
+		edit = new JRadioButton();
 		edit.setText("Edit");
-		JRadioButton view = new JRadioButton();
+		view = new JRadioButton();
 		view.setText("View");
 		modeGroup.add(edit);
 		modeGroup.add(view);
@@ -347,10 +358,16 @@ public class PaintSceneApp extends MainGame implements ActionListener, ChangeLis
 			//set tool as eraser
 		}
 		else if(s == colorButton){
-			//set Color.Black to active color
 			Color newColor = JColorChooser.showDialog(mainFrame, "Foreground Color", Color.BLACK);
+			paintCanvas.setColor(newColor);
 			colorButton.setIcon(iconOfColor(newColor,this.iconSize));
-		}		
+		}
+		else if(s == edit){
+			paintCanvas.editMode = true;
+		}
+		else if(s == view){
+			paintCanvas.editMode = false;
+		}
 	}
 
 	@Override
@@ -358,10 +375,9 @@ public class PaintSceneApp extends MainGame implements ActionListener, ChangeLis
 		Object s = e.getSource();
 		
 		if(s == toolSizeSlider){
-			int toolSize = ((JSlider)s).getValue();
-			//something.setToolSize(toolSize);
-			activeToolSize = toolSize;
-			toolSizeLabel.setText("    "+String.valueOf(activeToolSize));
+			int newToolSize = ((JSlider)s).getValue();
+			paintCanvas.setToolSize(newToolSize);
+			toolSizeLabel.setText("    "+String.valueOf(paintCanvas.activeToolSize));
 		}
 		
 	}
