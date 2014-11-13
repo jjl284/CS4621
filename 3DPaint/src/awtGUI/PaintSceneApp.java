@@ -1,9 +1,13 @@
 package awtGUI;
 
+import java.awt.BorderLayout;
 import java.awt.CheckboxMenuItem;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.FileDialog;
 import java.awt.Frame;
+import java.awt.Graphics2D;
+import java.awt.GridLayout;
 import java.awt.Menu;
 import java.awt.MenuBar;
 import java.awt.MenuItem;
@@ -11,9 +15,23 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.awt.image.BufferedImage;
 import java.io.File;
 
 import javax.swing.BoxLayout;
+import javax.swing.ButtonGroup;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JColorChooser;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JRadioButton;
+import javax.swing.JSlider;
+import javax.swing.JToggleButton;
+import javax.swing.JToolBar;
+import javax.swing.border.BevelBorder;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 import org.lwjgl.LWJGLException;
 
@@ -27,7 +45,7 @@ import cs4620.scene.ViewScreen;
 import cs4620.scene.form.ControlWindow;
 import ext.java.Parser;
 
-public class PaintSceneApp extends MainGame {
+public class PaintSceneApp extends MainGame implements ActionListener, ChangeListener{
 	
 	/**
 	 * The Thread That Runs The Other Window
@@ -49,6 +67,28 @@ public class PaintSceneApp extends MainGame {
 	private PaintCanvas paintCanvas;
 	public Scene scene;
 	
+	private JLabel toolSizeLabel;
+
+	private JToggleButton pencil;
+	private JToggleButton eraser;
+	
+	private JButton colorButton;
+	
+	private JSlider toolSizeSlider;
+	private final int sliderMin = 0;
+	private final int sliderMax = 50;
+	private final int sliderInit = 0;
+	private int iconSize = 48;
+	
+	//this variable will have to be deleted 
+	//and paintCanvas will have to have a tool size field
+	private int activeToolSize = sliderInit;
+	
+	//this variable will have to be deleted 
+	//and paintCanvas will have to have a active color field
+	private Color activeColor = Color.BLACK;
+	
+	
 	/**
 	 * Constructor
 	 * @param canvas
@@ -63,7 +103,7 @@ public class PaintSceneApp extends MainGame {
 		mainFrame.setSize(MAIN_WIDTH, MAIN_HEIGHT);
 		mainFrame.setTitle("3DPaint Application");
 		mainFrame.setBackground(Color.GRAY);
-		mainFrame.setLayout(new BoxLayout(mainFrame,BoxLayout.Y_AXIS));
+		mainFrame.setLayout(new BorderLayout());
 		mainFrame.addWindowListener(new WindowAdapter() {
 			public void windowClosing(WindowEvent e) {
 				exit();
@@ -98,8 +138,9 @@ public class PaintSceneApp extends MainGame {
 	   
 	    // Create the menus (File, Shading, Mode)
 	    Menu mFile=new Menu("File");
+	    Menu mEdit = new Menu ("Edit");
 	    Menu mShading=new Menu("Shading");
-	    Menu mMode=new Menu("Mode");
+	    //Menu mMode=new Menu("Mode");
 	    Menu mToolbars = new Menu("Toolbars");
 	    
 	   //final PaintSceneApp psapp = this;
@@ -136,16 +177,21 @@ public class PaintSceneApp extends MainGame {
 	    MenuItem mbLamb=new MenuItem("Lambertian");
 	    MenuItem mbCT=new MenuItem("Cook-Torrance");
 
+	    MenuItem mbUndo=new MenuItem("Undo");
+	    MenuItem mbRedo=new MenuItem("Redo");
+	    
 	    MenuItem mbEdit=new MenuItem("Edit");
 	    MenuItem mbView=new MenuItem("View");
 	   
-	    CheckboxMenuItem cEdit = new CheckboxMenuItem("Edit Bar",true);
-	    CheckboxMenuItem cColor=  new CheckboxMenuItem("Color Bar",true);
-	    CheckboxMenuItem cManip = new CheckboxMenuItem("Manipulator Bar",true);
+	    CheckboxMenuItem cShow = new CheckboxMenuItem("Show",true);
+	    //CheckboxMenuItem cEdit = new CheckboxMenuItem("Edit Bar",true);
+	    //CheckboxMenuItem cColor=  new CheckboxMenuItem("Color Bar",true);
+	    //CheckboxMenuItem cManip = new CheckboxMenuItem("Manipulator Bar",true);
 	    
-	    cEdit.addActionListener(new ToolbarActionListener("Edit Bar", cEdit.getState(), mainFrame));
-	    cColor.addActionListener(new ToolbarActionListener("Color Bar", cColor.getState(), mainFrame));
-	    cManip.addActionListener(new ToolbarActionListener("Manipulator Bar", cManip.getState(), mainFrame));
+	    cShow.addActionListener(new ToolbarActionListener("Show",cShow.getState(), mainFrame));
+	    //cEdit.addActionListener(new ToolbarActionListener("Edit Bar", cEdit.getState(), mainFrame));
+	    //cColor.addActionListener(new ToolbarActionListener("Color Bar", cColor.getState(), mainFrame));
+	    //cManip.addActionListener(new ToolbarActionListener("Manipulator Bar", cManip.getState(), mainFrame));
 	    // Attach menu items to menu
 	    mFile.add(mbImp);
 	    mFile.add(mbExp);
@@ -154,39 +200,112 @@ public class PaintSceneApp extends MainGame {
 	    mShading.add(mbBP);
 	    mShading.add(mbLamb);
 	    mShading.add(mbCT);
-	    mMode.add(mbEdit);
-	    mMode.add(mbView);
-	    mToolbars.add(cEdit);
-	    mToolbars.add(cColor);
-	    mToolbars.add(cManip);
+	    mEdit.add(mbUndo);
+	    mEdit.add(mbRedo);
+	    //mMode.add(mbEdit);
+	    //mMode.add(mbView);
+	    
+	    mToolbars.add(cShow);
+	    //mToolbars.add(cEdit);
+	    //mToolbars.add(cColor);
+	    //mToolbars.add(cManip);
+	    
 	    // Attach menu to menu bar
 	    menubar.add(mFile);
+	    menubar.add(mEdit);
 	    menubar.add(mShading);
-	    menubar.add(mMode);
+	    //menubar.add(mMode);
 	    menubar.add(mToolbars);
 	   
 	    // Set menu bar to the frame
 	    mainFrame.setMenuBar(menubar);
 	}
 	
+
+	// TODO: Create actual panels we're using
 	private void init_Panels() {
-	    //MANIP PANEL
-		ManipPanel mp = new ManipPanel();
-		mainFrame.add(mp);
-		mp.setVisible(true);
-		
-		
 		//EDIT PANEL
-		EditPanel ep = new EditPanel();
-		mainFrame.add(ep);
-	    ep.setVisible(true);
+		JToolBar ep = makeToolBar();
 	    
-	    //COLOR PANEL
-		ColorPanel cp = new ColorPanel();
-		mainFrame.add(cp);
-		cp.setVisible(true);
+		
+		//TOOL SIZE SLIDER BAR
+		toolSizeSlider = new JSlider(JSlider.VERTICAL,sliderMin, sliderMax, sliderInit);
+		toolSizeSlider.addChangeListener(this);
+		toolSizeSlider.setMinorTickSpacing(1);
+		toolSizeSlider.setPaintTicks(true);
+		toolSizeSlider.setSnapToTicks(true);
+		
+		//STATUS PANEL (also houses MANIP PANEL)
+		JPanel statusPanel = new JPanel();
+		statusPanel.setBorder(new BevelBorder(BevelBorder.LOWERED));
+		statusPanel.setPreferredSize(new Dimension(getWidth(),18));
+		statusPanel.setLayout(new GridLayout(1,1));
+		toolSizeLabel = new JLabel ("Tool Size: "+ activeToolSize);
+
+		statusPanel.add(toolSizeLabel);
+		
+		mainFrame.add(toolSizeSlider, BorderLayout.WEST);
+		mainFrame.add(ep, BorderLayout.EAST);
+		mainFrame.add(statusPanel, BorderLayout.SOUTH);
+		
+		mainFrame.pack();
+		mainFrame.setVisible(true);
+		
+	}
+		
+	private JToolBar makeToolBar(){
+		ButtonGroup tools = new ButtonGroup();
+		pencil = new JToggleButton(new ImageIcon("pencil.png"));
+		pencil.setToolTipText("pencil");
+		pencil.addActionListener(this);
+		
+		eraser = new JToggleButton(new ImageIcon("eraser.png"));
+		eraser.setToolTipText("eraser");
+		eraser.addActionListener(this);
+		
+		colorButton = new JButton();
+		colorButton.setIcon(iconOfColor(activeColor, iconSize));
+		colorButton.addActionListener(this);
+		
+
+		ButtonGroup modeGroup = new ButtonGroup();
+		JRadioButton edit = new JRadioButton();
+		edit.setText("Edit");
+		JRadioButton view = new JRadioButton();
+		view.setText("View");
+		modeGroup.add(edit);
+		modeGroup.add(view);
+		
+
+		//MANIP PANEL (probably not neccessary anymore?)
+		//ManipPanel mp = new ManipPanel();	
+		//So that JToggleButtons can only have 1 active at a time
+		tools.add(pencil);
+		tools.add(eraser);
+		
+		JToolBar toolBar = new JToolBar(JToolBar.VERTICAL);
+		toolBar.setFloatable(true);
+		toolBar.setRollover(true);
+		toolBar.add(pencil);
+		toolBar.add(eraser);
+		toolBar.add(colorButton);
+		toolBar.add(edit);
+		toolBar.add(view);
+		//toolBar.add(mp);
+		
+		return toolBar;
 	}
 	
+	private static ImageIcon iconOfColor(Color c, int size){
+		BufferedImage img = new BufferedImage (size, size, BufferedImage.TYPE_INT_ARGB);
+		Graphics2D g2d = (Graphics2D) img.getGraphics();
+		g2d.setColor(c);
+		g2d.fillOval(0, 0, size, size);
+		
+		ImageIcon imic = new ImageIcon(img);
+		return imic;
+	}
+		
 	@Override
 	protected void buildScreenList() {
 		screenList = new ScreenList(this, 0,
@@ -214,6 +333,36 @@ public class PaintSceneApp extends MainGame {
 		//}
 		mainFrame.dispose();
 		super.exit();
+	}
+
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		Object s = e.getSource();
+		
+		if (s == pencil){
+			//set tool as pencil
+		}
+		else if (s == eraser){
+			//set tool as eraser
+		}
+		else if(s == colorButton){
+			//set Color.Black to active color
+			Color newColor = JColorChooser.showDialog(mainFrame, "Foreground Color", Color.BLACK);
+			colorButton.setIcon(iconOfColor(newColor,this.iconSize));
+		}		
+	}
+
+	@Override
+	public void stateChanged(ChangeEvent e) {
+		Object s = e.getSource();
+		
+		if(s == toolSizeSlider){
+			int toolSize = ((JSlider)s).getValue();
+			//something.setToolSize(toolSize);
+			activeToolSize = toolSize;
+			toolSizeLabel.setText("Tool Size: " + activeToolSize);
+		}
+		
 	}
 	
 	/*class ControlThread implements Runnable {
