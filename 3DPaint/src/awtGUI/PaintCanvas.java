@@ -20,6 +20,7 @@ public class PaintCanvas extends Canvas{
 		// TODO Auto-generated constructor stub
 		statesList.add(this);
 		this.setColor(Color.BLACK);
+		this.setEdit(true);
 	}
 
 	public void setActiveTool(ToolType t){
@@ -32,6 +33,10 @@ public class PaintCanvas extends Canvas{
 	
 	public void setToolSize(int ts){
 		activeToolSize = ts;
+	}
+	
+	public void setEdit(boolean m){
+		editMode=m;
 	}
 	
 	public void setShading(Shading s){

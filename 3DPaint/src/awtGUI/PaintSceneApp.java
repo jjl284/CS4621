@@ -74,8 +74,7 @@ public class PaintSceneApp extends MainGame implements ActionListener, ChangeLis
 	
 	private JButton colorButton;
 	
-	private JRadioButton edit;
-	private JRadioButton view;
+	private JButton mode;
 	
 	private JSlider toolSizeSlider;
 	private final int sliderMin = 0;
@@ -267,7 +266,7 @@ public class PaintSceneApp extends MainGame implements ActionListener, ChangeLis
 		
 	private JToolBar makeToolBar(){
 		ButtonGroup tools = new ButtonGroup();
-		pencil = new JToggleButton(new ImageIcon("pencil.png"));
+		pencil = new JToggleButton(new ImageIcon("brush.png"));
 		pencil.setToolTipText("pencil");
 		pencil.addActionListener(this);
 		
@@ -280,13 +279,9 @@ public class PaintSceneApp extends MainGame implements ActionListener, ChangeLis
 		colorButton.addActionListener(this);
 		
 
-		ButtonGroup modeGroup = new ButtonGroup();
-		edit = new JRadioButton();
-		edit.setText("Edit");
-		view = new JRadioButton();
-		view.setText("View");
-		modeGroup.add(edit);
-		modeGroup.add(view);
+		mode = new JButton();
+		mode.setIcon(new ImageIcon("pencil.png"));
+		mode.addActionListener(this);
 		
 
 		//MANIP PANEL (probably not neccessary anymore?)
@@ -301,8 +296,7 @@ public class PaintSceneApp extends MainGame implements ActionListener, ChangeLis
 		toolBar.add(pencil);
 		toolBar.add(eraser);
 		toolBar.add(colorButton);
-		toolBar.add(edit);
-		toolBar.add(view);
+		toolBar.add(mode);
 		//toolBar.add(mp);
 		
 		return toolBar;
@@ -362,12 +356,14 @@ public class PaintSceneApp extends MainGame implements ActionListener, ChangeLis
 			paintCanvas.setColor(newColor);
 			colorButton.setIcon(iconOfColor(newColor,this.iconSize));
 		}
-		else if(s == edit){
-			paintCanvas.editMode = true;
+		else if(s == mode){
+			paintCanvas.setEdit(!paintCanvas.editMode);
+			if(paintCanvas.editMode)
+				mode.setIcon(new ImageIcon("pencil.png"));
+			else
+				mode.setIcon(new ImageIcon("view.png"));
 		}
-		else if(s == view){
-			paintCanvas.editMode = false;
-		}
+
 	}
 
 	@Override
