@@ -240,12 +240,13 @@ public class PaintSceneApp extends MainGame implements ActionListener, ChangeLis
 		statusPanel.setBorder(new BevelBorder(BevelBorder.LOWERED));
 		statusPanel.setPreferredSize(new Dimension(getWidth(),18));
 		statusPanel.setLayout(new GridLayout(1,1));
-		toolSizeLabel = new JLabel ("Tool Size: "+ activeToolSize);
+		toolSizeLabel = new JLabel ("    "+String.valueOf(activeToolSize));
 
 		statusPanel.add(toolSizeLabel);
 		
-		mainFrame.add(toolSizeSlider, BorderLayout.WEST);
+		//mainFrame.add(toolSizeSlider, BorderLayout.WEST);
 		mainFrame.add(ep, BorderLayout.EAST);
+		mainFrame.add(toolSizeSlider, BorderLayout.WEST);
 		mainFrame.add(statusPanel, BorderLayout.SOUTH);
 		
 		mainFrame.pack();
@@ -360,7 +361,7 @@ public class PaintSceneApp extends MainGame implements ActionListener, ChangeLis
 			int toolSize = ((JSlider)s).getValue();
 			//something.setToolSize(toolSize);
 			activeToolSize = toolSize;
-			toolSizeLabel.setText("Tool Size: " + activeToolSize);
+			toolSizeLabel.setText("    "+String.valueOf(activeToolSize));
 		}
 		
 	}
