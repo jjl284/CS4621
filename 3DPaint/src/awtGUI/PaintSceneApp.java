@@ -139,7 +139,7 @@ public class PaintSceneApp extends MainGame implements ActionListener, ChangeLis
 	    Menu mbLoad = new Menu("Load Default");
 	    mbLoad.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent arg0) {
-				String file = "";
+				String file = "Earth.xml";
 				if(file!=null){
 					Scene old = scene;
 					Parser p = new Parser();
