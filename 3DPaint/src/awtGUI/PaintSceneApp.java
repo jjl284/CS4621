@@ -136,6 +136,20 @@ public class PaintSceneApp extends MainGame implements ActionListener, ChangeLis
 	    //Menu mMode=new Menu("Mode");
 	    Menu mToolbars = new Menu("Toolbars");
 	    
+	    Menu mbLoad = new Menu("Load Default");
+	    mbLoad.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent arg0) {
+				String file = "";
+				if(file!=null){
+					Scene old = scene;
+					Parser p = new Parser();
+					Object o = p.parse(file, Scene.class);
+					if(o!=null) old.sendEvent(new SceneReloadEvent(file));
+					System.out.println("SCENE"+scene.getClass().toString());
+					return;
+				}
+			}});
+	    MenuItem loadEarth = new MenuItem("Earth");
 	   //final PaintSceneApp psapp = this;
 	    // Create MenuItems
 	    MenuItem mbImp=new MenuItem("Import");
@@ -203,6 +217,8 @@ public class PaintSceneApp extends MainGame implements ActionListener, ChangeLis
 	    //cColor.addActionListener(new ToolbarActionListener("Color Bar", cColor.getState(), mainFrame));
 	    //cManip.addActionListener(new ToolbarActionListener("Manipulator Bar", cManip.getState(), mainFrame));
 	    // Attach menu items to menu
+	    mFile.add(mbLoad);
+	    	mbLoad.add(loadEarth);
 	    mFile.add(mbImp);
 	    mFile.add(mbExp);
 	   
@@ -293,7 +309,7 @@ public class PaintSceneApp extends MainGame implements ActionListener, ChangeLis
 		tools.add(eraser);
 		
 		JToolBar toolBar = new JToolBar(JToolBar.VERTICAL);
-		toolBar.setFloatable(true);
+		toolBar.setFloatable(false);
 		toolBar.setRollover(true);
 		toolBar.add(pencil);
 		toolBar.add(eraser);
