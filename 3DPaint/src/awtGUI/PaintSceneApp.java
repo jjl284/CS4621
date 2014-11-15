@@ -137,19 +137,26 @@ public class PaintSceneApp extends MainGame implements ActionListener, ChangeLis
 	    Menu mToolbars = new Menu("Toolbars");
 	    
 	    Menu mbLoad = new Menu("Load Default");
-	    mbLoad.addActionListener(new ActionListener(){
+	    MenuItem loadEarth = new MenuItem("Earth");
+	    loadEarth.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent arg0) {
-				String file = "Earth.xml";
+				System.out.println("ACTION LISTENER");
+				
+				File f = new File("Earth.xml");
+				String file = f.getAbsolutePath();
+				System.out.println("FILE TO STRING"+file.toString());
 				if(file!=null){
-					Scene old = scene;
 					Parser p = new Parser();
 					Object o = p.parse(file, Scene.class);
-					if(o!=null) old.sendEvent(new SceneReloadEvent(file));
-					System.out.println("SCENE"+scene.getClass().toString());
-					return;
+					if(o!=null) {
+						Scene old = scene;
+						scene = (Scene)o;
+						if(old!=null) old.sendEvent(new SceneReloadEvent(file));
+						System.out.println("SCENE"+scene.getClass().toString());
+						return;
+					}
 				}
 			}});
-	    MenuItem loadEarth = new MenuItem("Earth");
 	   //final PaintSceneApp psapp = this;
 	    // Create MenuItems
 	    MenuItem mbImp=new MenuItem("Import");
