@@ -14,6 +14,7 @@ import static org.lwjgl.opengl.GL20.glCreateShader;
 import static org.lwjgl.opengl.GL20.glDeleteProgram;
 import static org.lwjgl.opengl.GL20.glDeleteShader;
 import static org.lwjgl.opengl.GL20.glDetachShader;
+import static org.lwjgl.opengl.GL20.glDisableVertexAttribArray;
 import static org.lwjgl.opengl.GL20.glEnableVertexAttribArray;
 import static org.lwjgl.opengl.GL20.glGetProgrami;
 import static org.lwjgl.opengl.GL20.glGetShaderi;
@@ -23,9 +24,6 @@ import static org.lwjgl.opengl.GL20.glShaderSource;
 import static org.lwjgl.opengl.GL20.glUseProgram;
 import static org.lwjgl.opengl.GL20.glValidateProgram;
 import static org.lwjgl.opengl.GL20.glVertexAttribPointer;
-import static org.lwjgl.opengl.GL30.glBindVertexArray;
-import static org.lwjgl.opengl.GL30.glDeleteVertexArrays;
-import static org.lwjgl.opengl.GL30.glGenVertexArrays;
 
 import java.nio.ByteBuffer;
 import java.util.ArrayDeque;
@@ -34,19 +32,21 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Queue;
 
+import egl.GL.BufferTarget;
 import egl.GL.BufferUsageHint;
+import egl.GL.GLType;
 import egl.GL.GetProgramParameterName;
+import egl.GL.PixelFormat;
+import egl.GL.PixelType;
+//import org.lwjgl.BufferUtils;
+import egl.GL.PrimitiveType;
 import egl.GL.ShaderParameter;
 import egl.GL.ShaderType;
+import egl.GL.TextureUnit;
+import egl.math.Color;
 import egl.math.Matrix4;
 import egl.math.Vector2;
 import egl.math.Vector4;
-//import org.lwjgl.BufferUtils;
-import egl.GL.PrimitiveType;
-import egl.GL.TextureUnit;
-import egl.math.Color;
-import egl.GL.BufferTarget;
-import egl.GL.GLType;
 
 public class SpriteBatch implements IDisposable {
 	/**
@@ -133,11 +133,13 @@ public class SpriteBatch implements IDisposable {
 	private static final String FS_SRC = 
 			"#version 120\n" +
 			"uniform sampler2D SBTex;\n" + 
+			"uniform vec4 ColorMult;\n" + 
+			"uniform vec4 ColorAdd;\n" + 
 			"varying vec2 fUV;\n" + 
 			"varying vec4 fUVRect;\n" + 
 			"varying vec4 fTint;\n" + 
 			"void main() {\n" + 
-			"    gl_FragColor = texture2D(SBTex, (vec2(fract(fUV.x), fract(fUV.y)) * fUVRect.zw) + fUVRect.xy) * fTint;\n" + 
+			"    gl_FragColor = (ColorMult * texture2D(SBTex, (vec2(fract(fUV.x), fract(fUV.y)) * fUVRect.zw) + fUVRect.xy) * fTint) + ColorAdd;\n" + 
 			"}";
 
 	/**
@@ -149,6 +151,9 @@ public class SpriteBatch implements IDisposable {
 	 */
 	public static final Vector2 UV_NO_TILE = new Vector2(1, 1);
 
+	private static final Vector4 DEFAULT_COL_MULT = new Vector4(1, 1, 1, 1);
+	private static final Vector4 DEFAULT_COL_ADD = new Vector4(0, 0, 0, 0);
+	
 	/**
 	 * Construct A Camera Matrix From A View Size
 	 * @param w View Width
@@ -167,12 +172,15 @@ public class SpriteBatch implements IDisposable {
 
 	// Render Batches
 	private int bufUsage;
-	private int vao, vbo, glyphCapacity;
+	private int vbo, glyphCapacity;
 	private ArrayList<SpriteBatchCall> batches;
 
+	// White Pixel Texture
+	private GLTexture texture;
+	
 	// Custom Shader
 	private int idProg, idVS, idFS;
-	private int unWorld, unVP, unTexture;
+	private int unWorld, unVP, unTexture, unColMult, unColAdd;
 
 	/**
 	 * Construct A SpriteBatch With Static/Dynamic Qualifiers
@@ -189,6 +197,19 @@ public class SpriteBatch implements IDisposable {
 		createProgram();
 		searchUniforms();
 		createVertexArray();
+		
+		texture = new GLTexture().init();
+		ByteBuffer buf = NativeMem.createByteBuffer(4);
+		buf.put((byte)0xff);
+		buf.put((byte)0xff);
+		buf.put((byte)0xff);
+		buf.put((byte)0xff);
+		buf.flip();
+		texture.setImage(1, 1, PixelFormat.Rgba, PixelType.UnsignedByte, buf, false);
+		
+		glUseProgram(idProg);
+		GLUniform.set(unColMult, DEFAULT_COL_MULT);
+		GLUniform.set(unColAdd, DEFAULT_COL_ADD);
 	}
 	/**
 	 * Destroy OpenGL Resources This SpriteBatch Allocated
@@ -197,13 +218,12 @@ public class SpriteBatch implements IDisposable {
 	public void dispose() {
 		glDeleteBuffers(vbo);
 		vbo = 0;
-		glDeleteVertexArrays(vao);
-		vao = 0;
 		glDetachShader(idProg, idVS);
 		glDeleteShader(idVS);
 		glDetachShader(idProg, idFS);
 		glDeleteShader(idFS);
 		glDeleteProgram(idProg);
+		texture.dispose();
 	}
 
 	private void createProgram() {
@@ -241,26 +261,14 @@ public class SpriteBatch implements IDisposable {
 		unWorld = glGetUniformLocation(idProg, "World");
 		unVP = glGetUniformLocation(idProg, "VP");
 		unTexture = glGetUniformLocation(idProg, "SBTex");
+		unColMult = glGetUniformLocation(idProg, "ColorMult");
+		unColAdd = glGetUniformLocation(idProg, "ColorAdd");
 	}
 	private void createVertexArray() {
-		vao = glGenVertexArrays();
-		glBindVertexArray(vao);
-
 		vbo = glGenBuffers();
 		glyphCapacity = INITIAL_GLYPH_CAP;
 		glBindBuffer(BufferTarget.ArrayBuffer, vbo);
 		glBufferData(BufferTarget.ArrayBuffer, (glyphCapacity * 6) * VertexSpriteBatch.Size, bufUsage);
-
-		glEnableVertexAttribArray(0);
-		glEnableVertexAttribArray(1);
-		glEnableVertexAttribArray(2);
-		glEnableVertexAttribArray(3);
-		glVertexAttribPointer(0, 3, GLType.Float, false, VertexSpriteBatch.Size, 0);
-		glVertexAttribPointer(1, 4, GLType.UnsignedByte, true, VertexSpriteBatch.Size, 36);
-		glVertexAttribPointer(2, 2, GLType.Float, false, VertexSpriteBatch.Size, 12);
-		glVertexAttribPointer(3, 4, GLType.Float, false, VertexSpriteBatch.Size, 20);
-
-		glBindVertexArray(0);
 
 		GLBuffer.unbind(BufferTarget.ArrayBuffer);    	
 	}
@@ -275,6 +283,7 @@ public class SpriteBatch implements IDisposable {
 	}
 
 	private SpriteGlyph createGlyph(GLTexture t, float d) {
+		if(t == null) t = texture;
 		if(emptyGlyphs.size() > 0) {
 			SpriteGlyph g = emptyGlyphs.remove();
 			g.texture = t;
@@ -615,12 +624,14 @@ public class SpriteBatch implements IDisposable {
 		generateBatches();
 	}
 
-	public void renderBatch(Matrix4 mWorld, Matrix4 mCamera, BlendState bs, SamplerState ss, DepthState ds, RasterizerState rs) {
+	public void renderBatch(Matrix4 mWorld, Matrix4 mCamera, BlendState bs, SamplerState ss, DepthState ds, RasterizerState rs, Vector4 cMul, Vector4 cAdd) {
 		// Set Up Render State
 		if(bs == null) bs = BlendState.PREMULTIPLIED_ALPHA_BLEND;
 		if(ds == null) ds = DepthState.NONE;
 		if(rs == null) rs = RasterizerState.CULL_NONE;
 		if(ss == null) ss = SamplerState.LINEAR_WRAP;
+		if(cMul == null) cMul = DEFAULT_COL_MULT;
+		if(cAdd == null) cAdd = DEFAULT_COL_ADD;
 		bs.set();
 		ds.set();
 		rs.set();
@@ -631,15 +642,21 @@ public class SpriteBatch implements IDisposable {
 		// Set Up The Matrices
 		GLUniform.setST(unWorld, mWorld, false);
 		GLUniform.setST(unVP, mCamera, false);
+		GLUniform.set(unColMult, cMul);
+		GLUniform.set(unColAdd, cAdd);
 
-		glBindVertexArray(vao);
+		glBindBuffer(BufferTarget.ArrayBuffer, vbo);
 		glEnableVertexAttribArray(0);
 		glEnableVertexAttribArray(1);
 		glEnableVertexAttribArray(2);
 		glEnableVertexAttribArray(3);
+		glVertexAttribPointer(0, 3, GLType.Float, false, VertexSpriteBatch.Size, 0);
+		glVertexAttribPointer(1, 4, GLType.UnsignedByte, true, VertexSpriteBatch.Size, 36);
+		glVertexAttribPointer(2, 2, GLType.Float, false, VertexSpriteBatch.Size, 12);
+		glVertexAttribPointer(3, 4, GLType.Float, false, VertexSpriteBatch.Size, 20);
 		
 		// Draw All The Batches
-		int bc = batches.size();
+		int bc = batches == null ? 0 : batches.size();
 		for(int i = 0; i < bc; i++) {
 			SpriteBatchCall batch = batches.get(i);
 			batch.Texture.use(TextureUnit.Texture0, unTexture);
@@ -649,6 +666,13 @@ public class SpriteBatch implements IDisposable {
 		}
 
 		GLProgram.unuse();
-		glBindVertexArray(0);
+		glDisableVertexAttribArray(0);
+		glDisableVertexAttribArray(1);
+		glDisableVertexAttribArray(2);
+		glDisableVertexAttribArray(3);
+		glBindBuffer(BufferTarget.ArrayBuffer, 0);
+	}
+	public void renderBatch(Matrix4 mWorld, Matrix4 mCamera, BlendState bs, SamplerState ss, DepthState ds, RasterizerState rs) {
+		renderBatch(mWorld, mCamera, bs, ss, ds, rs, null, null);
 	}
 }

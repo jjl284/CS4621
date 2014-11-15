@@ -26,26 +26,39 @@ varying vec4 worldPos; // vertex position in world coordinates
 void main() {
 	// interpolating normals will change the length of the normal, so renormalize the normal.
 	vec3 N = normalize(fN);
-	vec3 V = normalize(worldCam - worldPos.xyz);
+	vec3 V = normalize(worldPos.xyz - worldCam);
 	
+	
+	vec4 baseColor;
+	
+	if(gl_FrontFacing) {
+		baseColor = vec4(.6, 0, 0, 1);
+	}
+	else {
+		baseColor = vec4(.2, .2, .2, 1);
+		N = -N;
+	}
+
 	vec4 finalColor = vec4(0.0, 0.0, 0.0, 0.0);
 
 	for (int i = 0; i < numLights; i++) {
-	  float r = length(lightPosition[i] - worldPos.xyz);
-	  vec3 L = normalize(lightPosition[i] - worldPos.xyz); 
-	  vec3 H = normalize(L + V);
-
-	  // calculate diffuse term
-	  vec4 Idiff = getDiffuseColor(fUV) * max(dot(N, L), 0.0);
-
-	  // calculate specular term
-	  vec4 Ispec = getSpecularColor(fUV) * pow(max(dot(N, H), 0.0), shininess);
-
-	  finalColor += vec4(lightIntensity[i], 0.0) * (Idiff + Ispec) / (r*r);
+		float r = length(lightPosition[i] - worldPos.xyz);
+		vec3 L = normalize(lightPosition[i] - worldPos.xyz); 
+		vec3 H = normalize(L + V);
+		
+		// calculate diffuse term
+		vec4 Idiff = baseColor * max(dot(N, L), 0.0);
+		
+		// calculate specular term
+		vec4 Ispec = vec4(1,1,1,1) * pow(max(dot(N, H), 0.0), shininess);
+		
+		finalColor += vec4(lightIntensity[i], 0.0) * (Idiff + Ispec) / (r*r);
 	}
 
 	// calculate ambient term
-	vec4 Iamb = getDiffuseColor(fUV);
+	gl_FragColor = finalColor  * exposure;
+		
+		
+
 	
-	gl_FragColor = (finalColor + vec4(ambientLightIntensity, 0.0) * Iamb) * exposure; 
 }

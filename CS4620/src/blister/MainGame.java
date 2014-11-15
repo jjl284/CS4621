@@ -59,9 +59,9 @@ public abstract class MainGame implements IDisposable {
 	private final MouseWheelEventArgs eMW;
 	private final MouseMoveEventArgs eMM;
 	private final WindowResizeArgs eWR;
-	
-	private Canvas canvas;
 
+	private Canvas canvas;
+	
 	/**
 	 * List Of Screens That Must Be Built
 	 */
@@ -139,6 +139,7 @@ public abstract class MainGame implements IDisposable {
 		curTime = new GameTime();
 		lastTime = new GameTime();
 	}
+	
 	/**
 	 * Disposes Of All Screens And Exits The Application
 	 */
@@ -153,7 +154,7 @@ public abstract class MainGame implements IDisposable {
 	 * Destroys The Window And Stops The Program
 	 */
 	public void exit() {
-		//Display.destroy(); //TODO: I commented this out to hide the error log on closing... hm...
+		Display.destroy();
 		GLDiagnostic.dispose();
 		System.exit(0);
 	}

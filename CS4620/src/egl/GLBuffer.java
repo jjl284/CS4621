@@ -15,6 +15,8 @@ import java.nio.IntBuffer;
 import java.nio.ShortBuffer;
 import java.util.HashMap;
 
+import org.lwjgl.BufferUtils;
+
 import egl.GL.BufferTarget;
 import egl.GL.GLType;
 
@@ -589,7 +591,7 @@ public class GLBuffer implements IDisposable {
         init();
         setElementFormat(GLType.Float, vecDim);
         setTarget(BufferTarget.ArrayBuffer);
-        smartSetData(data, 0, 0);
+        smartSetData(data, data.length, 0);
         return this;
     }
     /**
@@ -600,7 +602,7 @@ public class GLBuffer implements IDisposable {
     public GLBuffer initAsIndex(int[] data) {
         init();
         setAsIndexInt();
-        smartSetData(data, 0, 0);
+        smartSetData(data, data.length, 0);
         return this;
     }
     /**
@@ -611,7 +613,46 @@ public class GLBuffer implements IDisposable {
     public GLBuffer initAsIndex(short[] data) {
         init();
         setAsIndexShort();
-        smartSetData(data, 0, 0);
+        smartSetData(data, data.length, 0);
         return this;
+    }
+    
+    /**
+     * Initialize This As A Vertex Buffer Containing Data
+     * @param data Buffer Vertex Data
+     * @param vecDim Components Per Element
+     * @return Self
+     */
+    static public GLBuffer createAsVertex(float[] data, int vecDim, int usage) {
+    	GLBuffer buf = new GLBuffer(BufferTarget.ArrayBuffer, usage);
+        buf.init();
+        buf.setTarget(BufferTarget.ArrayBuffer);
+        buf.setElementFormat(GLType.Float, vecDim);
+        
+        FloatBuffer fb = BufferUtils.createFloatBuffer(data.length);
+		fb.put(data);
+		fb.position(0);
+		fb.limit(data.length);
+		buf.setDataInitial(fb);
+		
+        return buf;
+    }
+    /**
+     * Initialize This As An Index Buffer Containing Data
+     * @param data Buffer Index Data
+     * @return Self
+     */
+    static public GLBuffer createAsIndex(int[] data, int usage) {
+    	GLBuffer buf = new GLBuffer(BufferTarget.ElementArrayBuffer, usage);
+        buf.init();
+        buf.setAsIndexInt();
+        
+        IntBuffer intb = BufferUtils.createIntBuffer(data.length);
+		intb.put(data);
+		intb.position(0);
+		intb.limit(data.length);
+		
+		buf.setDataInitial(intb);
+        return buf;
     }
 }

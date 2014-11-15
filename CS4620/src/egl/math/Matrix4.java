@@ -77,6 +77,18 @@ public class Matrix4 implements Cloneable {
 		this(_m.m);
 	}
 	/**
+	 * Minor Constructor extends with zeros and a one
+	 * @param _m Matrix
+	 */
+	public Matrix4(Matrix3 _m) {
+		this(
+				_m.m[0], _m.m[3], _m.m[6], 0,
+				_m.m[1], _m.m[4], _m.m[7], 0,
+				_m.m[2], _m.m[5], _m.m[8], 0,
+				   0   ,    0   ,    0   , 1
+				);
+	}
+	/**
 	 * Row Constructor
 	 * @param r0 [{@link Vector4 ARR}] Row 1
 	 * @param r1 [{@link Vector4 ARR}] Row 2
@@ -135,6 +147,26 @@ public class Matrix4 implements Cloneable {
 	 */
 	public static int index(int r, int c) {
 		return c * SIZE + r;
+	}
+	
+	/**
+	 * Read One Entry Of The Matrix
+	 * @param r Row    In Range [0,SIZE)
+	 * @param c Column In Range [0,SIZE)
+	 * @return Entry at Row r and Column c.
+	 */
+	public float get(int r, int c) {
+		return m[index(r,c)];
+	}
+	
+	/**
+	 * Write One Entry Of The Matrix
+	 * @param r Row    In Range [0,SIZE)
+	 * @param c Column In Range [0,SIZE)
+	 * @param v Value To Write
+	 */
+	public void set(int r, int c, float v) {
+		m[index(r,c)] = v;
 	}
 	
 	/**
@@ -892,6 +924,43 @@ public class Matrix4 implements Cloneable {
 	 */
 	public static Matrix4 createOrthographic(float w, float h, float znear, float zfar) {
 		return createOrthographic(w, h, znear, zfar, new Matrix4());
+	}
+	
+	/**
+	 * Create An Orthographic Matrix Into Out
+	 * <pre>
+	 * Let w = r - l
+	 * Let h = t - b
+	 * |  2 / w  0      0     -(l + r) / w |
+	 * |  0      2 / h  0     -(b + t) / h |
+	 * |  0      0      0     1            |
+	 * </pre>
+	 * @param l Left Side Of Rect
+	 * @param r Right Side Of Rect
+	 * @param b Bottom Side Of Rect
+	 * @param t Top Side Of Rect
+	 * @param out Non-Null Output Matrix
+	 * @return Out
+	 */
+	public static Matrix4 createOrthographic2D(float l, float r, float b, float t, Matrix4 out) {
+		float w = r - l, h = t - b;
+		return out.set(
+				2 / w, 0, 0, -(l + r) / w,
+				0, 2 / h, 0, -(b + t) / h,
+				0, 0, 1, 0, 
+				0, 0, 0, 1);
+	}
+	
+	/**
+	 * @see {@link #createOrthographic(float, float, float, float, Matrix3) Mat3.createOrthographic(l, r, b, t, new Mat3())}
+	 * @param l Left Side Of Rect
+	 * @param r Right Side Of Rect
+	 * @param b Bottom Side Of Rect
+	 * @param t Top Side Of Rect
+	 * @return New Matrix
+	 */
+	public static Matrix4 createOrthographic2D(float l, float r, float b, float t) {
+		return createOrthographic2D(l, r, b, t, new Matrix4());
 	}
 
 	/**

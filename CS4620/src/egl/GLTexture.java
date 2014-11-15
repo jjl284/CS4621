@@ -100,7 +100,7 @@ public class GLTexture implements IDisposable {
         dimensions = new int[] { 0, 0, 0 };
 
         setTarget(target);
-        internalFormat = PixelInternalFormat.Rgba;
+        internalFormat = PixelInternalFormat.Rgba8;
         if(init) init();
     }
     public GLTexture(int target) {
@@ -177,20 +177,17 @@ public class GLTexture implements IDisposable {
         bind();
         switch(dims) {
             case 1:
-                if(buf != null) glTexImage1D(target, 0, internalFormat, getWidth(), 0, pixelFormat, pixelType, buf);
-                else  glTexImage1D(target, 0, internalFormat, getWidth(), 0, pixelFormat, pixelType, 0);
+                glTexImage1D(target, 0, internalFormat, getWidth(), 0, pixelFormat, pixelType, buf);
                 break;
             case 2:
                 if(mipMap)
                     glTexParameteri(target, TextureParameterName.GenerateMipmap, 1);
-                if(buf != null) glTexImage2D(target, 0, internalFormat, getWidth(), getHeight(), 0, pixelFormat, pixelType, buf);
-                else glTexImage2D(target, 0, internalFormat, getWidth(), getHeight(), 0, pixelFormat, pixelType, 0);
+                glTexImage2D(target, 0, internalFormat, getWidth(), getHeight(), 0, pixelFormat, pixelType, buf);
                 if(mipMap && getTarget() == TextureTarget.Texture2D)
                 	GL30.glGenerateMipmap(TextureTarget.Texture2D);
                 break;
             case 3:
-            	if(buf != null) glTexImage3D(target, 0, internalFormat, getWidth(), getHeight(), getDepth(), 0, pixelFormat, pixelType, buf);
-            	else glTexImage3D(target, 0, internalFormat, getWidth(), getHeight(), getDepth(), 0, pixelFormat, pixelType, 0);
+        		glTexImage3D(target, 0, internalFormat, getWidth(), getHeight(), getDepth(), 0, pixelFormat, pixelType, buf);
                 break;
             default:
                 throw new Exception("Invalid Dimensions For The Texture (Must Be > 0)");
@@ -204,6 +201,7 @@ public class GLTexture implements IDisposable {
 		} 
     	catch (Exception e) {
     		// The Apocalypse Has Begun. Quick... Hide In The Garage!
+    		// Update: This Error Has Occurred. We Are All FUCKED!!!
 		}
     }
     public void setImage(int w, int h, int pixelFormat, int pixelType, ByteBuffer buf, boolean mipMap) {

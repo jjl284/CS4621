@@ -25,9 +25,9 @@ import egl.math.Vector4;
 public class ManipRenderer implements IDisposable {
 	private static final Vector4[] AxisColors = new Vector4[3];
 	static {
-		AxisColors[Manipulator.Axis.X] = new Vector4(1, 0, 0, .1f);
-		AxisColors[Manipulator.Axis.Y] = new Vector4(0, 1, 0, .1f);
-		AxisColors[Manipulator.Axis.Z] = new Vector4(0, 0, 1, .1f);
+		AxisColors[Manipulator.Axis.X] = new Vector4(1, 0, 0, .3f);
+		AxisColors[Manipulator.Axis.Y] = new Vector4(0, 1, 0, .3f);
+		AxisColors[Manipulator.Axis.Z] = new Vector4(0, 0, 1, .3f);
 	}
 	
 	GLProgram program = new GLProgram(true);

@@ -259,12 +259,12 @@ public class ManipController implements IDisposable {
 		}
 		if (parentSpace) {
 			if (object.parent != null) {
-				object.parent.sceneObject.transformation.mulPos(axisOrigin);
-				object.parent.sceneObject.transformation.mulPos(axisDirection);
+				object.parent.mWorldTransform.mulPos(axisOrigin);
+				object.parent.mWorldTransform.mulDir(axisDirection);
 			}
 		} else {
-			object.sceneObject.transformation.mulPos(axisOrigin);
-			object.sceneObject.transformation.mulDir(axisDirection);
+			object.mWorldTransform.mulPos(axisOrigin);
+			object.mWorldTransform.mulDir(axisDirection);
 		}
 		float t1 = getAxisT(axisOrigin, axisDirection, mViewProjection, lastMousePos);
 		float t2 = getAxisT(axisOrigin, axisDirection, mViewProjection, curMousePos);
@@ -302,12 +302,12 @@ public class ManipController implements IDisposable {
 		}
 		if (parentSpace) {
 			if (object.parent != null) {
-				object.parent.sceneObject.transformation.mulPos(axisOrigin);
-				object.parent.sceneObject.transformation.mulPos(axisDirection);
+				object.parent.mWorldTransform.mulPos(axisOrigin);
+				object.parent.mWorldTransform.mulDir(axisDirection);
 			}
 		} else {
-			object.sceneObject.transformation.mulPos(axisOrigin);
-			object.sceneObject.transformation.mulDir(axisDirection);
+			object.mWorldTransform.mulPos(axisOrigin);
+			object.mWorldTransform.mulDir(axisDirection);
 		}
 		float t1 = getAxisT(axisOrigin, axisDirection, mViewProjection, lastMousePos);
 		float t2 = getAxisT(axisOrigin, axisDirection, mViewProjection, curMousePos);
@@ -399,6 +399,10 @@ public class ManipController implements IDisposable {
 		else if(currentObject != null) {
 			currentObject = null;
 		}
+	}
+	
+	public RenderObject getCurrentObject() {
+		return currentObject;
 	}
 	
 	public void draw(RenderCamera camera) {

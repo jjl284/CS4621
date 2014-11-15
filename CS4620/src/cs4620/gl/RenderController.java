@@ -2,9 +2,11 @@ package cs4620.gl;
 
 import java.util.ArrayList;
 
+import cs4620.anim.AnimationEngine;
 import cs4620.common.Material;
 import cs4620.common.Mesh;
 import cs4620.common.Scene;
+import cs4620.common.SceneCamera;
 import cs4620.common.SceneObject;
 import cs4620.common.Texture;
 import cs4620.common.event.SceneCollectionModifiedEvent;
@@ -20,6 +22,7 @@ public class RenderController implements IDisposable {
 	public final SceneEventQueue queue;
 	public final Scene scene;
 	public RenderEnvironment env;
+	public AnimationEngine animEngine;
 	private boolean requestNewScene = false;
 	
 	public RenderController(Scene s, Vector2 viewSize) {
@@ -27,6 +30,15 @@ public class RenderController implements IDisposable {
 		queue = new SceneEventQueue(scene);
 		scene.addListener(queue);
 		env = RenderTreeBuilder.build(scene, viewSize);
+		animEngine = new AnimationEngine(scene);
+		for(SceneObject o : scene.objects) {
+			if(o instanceof SceneCamera) {
+				System.out.println("Camera " + o.getID().name + " will not be animated");
+			}
+			else {
+				animEngine.addObject(o.getID().name, o);
+			}
+		}
 	}
 	@Override
 	public void dispose() {
@@ -81,7 +93,15 @@ public class RenderController implements IDisposable {
 					}
 					break;
 				case Object:
-					isTreeModified = !cme.isAdded || (scene.objects.get(cme.name) != null);
+					SceneObject o = scene.objects.get(cme.name);
+					isTreeModified = !cme.isAdded || (o != null);
+					if(o != null && o instanceof SceneCamera) {
+						System.out.println("Camera " + cme.name + " will not be animated");
+					}
+					else {
+						if(cme.isAdded) animEngine.addObject(cme.name, o);
+						else animEngine.removeObject(cme.name);
+					}
 					break;
 				default:
 					break;

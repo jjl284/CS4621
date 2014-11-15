@@ -127,6 +127,27 @@ public class Matrix3 implements Cloneable {
 	public static int index(int r, int c) {
 		return c * SIZE + r;
 	}
+	
+	/**
+	 * Read One Entry Of The Matrix
+	 * @param r Row    In Range [0,SIZE)
+	 * @param c Column In Range [0,SIZE)
+	 * @return Entry at Row r and Column c.
+	 */
+	public float get(int r, int c) {
+		return m[index(r,c)];
+	}
+	
+	/**
+	 * Write One Entry Of The Matrix
+	 * @param r Row    In Range [0,SIZE)
+	 * @param c Column In Range [0,SIZE)
+	 * @param v Value To Write
+	 */
+	public void set(int r, int c, float v) {
+		m[index(r,c)] = v;
+	}
+
 	/**
 	 * Helper To Calculate An Inner Product
 	 * @param left Left Side Matrix
@@ -428,6 +449,29 @@ public class Matrix3 implements Cloneable {
 		}
 		return 0;
 	}
+	
+	/**
+	 * Add Matrix m1 Into This
+	 * @param m1
+	 * @return This
+	 */
+	public Matrix3 add(Matrix3 m1) {
+		for (int i = 0; i < ELEMENTS; i++)
+			m[i] += m1.m[i];
+		return this;
+	}
+	
+	/**
+	 * Subtract Matrix m1 From This
+	 * @param m1
+	 * @return This
+	 */
+	public Matrix3 sub(Matrix3 m1) {
+		for (int i = 0; i < ELEMENTS; i++)
+			m[i] -= m1.m[i];
+		return this;
+	}
+	
 	/**
 	 * Calculates The Determinant Of This Matrix
 	 * @return Determinant
@@ -460,6 +504,52 @@ public class Matrix3 implements Cloneable {
 				f * coFactor(1, 0), f * coFactor(1, 1), f * coFactor(1, 2),
 				f * coFactor(2, 0), f * coFactor(2, 1), f * coFactor(2, 2)
 				);
+	}
+	
+	/**
+	 * Set this to a linear interpolation of two other matrices
+	 * @return this
+	 */
+	public Matrix3 interpolate(Matrix3 m1, Matrix3 m2, float r) {
+		for(int i = 0; i < ELEMENTS; i++) {
+			m[i] = (m2.m[i] - m1.m[i]) * r + m1.m[i];
+		}
+		return this;
+	}
+	
+	/**
+	 * The 1-norm of this matrix (the maximum column sum)
+	 * @return the norm
+	 */
+	public float norm1() {
+		float norm = 0;
+		for (int c = 0; c < SIZE; c++) {
+			float sum = 0;
+			for (int r = 0; r < SIZE; r++)
+				sum += Math.abs(m[index(r,c)]);
+			norm = Math.max(norm, sum);
+		}
+		return norm;
+	}
+	
+	/**
+	 * Compute polar decomposition of this.
+	 * Algorithm from:
+	 *    N. Higham, Computing the Polar Decomposition---with Applications
+	 *    SIAM J. Sci. Stat. Comput. 7:4 (Oct 1986) 
+	 */
+	public void polar_decomp(Matrix3 outQ, Matrix3 outP) {
+		final float TOL = 1e-6f;
+		Matrix3 Xprev = new Matrix3();
+		Matrix3 X = new Matrix3(this);
+		Matrix3 Y = new Matrix3();
+		do {
+			Y.set(X).invert();
+			Xprev.set(X);
+			X.interpolate(X, Y.transpose(), 0.5f);
+		} while (X.clone().sub(Xprev).norm1() > TOL * Xprev.norm1());
+		outQ.set(X);
+		outP.set(X).transpose().mulBefore(this);
 	}
 
 	/**

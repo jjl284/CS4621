@@ -9,14 +9,14 @@ import egl.math.Matrix4;
 import egl.math.Vector3;
 
 public class CameraController {
-	final Scene scene;
+	protected final Scene scene;
 	public RenderCamera camera;
-	final RenderEnvironment rEnv;
+	protected final RenderEnvironment rEnv;
 	
-	boolean prevFrameButtonDown = false;
-	int prevMouseX, prevMouseY;
+	protected boolean prevFrameButtonDown = false;
+	protected int prevMouseX, prevMouseY;
 	
-	boolean orbitMode = false;
+	protected boolean orbitMode = false;
 	
 	public CameraController(Scene s, RenderEnvironment re, RenderCamera c) {
 		scene = s;
@@ -92,7 +92,7 @@ public class CameraController {
 	 * @param transformation  The camera's transformation matrix (in/out parameter)
 	 * @param rotation  The rotation in degrees, as Euler angles (rotation angles about x, y, z axes)
 	 */
-	private void rotate(Matrix4 parentWorld, Matrix4 transformation, Vector3 rotation) {
+	protected void rotate(Matrix4 parentWorld, Matrix4 transformation, Vector3 rotation) {
 		// TODO#A3 SOLUTION START
 		
 		rotation = rotation.clone().mul((float)(Math.PI / 180.0));
@@ -120,7 +120,7 @@ public class CameraController {
 	 * @param transformation  The camera's transformation matrix (in/out parameter)
 	 * @param motion  The translation in camera-space units
 	 */
-	private void translate(Matrix4 parentWorld, Matrix4 transformation, Vector3 motion) {
+	protected void translate(Matrix4 parentWorld, Matrix4 transformation, Vector3 motion) {
 		// TODO#A3 SOLUTION START
 
 		Matrix4 mTrans = Matrix4.createTranslation(motion);

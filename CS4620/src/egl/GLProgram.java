@@ -168,6 +168,8 @@ public class GLProgram implements IDisposable {
                     case "binormal": sem = Semantic.Bitangent; break;
                     case "texcoord": sem = Semantic.TexCoord; break;
                     case "color": sem = Semantic.Color; break;
+                    case "blendindices": sem = Semantic.BlendIndices; break;
+                    case "blendweight": sem = Semantic.BlendWeight; break;
                     default: sem = Semantic.None; break;
                 }
                 int index = Integer.parseInt(m.group(3));
@@ -304,6 +306,7 @@ public class GLProgram implements IDisposable {
             link(materialName);
         }
         catch(Exception e) {
+        	System.err.println(e.getMessage());
             return this;
         }
         initAttributes();
@@ -320,6 +323,7 @@ public class GLProgram implements IDisposable {
             link(materialName);
         }
         catch(Exception e) {
+        	System.err.println(e.getMessage());
             return this;
         }
         initAttributes();
@@ -336,6 +340,7 @@ public class GLProgram implements IDisposable {
             link(materialName);
         }
         catch(Exception e) {
+        	System.err.println(e.getMessage());
             return this;
         }
         initAttributes();
@@ -343,7 +348,7 @@ public class GLProgram implements IDisposable {
         return this;
     }
     
-    public HashMap<String, Integer> getUniforms() {
-    	return (HashMap<String, Integer>)this.uniforms.clone();
+    public void printUniforms() {
+    	System.out.println(uniforms);
     }
 }

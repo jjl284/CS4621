@@ -8,6 +8,7 @@ import org.lwjgl.opengl.GL11;
 
 import egl.BlendState;
 import egl.DepthState;
+import egl.GLProgram;
 import egl.IDisposable;
 import egl.GL.GLType;
 import egl.GL.PrimitiveType;
@@ -95,13 +96,53 @@ public class Renderer implements IDisposable {
 			}
 
 			mesh.vBuffer.useAsAttrib(material.shaderInterface);
+			mesh.vBufferTangentSpace.useAsAttrib(material.shaderInterfaceTangentSpace);
+			if(mesh.vBufferSkinned.getIsCreated()) {
+				mesh.vBufferSkinned.useAsAttrib(material.shaderInterfaceSkinned);
+			}
 			for(RenderObject ro : p.objects) {
 				material.useObject(ro);
 				GL11.glDrawElements(PrimitiveType.Triangles, mesh.indexCount, GLType.UnsignedInt, 0);
 				GLError.get("Draw");
 			}
 		}
-	} 
+	}
+	
+	public void draw(RenderCamera camera, ArrayList<RenderLight> lights, RasterizerState rs) {
+		DepthState.DEFAULT.set();
+		BlendState.OPAQUE.set();
+		if(rs != null)
+			rs.set();
+		else
+			RasterizerState.CULL_CLOCKWISE.set();
+		
+		// Draw Up To 16 Lights
+		int cc = lights.size() > 16 ? 16 : lights.size();
+
+		RenderMaterial material = null;
+		RenderMesh mesh = null;
+		for(RenderPass p : passes) {
+			if(material != p.material) {
+				material = p.material;
+				material.program.use();
+				material.useMaterialProperties();
+				material.useCameraAndLights(camera, lights, 0, cc);
+			}
+			if(mesh != p.mesh) {
+				if(mesh != null) mesh.iBuffer.unbind();
+				mesh = p.mesh;
+				mesh.iBuffer.bind();
+			}
+
+			mesh.vBuffer.useAsAttrib(material.shaderInterface);
+			for(RenderObject ro : p.objects) {
+				material.useObject(ro);
+				GL11.glDrawElements(PrimitiveType.Triangles, mesh.indexCount, GLType.UnsignedInt, 0);
+				GLError.get("Draw");
+			}
+		}
+		GLProgram.unuse();
+	}
 
 	public void beginPickingPass(RenderCamera camera) {
 		GL11.glClearColor(1.0f, 1.0f, 1.0f, 1.0f);

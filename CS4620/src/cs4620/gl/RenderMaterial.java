@@ -1,9 +1,5 @@
 package cs4620.gl;
 
-import static org.lwjgl.opengl.GL11.glBindTexture;
-import static org.lwjgl.opengl.GL13.glActiveTexture;
-import static org.lwjgl.opengl.GL20.glUniform1i;
-
 import java.io.BufferedReader;
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
@@ -23,12 +19,10 @@ import egl.NativeMem;
 import egl.SamplerState;
 import egl.ShaderInterface;
 import egl.math.Color;
-import egl.math.Matrix4;
 import egl.math.Vector3;
 import egl.math.Vector3d;
 import egl.math.Vector4;
 import ext.java.IOUtils;
-import cs4620.common.texture.TexCubeMap;
 
 
 public class RenderMaterial implements IDisposable {
@@ -92,13 +86,14 @@ public class RenderMaterial implements IDisposable {
 					"	return textureCube(cubeMap, v);" +
 					"} ";
 	
-	
 	private static String getProvider(String provider, String type) {
 		return String.format(provider, type, type, type);
 	}
 
 	public final GLProgram program = new GLProgram(false);
 	public final ShaderInterface shaderInterface = new ShaderInterface(RenderMesh.VERTEX_DECLARATION);
+	public final ShaderInterface shaderInterfaceTangentSpace = new ShaderInterface(RenderMesh.VERTEX_DECLARATION_TANGENT_SPACE);
+	public final ShaderInterface shaderInterfaceSkinned = new ShaderInterface(RenderMesh.VERTEX_DECLARATION_SKINNED);
 	
 	private IProvider pDiffuse = null;
 	private IProvider pNormal = null;
@@ -106,8 +101,11 @@ public class RenderMaterial implements IDisposable {
 
 	public final Material sceneMaterial;
 	
-	public int unWorld, unWorldIT, unV, unP, unVP, unLPos, unLIntensity, unLCount, unCubeMap, unWorldCam, 
-		unShininess, unRoughness, unDispMagnitude, unAmbientLIntensity, unExposure;
+	public int
+		unWorld, unWorldIT, unWorldBones, unWorldITBones,
+		unV, unP, unVP, unWorldCam,
+		unLPos, unLIntensity, unLCount,
+		unCubeMap, unShininess, unRoughness, unDispMagnitude, unAmbientLIntensity, unExposure;
 	private FloatBuffer fbLight = NativeMem.createFloatBuffer(16 * 3);
 
 	public RenderMaterial(Material m) {
@@ -131,7 +129,7 @@ public class RenderMaterial implements IDisposable {
 		code = getProvider(sceneMaterial.inputSpecular.type == Type.TEXTURE ? PROVIDER_FORMAT_TEXTURE : PROVIDER_FORMAT_COLOR, "Specular") + code;
 		code = getProvider(sceneMaterial.inputNormal.type == Type.TEXTURE ? PROVIDER_FORMAT_TEXTURE : PROVIDER_FORMAT_COLOR, "Normal") + code;
 		code = getProvider(sceneMaterial.inputDiffuse.type == Type.TEXTURE ? PROVIDER_FORMAT_TEXTURE : PROVIDER_FORMAT_COLOR, "Diffuse") + code;
-		code = (true ? PROVIDER_CUBE_MAP : " ") + code;
+		code = PROVIDER_CUBE_MAP + code;
 		code = "\r\n#version 120\r\n" + code;
 		
 		return code;
@@ -164,11 +162,16 @@ public class RenderMaterial implements IDisposable {
 		
 		// Create Mappings
 		shaderInterface.build(program.semanticLinks);
-		System.out.println("Your shader program's registered uniforms: " + program.getUniforms());
+		shaderInterfaceTangentSpace.build(program.semanticLinks);
+		shaderInterfaceSkinned.build(program.semanticLinks);
+		System.out.print("Your shader program's registered uniforms: ");
+		program.printUniforms();
 		
 		// Transformation info
 		unWorld = program.getUniform("mWorld");
-		unWorldIT = program.getUniform("mWorldIT"); 
+		unWorldIT = program.getUniform("mWorldIT");
+		unWorldBones = program.getUniform("mWorldBones");
+		unWorldITBones = program.getUniform("mWorldITBones");
 		unV = program.getUniform("mView");
 		unP = program.getUniform("mProj");
 		unVP = program.getUniform("mViewProjection");

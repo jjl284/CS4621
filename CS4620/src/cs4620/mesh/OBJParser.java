@@ -70,7 +70,7 @@ public class OBJParser {
 	public static OBJMesh parse(String file, boolean discardTexCoords, boolean discardNormals, float tPosSq, float tUVSq, float tNormDot) {
 		try {
 			BufferedReader r = new BufferedReader(new InputStreamReader(new FileInputStream(file)));
-			
+
 			// For Minifying The Mesh
 			ArrayList<Integer> posInds = new ArrayList<>(), uvInds = new ArrayList<>(), normInds = new ArrayList<>();
 			PosComparer cmpPos = new PosComparer(tPosSq);

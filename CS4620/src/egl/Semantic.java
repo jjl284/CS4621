@@ -29,6 +29,8 @@ public class Semantic {
 	public static final int Bitangent = 0x0030;
 	public static final int Color = 0x0040;
 	public static final int TexCoord = 0x0050;
-	public static final int Custom = 0x0060;
+	public static final int BlendIndices = 0x0060;
+	public static final int BlendWeight = 0x0070;
+	public static final int Custom = 0x0080;
 	public static final int None = 0xffff;
 }

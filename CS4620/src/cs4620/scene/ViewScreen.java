@@ -15,12 +15,15 @@ import blister.GameTime;
 import blister.ScreenState;
 import blister.input.KeyboardEventDispatcher;
 import blister.input.KeyboardKeyEventArgs;
+import cs4620.anim.Animator;
+import cs4620.anim.TimelineViewer;
 import cs4620.common.Scene;
 import cs4620.common.event.SceneReloadEvent;
 import cs4620.gl.CameraController;
 import cs4620.gl.GridRenderer;
 import cs4620.gl.RenderCamera;
 import cs4620.gl.RenderController;
+import cs4620.gl.RenderObject;
 import cs4620.gl.Renderer;
 import cs4620.gl.manip.ManipController;
 import cs4620.scene.form.RPMaterialData;
@@ -40,6 +43,7 @@ public class ViewScreen extends GameScreen {
 	int prevCamScroll = 0;
 	boolean wasPickPressedLast = false;
 	boolean showGrid = true;
+	boolean useTimelineMouseOver = true;
 	
 	SceneApp app;
 	ScenePanel sceneTree;
@@ -51,6 +55,9 @@ public class ViewScreen extends GameScreen {
 	CameraController camController;
 	ManipController manipController;
 	GridRenderer gridRenderer;
+	boolean updateAnimation;
+	Animator animator;
+	TimelineViewer animTimeViewer = new TimelineViewer();
 	
 	@Override
 	public int getNext() {
@@ -84,14 +91,8 @@ public class ViewScreen extends GameScreen {
 	private final ACEventFunc<KeyboardKeyEventArgs> onKeyPress = new ACEventFunc<KeyboardKeyEventArgs>() {
 		@Override
 		public void receive(Object sender, KeyboardKeyEventArgs args) {
+			RenderObject selected;
 			switch (args.key) {
-			case Keyboard.KEY_M:
-				if(!args.getAlt()) return;
-				if(dataMaterial != null) {
-					app.otherWindow.tabToForefront("Material");
-					dataMaterial.addBasic();
-				}
-				break;
 			case Keyboard.KEY_G:
 				showGrid = !showGrid;
 				break;
@@ -119,6 +120,34 @@ public class ViewScreen extends GameScreen {
 					e.printStackTrace();
 				}
 				break;
+			case Keyboard.KEY_LBRACKET:
+				rController.animEngine.rewind(1);
+				updateAnimation = true;
+				break;
+			case Keyboard.KEY_RBRACKET:
+				rController.animEngine.advance(1);
+				updateAnimation = true;
+				break;
+			case Keyboard.KEY_N:
+				selected = manipController.getCurrentObject();
+				if(selected != null) {
+					rController.animEngine.addKeyframe(selected.sceneObject.getID().name);
+					updateAnimation = true;
+				}
+				break;
+			case Keyboard.KEY_M:
+				selected = manipController.getCurrentObject();
+				if(selected != null) {
+					rController.animEngine.removeKeyframe(selected.sceneObject.getID().name);
+					updateAnimation = true;
+				}
+				break;
+			case Keyboard.KEY_BACKSLASH:
+				animator.togglePlaying();
+				break;
+			case Keyboard.KEY_APOSTROPHE:
+				useTimelineMouseOver = !useTimelineMouseOver;
+				break;
 			default:
 				break;
 			}
@@ -135,6 +164,7 @@ public class ViewScreen extends GameScreen {
 		createCamController();
 		manipController = new ManipController(rController.env, app.scene, app.otherWindow);
 		gridRenderer = new GridRenderer();
+		animator = new Animator();
 		
 		KeyboardEventDispatcher.OnKeyPressed.add(onKeyPress);
 		manipController.hook();
@@ -149,12 +179,15 @@ public class ViewScreen extends GameScreen {
 		if(tab != null) dataTexture = (RPTextureData)tab;
 		
 		wasPickPressedLast = false;
+		updateAnimation = false;
+		animTimeViewer.init();
 		prevCamScroll = 0;
 	}
 	@Override
 	public void onExit(GameTime gameTime) {
 		KeyboardEventDispatcher.OnKeyPressed.remove(onKeyPress);
 		rController.dispose();
+		animTimeViewer.dispose();
 		manipController.dispose();
 	}
 
@@ -198,10 +231,23 @@ public class ViewScreen extends GameScreen {
 		if(rController.isNewSceneRequested()) {
 			setState(ScreenState.ChangeNext);
 		}
+		
+		// Update Animation
+		int frames = animator.update((float)gameTime.elapsed);
+		if(frames > 0) {
+			rController.animEngine.advance(frames);
+			updateAnimation = true;
+		}
+		if(updateAnimation) {
+			rController.animEngine.updateTransformations();
+			updateAnimation = false;
+		}
 	}
 	
 	@Override
 	public void draw(GameTime gameTime) {
+
+		
 		rController.update(renderer, camController);
 
 		if(pick && camController.camera != null) {
@@ -219,6 +265,14 @@ public class ViewScreen extends GameScreen {
 			if (showGrid)
 				gridRenderer.draw(camController.camera);
 		}
+		
+		RenderObject co = manipController.getCurrentObject();
+		animTimeViewer.draw(
+				game.getWidth(), game.getHeight(),
+				rController.animEngine,
+				co == null ? "" : co.sceneObject.getID().name,
+				Mouse.getY() < 40 || !useTimelineMouseOver, (float)gameTime.elapsed);
+		
         GLError.get("draw");
 	}
 }
