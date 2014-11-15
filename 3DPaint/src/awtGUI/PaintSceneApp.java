@@ -14,17 +14,25 @@ import java.awt.event.WindowEvent;
 import java.io.File;
 
 import javax.swing.BoxLayout;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
 
 import org.lwjgl.LWJGLException;
 
 import blister.FalseFirstScreen;
 import blister.MainGame;
 import blister.ScreenList;
+import cs4620.common.Mesh;
 import cs4620.common.Scene;
+import cs4620.common.Scene.NameBindMesh;
+import cs4620.common.Scene.NameBindSceneObject;
+import cs4620.common.Scene.NameBindTexture;
+import cs4620.common.SceneObject;
+import cs4620.common.Texture;
 import cs4620.common.event.SceneReloadEvent;
-import cs4620.scene.SceneApp;
-import cs4620.scene.ViewScreen;
-import cs4620.scene.form.ControlWindow;
+import cs4620.common.texture.TexGenUVGrid;
+import cs4620.mesh.gen.MeshGenCube;
+import egl.math.Vector3;
 import ext.java.Parser;
 
 public class PaintSceneApp extends MainGame {
@@ -104,6 +112,103 @@ public class PaintSceneApp extends MainGame {
 	    
 	   //final PaintSceneApp psapp = this;
 	    // Create MenuItems
+	    Menu mbNew=new Menu("New...");
+	    
+	    MenuItem newSphere = new MenuItem("Sphere");
+	    MenuItem newCube = new MenuItem("Cube");
+	    MenuItem newCylinder = new MenuItem("Cylinder");
+	    MenuItem newPlane = new MenuItem("Plane");
+	    MenuItem newTorus = new MenuItem("Torus");
+	    MenuItem newMesh = new MenuItem("Import Mesh...");
+	    
+	    ActionListener newMeshActionListener = new ActionListener() {
+	    	@Override
+			public void actionPerformed(ActionEvent arg0) {
+	    		// Create a new XML file with the given mesh and default texture, then load the mesh
+	    		scene = new Scene();
+	    		scene.setBackground( new Vector3(240,240,240) );
+	    		
+	    		Mesh m = new Mesh(); m.setGenerator( new MeshGenCube() );
+	    		scene.addMesh( new NameBindMesh("Cube", m) );
+	    		
+	    		Texture t = new Texture();
+	    		//t.setFile("data/textures/EarthLonLat.png");
+	    		t.setGenerator( new TexGenUVGrid() );
+	    		scene.addTexture( new NameBindTexture("CubeTexture", t) );
+	    		
+	    		SceneObject o = new SceneObject();
+	    		scene.addObject(new NameBindSceneObject("PaintedCube", o));
+	    		
+	    		
+	    		try {
+					scene.saveData("data/scenes/NewPaintedCube.xml");
+				} catch (ParserConfigurationException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (TransformerException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+	    		
+	    		System.out.println("Created a new scene with a cube");
+	    		return;
+	    	}
+	    };
+	    
+	    newSphere.addActionListener(newMeshActionListener);
+	    newCube.addActionListener(newMeshActionListener);
+	    newCylinder.addActionListener(newMeshActionListener);
+	    newPlane.addActionListener(newMeshActionListener);
+	    newTorus.addActionListener(newMeshActionListener);
+	    
+	    newMesh.addActionListener(new ActionListener() {
+	    	@Override
+			public void actionPerformed(ActionEvent arg0) {
+				// TODO: Allow user to select a specific mesh of their choosing
+	    		// TODO: Direct user to select a texture size when done selecting mesh
+				FileDialog fd = new FileDialog(mainFrame);
+				fd.setVisible(true);
+				for(File f : fd.getFiles()) {
+					String file = f.getAbsolutePath();
+					if(file != null) {
+						Parser p = new Parser();
+						Object o = p.parse(file, Scene.class);
+						if(o != null) {
+							Scene old = scene;
+							scene = (Scene)o;
+							if(old != null) old.sendEvent(new SceneReloadEvent(file));
+							System.out.println("SCENE "+scene.getClass().toString());
+							return;}}}}
+	    });
+	    
+	    mbNew.add(newSphere);
+	    mbNew.add(newCube);
+	    mbNew.add(newCylinder);
+	    mbNew.add(newPlane);
+	    mbNew.add(newTorus);
+	    mbNew.add(newMesh);
+	    
+	    mbNew.addActionListener(new ActionListener(){
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				// TODO: Customize this to allow the user to select from existing
+				// TODO: Customize this to ask user to specify a
+				FileDialog fd = new FileDialog(mainFrame);
+				fd.setVisible(true);
+				for(File f : fd.getFiles()) {
+					String file = f.getAbsolutePath();
+					if(file != null) {
+						Parser p = new Parser();
+						Object o = p.parse(file, Scene.class);
+						if(o != null) {
+							Scene old = scene;
+							scene = (Scene)o;
+							if(old != null) old.sendEvent(new SceneReloadEvent(file));
+							System.out.println("SCENE "+scene.getClass().toString());
+							return;}}}}});
+	    
+	    
 	    MenuItem mbImp=new MenuItem("Import");
 		mbImp.addActionListener(new ActionListener() {
 			@Override
@@ -147,6 +252,7 @@ public class PaintSceneApp extends MainGame {
 	    cColor.addActionListener(new ToolbarActionListener("Color Bar", cColor.getState(), mainFrame));
 	    cManip.addActionListener(new ToolbarActionListener("Manipulator Bar", cManip.getState(), mainFrame));
 	    // Attach menu items to menu
+	    mFile.add(mbNew);
 	    mFile.add(mbImp);
 	    mFile.add(mbExp);
 	   
