@@ -265,6 +265,8 @@ public class PaintSceneApp extends MainGame implements ActionListener, ChangeLis
 	}
 		
 	private JToolBar makeToolBar(){
+		JPanel[] panelHolder = new JPanel[1];
+		
 		ButtonGroup tools = new ButtonGroup();
 		pencil = new JToggleButton(new ImageIcon("brush.png"));
 		pencil.setToolTipText("pencil");
@@ -296,7 +298,11 @@ public class PaintSceneApp extends MainGame implements ActionListener, ChangeLis
 		toolBar.add(pencil);
 		toolBar.add(eraser);
 		toolBar.add(colorButton);
-		toolBar.add(mode);
+		for(JPanel p: panelHolder){
+			p = new JPanel();
+			toolBar.add(p);
+		}
+		toolBar.add(mode,BorderLayout.SOUTH);
 		//toolBar.add(mp);
 		
 		return toolBar;
@@ -353,8 +359,9 @@ public class PaintSceneApp extends MainGame implements ActionListener, ChangeLis
 		}
 		else if(s == colorButton){
 			Color newColor = JColorChooser.showDialog(mainFrame, "Foreground Color", Color.BLACK);
-			paintCanvas.setColor(newColor);
-			colorButton.setIcon(iconOfColor(newColor,this.iconSize));
+			if(newColor!=null){
+				
+			}
 		}
 		else if(s == mode){
 			paintCanvas.setEdit(!paintCanvas.editMode);
