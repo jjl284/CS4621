@@ -157,6 +157,8 @@ public class PaintSceneApp extends MainGame implements ActionListener, ChangeLis
 					}
 				}
 			}});
+	    
+	    
 	   //final PaintSceneApp psapp = this;
 	    // Create MenuItems
 	    MenuItem mbImp=new MenuItem("Import");
