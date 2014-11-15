@@ -1,19 +1,22 @@
 package awtGUI;
 
 import java.awt.Component;
+import java.awt.GridLayout;
 import java.awt.event.ComponentListener;
 
 import javax.swing.ButtonGroup;
+import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JToolBar;
 
-public class ManipPanel extends JToolBar{
+public class ManipPanel extends JPanel{
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
 
 	public ManipPanel(){
+		this.setLayout(new GridLayout(3,1));
 		JRadioButton zoom = new JRadioButton();
 		zoom.setText("Zoom");
 		JRadioButton rotate = new JRadioButton();
