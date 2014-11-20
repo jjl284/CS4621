@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<scene>
+  <texture>
+    <name>NormalMapped</name>
+    <data>
+      <generator>
+        <size>256 256</size>
+      </generator>
+    </data>
+  </texture>
+  <texture>
+    <name>CubeTexture</name>
+    <data>
+      <file>data/textures/CubeTexture.png</file>
+    </data>
+  </texture>
+  <mesh>
+    <name>DefaultCube</name>
+    <data>
+      <generator type="cs4620.mesh.gen.MeshGenCube"/>
+      <genOptions>
+        <divLatitude>80</divLatitude>
+        <divLongitude>120</divLongitude>
+        <innerRadius>0.25</innerRadius>
+      </genOptions>
+    </data>
+  </mesh>
+  <mesh>
+    <name>Plane</name>
+    <data>
+      <generator type="cs4620.mesh.gen.MeshGenPlane"/>
+      <genOptions>
+        <divLatitude>80</divLatitude>
+        <divLongitude>120</divLongitude>
+        <innerRadius>0.25</innerRadius>
+      </genOptions>
+    </data>
+  </mesh>
+  <material>
+    <name>GenericCubeMaterial</name>
+    <data>
+      <type>Ambient</type>
+      <diffuse>
+        <texture>CubeTexture</texture>
+      </diffuse>
+      <normal>
+        <color>128 128 255 255 </color>
+      </normal>
+      <specular>
+        <color>255 255 255 255 </color>
+      </specular>
+      <shininess>50.0</shininess>
+      <roughness>0.3</roughness>
+      <dispMagnitude>0.3</dispMagnitude>
+    </data>
+  </material>
+  <object>
+    <name>Camera</name>
+    <data type="cs4620.common.SceneCamera">
+      <matrix>1.0 0.0 0.0 0.0 0.0 1.0 0.0 0.0 0.0 0.0 1.0 0.0 0.0 0.0 2.0 1.0</matrix>
+      <parent>World</parent>
+      <zPlanes>0.01 1000.0</zPlanes>
+      <perspective>0.02 0.02</perspective>
+      <exposure>2.0</exposure>
+    </data>
+  </object>
+  <object>
+    <name>PaintedCube</name>
+    <data>
+      <matrix>1.0 0.0 0.0 0.0 0.0 1.0 0.0 0.0 0.0 0.0 1.0 0.0 0.0 0.0 0.0 1.0</matrix>
+      <parent>World</parent>
+      <mesh>DefaultCube</mesh>
+      <material>GenericCubeMaterial</material>
+    </data>
+  </object>
+</scene>
