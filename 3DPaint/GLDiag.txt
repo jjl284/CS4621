@@ -1,16 +1,16 @@
-TIME:                         Sat Nov 15 18:33:42 EST 2014
+TIME:                         Thu Nov 20 15:55:38 EST 2014
 
 === Java System Properties ===
-java.version:                 1.7.0_71
+java.version:                 1.7.0_51
 java.runtime.name:            Java(TM) SE Runtime Environment
 java.vm.name:                 Java HotSpot(TM) 64-Bit Server VM
-java.vm.version:              24.71-b01
-os.name:                      Windows 8.1
-os.version:                   6.3
+java.vm.version:              24.51-b03
+os.name:                      Windows 8
+os.version:                   6.2
 
 ====== OpenGL Properties =====
 GL_VENDOR:                    Intel
-GL_VERSION:                   4.2.0 - Build 10.18.10.3316
-GL_RENDERER:                  Intel(R) HD Graphics 4600
-GL_SHADING_LANGUAGE_VERSION:  4.20 - Build 10.18.10.3316
+GL_VERSION:                   4.0.0 - Build 10.18.10.3304
+GL_RENDERER:                  Intel(R) HD Graphics 4000
+GL_SHADING_LANGUAGE_VERSION:  4.00 - Build 10.18.10.3304
 

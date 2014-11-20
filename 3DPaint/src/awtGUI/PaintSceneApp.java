@@ -41,11 +41,15 @@ import org.lwjgl.LWJGLException;
 import blister.FalseFirstScreen;
 import blister.MainGame;
 import blister.ScreenList;
+import cs4620.common.Material;
+import cs4620.common.Material.InputProvider;
 import cs4620.common.Mesh;
 import cs4620.common.Scene;
+import cs4620.common.Scene.NameBindMaterial;
 import cs4620.common.Scene.NameBindMesh;
 import cs4620.common.Scene.NameBindSceneObject;
 import cs4620.common.Scene.NameBindTexture;
+import cs4620.common.SceneCamera;
 import cs4620.common.SceneObject;
 import cs4620.common.Texture;
 import cs4620.common.event.SceneReloadEvent;
@@ -183,23 +187,43 @@ public class PaintSceneApp extends MainGame implements ActionListener, ChangeLis
 	    	@Override
 			public void actionPerformed(ActionEvent arg0) {
 	    		// Create a new XML file with the given mesh and default texture, then load the mesh
+	    		Scene old = scene;
 	    		scene = new Scene();
-	    		scene.setBackground( new Vector3(240,240,240) );
+	    		scene.setBackground( new Vector3(40,40,40) );
 	    		
 	    		Mesh m = new Mesh(); m.setGenerator( new MeshGenCube() );
-	    		scene.addMesh( new NameBindMesh("Cube", m) );
+	    		scene.addMesh( new NameBindMesh("DefaultCube", m) );
 	    		
 	    		Texture t = new Texture();
 	    		//t.setFile("data/textures/EarthLonLat.png");
-	    		t.setGenerator( new TexGenUVGrid() );
+	    		//scene.addTexture( new NameBindTexture("CubeTexture", t) );
+	    		PaintTexture pt = new PaintTexture(1024, 1024, "data/textures/CubeTexture.png");
+	    		t.setFile("data/textures/CubeTexture.png");
 	    		scene.addTexture( new NameBindTexture("CubeTexture", t) );
 	    		
+	    		Material mat = new Material();
+	    		mat.setType(Material.T_AMBIENT);
+	    		InputProvider ip = new InputProvider();
+	    		ip.setTexture("CubeTexture");
+	    		mat.setDiffuse(ip);
+	    		scene.addMaterial(new NameBindMaterial("GenericCubeMaterial", mat));
+	    		
 	    		SceneObject o = new SceneObject();
+	    		o.setMaterial("GenericCubeMaterial");
+	    		o.setMesh("DefaultCube");
 	    		scene.addObject(new NameBindSceneObject("PaintedCube", o));
 	    		
+	    		SceneCamera cam = new SceneCamera();
+	    		cam.addTranslation(new Vector3(0,0,2));
+	    		scene.addObject(new NameBindSceneObject("Camera", cam));
 	    		
+	    		
+	    		// Attempt to create a new scene file and then reload the display
 	    		try {
-					scene.saveData("data/scenes/NewPaintedCube.xml");
+					scene.saveData("data/scenes/PaintedCube.xml");
+					File f = new File("data/scenes/PaintedCube.xml");
+					String file = f.getAbsolutePath();
+					if(old!=null) old.sendEvent(new SceneReloadEvent(file));
 				} catch (ParserConfigurationException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -298,17 +322,17 @@ public class PaintSceneApp extends MainGame implements ActionListener, ChangeLis
 	    MenuItem mbBP=new MenuItem("Blinn-Phong");
 	    mbBP.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent arg0) {
-				paintCanvas.setShading(Shading.PHONG);			
+				//paintCanvas.setShading(Shading.PHONG);			
 			}});
 	    MenuItem mbLamb=new MenuItem("Lambertian");
 	    mbLamb.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent arg0) {
-				paintCanvas.setShading(Shading.LAMBERTIAN);			
+				//paintCanvas.setShading(Shading.LAMBERTIAN);			
 			}});
 	    MenuItem mbCT=new MenuItem("Cook-Torrance");
 	    mbCT.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent arg0) {
-				paintCanvas.setShading(Shading.CT);			
+				//paintCanvas.setShading(Shading.CT);			
 			}});
 	    
 	    MenuItem mbUndo=new MenuItem("Undo");
