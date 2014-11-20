@@ -44,17 +44,13 @@ public class CameraController {
 		
 		if(Keyboard.isKeyDown(Keyboard.KEY_W)) { motion.add(0, 0, -1); }
 		if(Keyboard.isKeyDown(Keyboard.KEY_S)) { motion.add(0, 0, 1); }
-		if(Keyboard.isKeyDown(Keyboard.KEY_A)) { motion.add(-1, 0, 0); }
-		if(Keyboard.isKeyDown(Keyboard.KEY_D)) { motion.add(1, 0, 0); }
-		if(Keyboard.isKeyDown(Keyboard.KEY_LSHIFT)) { motion.add(0, -1, 0); }
-		if(Keyboard.isKeyDown(Keyboard.KEY_SPACE)) { motion.add(0, 1, 0); }
 
 		if(Keyboard.isKeyDown(Keyboard.KEY_E)) { rotation.add(0, 0, -1); }
 		if(Keyboard.isKeyDown(Keyboard.KEY_Q)) { rotation.add(0, 0, 1); }
-		if(Keyboard.isKeyDown(Keyboard.KEY_DOWN)) { rotation.add(-1, 0, 0); }
-		if(Keyboard.isKeyDown(Keyboard.KEY_UP)) { rotation.add(1, 0, 0); }
-		if(Keyboard.isKeyDown(Keyboard.KEY_RIGHT)) { rotation.add(0, -1, 0); }
-		if(Keyboard.isKeyDown(Keyboard.KEY_LEFT)) { rotation.add(0, 1, 0); }
+		if(Keyboard.isKeyDown(Keyboard.KEY_A)) { rotation.add(-1, 0, 0); }
+		if(Keyboard.isKeyDown(Keyboard.KEY_D)) { rotation.add(1, 0, 0); }
+		if(Keyboard.isKeyDown(Keyboard.KEY_Z)) { rotation.add(0, -1, 0); }
+		if(Keyboard.isKeyDown(Keyboard.KEY_C)) { rotation.add(0, 1, 0); }
 		
 		boolean thisFrameButtonDown = Mouse.isButtonDown(0) && !(Keyboard.isKeyDown(Keyboard.KEY_LCONTROL) || Keyboard.isKeyDown(Keyboard.KEY_RCONTROL));
 		int thisMouseX = Mouse.getX(), thisMouseY = Mouse.getY();
@@ -93,23 +89,17 @@ public class CameraController {
 	 * @param rotation  The rotation in degrees, as Euler angles (rotation angles about x, y, z axes)
 	 */
 	protected void rotate(Matrix4 parentWorld, Matrix4 transformation, Vector3 rotation) {
-		// TODO#A3 SOLUTION START
-		
 		rotation = rotation.clone().mul((float)(Math.PI / 180.0));
 		Matrix4 mRot = Matrix4.createRotationX(rotation.x);
 		mRot.mulAfter(Matrix4.createRotationY(rotation.y));
 		mRot.mulAfter(Matrix4.createRotationZ(rotation.z));
 
-		if (orbitMode) {
-			Vector3 rotCenter = new Vector3(0,0,0);
-			transformation.clone().invert().mulPos(rotCenter);
-			parentWorld.clone().invert().mulPos(rotCenter);
-			mRot.mulBefore(Matrix4.createTranslation(rotCenter.clone().negate()));
-			mRot.mulAfter(Matrix4.createTranslation(rotCenter));
-		}
+		Vector3 rotCenter = new Vector3(0,0,0);
+		transformation.clone().invert().mulPos(rotCenter);
+		parentWorld.clone().invert().mulPos(rotCenter);
+		mRot.mulBefore(Matrix4.createTranslation(rotCenter.clone().negate()));
+		mRot.mulAfter(Matrix4.createTranslation(rotCenter));
 		transformation.mulBefore(mRot);
-		
-		// SOLUTION END
 	}
 	
 	/**
@@ -121,13 +111,10 @@ public class CameraController {
 	 * @param motion  The translation in camera-space units
 	 */
 	protected void translate(Matrix4 parentWorld, Matrix4 transformation, Vector3 motion) {
-		// TODO#A3 SOLUTION START
-
 		Matrix4 mTrans = Matrix4.createTranslation(motion);
 		
 		transformation.mulBefore(mTrans);
-		
-		// SOLUTION END
+
 	}
 }
 
