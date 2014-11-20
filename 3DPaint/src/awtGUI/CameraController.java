@@ -89,17 +89,19 @@ public class CameraController {
 	 * @param rotation  The rotation in degrees, as Euler angles (rotation angles about x, y, z axes)
 	 */
 	protected void rotate(Matrix4 parentWorld, Matrix4 transformation, Vector3 rotation) {
-		rotation = rotation.clone().mul((float)(Math.PI / 180.0));
-		Matrix4 mRot = Matrix4.createRotationX(rotation.x);
-		mRot.mulAfter(Matrix4.createRotationY(rotation.y));
-		mRot.mulAfter(Matrix4.createRotationZ(rotation.z));
-
-		Vector3 rotCenter = new Vector3(0,0,0);
-		transformation.clone().invert().mulPos(rotCenter);
-		parentWorld.clone().invert().mulPos(rotCenter);
-		mRot.mulBefore(Matrix4.createTranslation(rotCenter.clone().negate()));
-		mRot.mulAfter(Matrix4.createTranslation(rotCenter));
-		transformation.mulBefore(mRot);
+		if(!scene.editMode){
+			rotation = rotation.clone().mul((float)(Math.PI / 180.0));
+			Matrix4 mRot = Matrix4.createRotationX(rotation.x);
+			mRot.mulAfter(Matrix4.createRotationY(rotation.y));
+			mRot.mulAfter(Matrix4.createRotationZ(rotation.z));
+	
+			Vector3 rotCenter = new Vector3(0,0,0);
+			transformation.clone().invert().mulPos(rotCenter);
+			parentWorld.clone().invert().mulPos(rotCenter);
+			mRot.mulBefore(Matrix4.createTranslation(rotCenter.clone().negate()));
+			mRot.mulAfter(Matrix4.createTranslation(rotCenter));
+			transformation.mulBefore(mRot);
+		}			
 	}
 	
 	/**
@@ -111,10 +113,10 @@ public class CameraController {
 	 * @param motion  The translation in camera-space units
 	 */
 	protected void translate(Matrix4 parentWorld, Matrix4 transformation, Vector3 motion) {
-		Matrix4 mTrans = Matrix4.createTranslation(motion);
-		
-		transformation.mulBefore(mTrans);
-
+		if(!scene.editMode){
+			Matrix4 mTrans = Matrix4.createTranslation(motion);
+			transformation.mulBefore(mTrans);
+		}		
 	}
 }
 
