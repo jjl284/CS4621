@@ -79,6 +79,7 @@ public class PaintSceneApp extends MainGame implements ActionListener, ChangeLis
 	private Frame mainFrame;
 	private PaintCanvas paintCanvas;
 	public Scene scene;
+	public PaintTexture paintTexture;
 	
 	private JLabel toolSizeLabel;
 
@@ -164,6 +165,11 @@ public class PaintSceneApp extends MainGame implements ActionListener, ChangeLis
 					if(o!=null) {
 						Scene old = scene;
 						scene = (Scene)o;
+						String matName = scene.objects.get("Earth").material;
+						String texName = scene.materials.get(matName).inputDiffuse.texture;
+						String texFileName = scene.textures.get(texName).file;
+						//File f = new File(texFileName);
+						//paintTexture = new PaintTexture(texFileName);
 						if(old!=null) old.sendEvent(new SceneReloadEvent(file));
 						System.out.println("SCENE"+scene.getClass().toString());
 						return;
@@ -197,7 +203,7 @@ public class PaintSceneApp extends MainGame implements ActionListener, ChangeLis
 	    		Texture t = new Texture();
 	    		//t.setFile("data/textures/EarthLonLat.png");
 	    		//scene.addTexture( new NameBindTexture("CubeTexture", t) );
-	    		PaintTexture pt = new PaintTexture(1024, 1024, "data/textures/CubeTexture.png");
+	    		paintTexture = new PaintTexture(1024, 1024, "data/textures/CubeTexture.png");
 	    		t.setFile("data/textures/CubeTexture.png");
 	    		scene.addTexture( new NameBindTexture("CubeTexture", t) );
 	    		
