@@ -215,6 +215,6 @@ public class PaintTexture {
 	 * @param meshData the corresponding MeshData object
 	 */
 	public void addPaint(Vector3 location, Vector2d texCoords, MeshData meshData) {
-		setPixelColor(Colord inPixel, int inX, int inY);
+		//setPixelColor(Colord inPixel, int inX, int inY);
 	}
 }

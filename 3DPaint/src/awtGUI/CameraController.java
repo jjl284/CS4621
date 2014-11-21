@@ -131,7 +131,7 @@ public class CameraController {
 	}
 	
 	protected void paint(int curMouseX, int curMouseY) {
-		System.out.println("paint called");
+		//System.out.println("paint called");
 		Vector3 rayOrigin = new Vector3();
 		Vector3 rayDirection = new Vector3();
 		getRay(curMouseX, curMouseY, rayOrigin, rayDirection);

@@ -57,9 +57,9 @@ public class Triangle extends Surface {
 	    this.mesh = mesh;
 	    this.index = new Vector3i(index);
 	    
-	    Vector3d v0 = owner.getPosition(index.x);
-	    Vector3d v1 = owner.getPosition(index.y);
-	    Vector3d v2 = owner.getPosition(index.z);
+	    Vector3 v0 = getPosition(index.x);
+	    Vector3 v1 = getPosition(index.y);
+	    Vector3 v2 = getPosition(index.z);
 	    
 	    a = v0.x-v1.x;
 	    b = v0.y-v1.y;
