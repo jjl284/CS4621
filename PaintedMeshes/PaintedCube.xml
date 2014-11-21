@@ -1,11 +1,22 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <scene>
   <texture>
-    <name>PlaneTexture</name>
+    <name>CubeTexture</name>
     <data>
-      <file>data/textures/PlaneTexture.png</file>
+      <file>CubeTexture.png</file>
     </data>
   </texture>
+  <mesh>
+    <name>DefaultCube</name>
+    <data>
+      <generator type="cs4620.mesh.gen.MeshGenCube"/>
+      <genOptions>
+        <divLatitude>80</divLatitude>
+        <divLongitude>120</divLongitude>
+        <innerRadius>0.25</innerRadius>
+      </genOptions>
+    </data>
+  </mesh>
   <mesh>
     <name>Plane</name>
     <data>
@@ -17,23 +28,12 @@
       </genOptions>
     </data>
   </mesh>
-  <mesh>
-    <name>DefaultPlane</name>
-    <data>
-      <generator type="cs4620.mesh.gen.MeshGenPlane"/>
-      <genOptions>
-        <divLatitude>80</divLatitude>
-        <divLongitude>120</divLongitude>
-        <innerRadius>0.25</innerRadius>
-      </genOptions>
-    </data>
-  </mesh>
   <material>
-    <name>PlaneMaterial</name>
+    <name>CubeMaterial</name>
     <data>
       <type>Ambient</type>
       <diffuse>
-        <texture>PlaneTexture</texture>
+        <texture>CubeTexture</texture>
       </diffuse>
       <normal>
         <color>128 128 255 255 </color>
@@ -57,12 +57,12 @@
     </data>
   </object>
   <object>
-    <name>PaintedPlane</name>
+    <name>PaintedObject</name>
     <data>
       <matrix>1.0 0.0 0.0 0.0 0.0 1.0 0.0 0.0 0.0 0.0 1.0 0.0 0.0 0.0 0.0 1.0</matrix>
       <parent>World</parent>
-      <mesh>DefaultPlane</mesh>
-      <material>PlaneMaterial</material>
+      <mesh>DefaultCube</mesh>
+      <material>CubeMaterial</material>
     </data>
   </object>
 </scene>

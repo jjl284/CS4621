@@ -3,7 +3,7 @@
   <texture>
     <name>SphereTexture</name>
     <data>
-      <file>data/textures/SphereTexture.png</file>
+      <file>SphereTexture.png</file>
     </data>
   </texture>
   <mesh>
@@ -57,7 +57,7 @@
     </data>
   </object>
   <object>
-    <name>PaintedSphere</name>
+    <name>PaintedObject</name>
     <data>
       <matrix>1.0 0.0 0.0 0.0 0.0 1.0 0.0 0.0 0.0 0.0 1.0 0.0 0.0 0.0 0.0 1.0</matrix>
       <parent>World</parent>

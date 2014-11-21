@@ -35,16 +35,45 @@ public class PaintTexture {
 	/** Data array* */
 	protected Colord[][] data;
 	
+	protected String filename;
+	
+	protected String filepath;
 
 	// Creates an image "filename.png" of size w x h and initialized to black
 	public PaintTexture(int w, int h, String filename) {
 		setSize(w, h);
 		clear();
-		write(filename);
+		this.filepath = "";
+		this.filename = filename;
+		write(filepath + filename);
 	}
+	
+	// Creates an instance of PaintTexture from "filename.png"
+		public PaintTexture(String filename) {
+			this.filepath = "";
+			this.filename = filename;
+			
+			BufferedImage image = null;
+			
+			try {
+			    image = ImageIO.read(new File(filename));
+			    setSize(image.getWidth(), image.getHeight());
+				for (int i = 0; i < width; i++) {
+					for (int j = 0; j < height; j++) {
+						data[i][j].set(image.getRGB(i,j));
+					}
+				}
+			} catch (IOException e) {
+				
+			}
+		}
 	
 	// Creates an image copy of oldImage in "filename.png"
 	public PaintTexture(String oldName, String filename) {
+		
+		this.filepath = "";
+		this.filename = filename;
+		
 		BufferedImage oldImage = null;
 		
 		try {
@@ -55,7 +84,7 @@ public class PaintTexture {
 					data[i][j].set(oldImage.getRGB(i,j));
 				}
 			}
-			write(filename);
+			write(this.filepath + this.filename);
 		} catch (IOException e) {
 		
 		}

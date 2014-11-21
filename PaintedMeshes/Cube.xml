@@ -3,7 +3,7 @@
   <texture>
     <name>CubeTexture</name>
     <data>
-      <file>data/textures/CubeTexture.png</file>
+      <file>C:\Users\Sachiko\Documents\GitHub\CS4621\3DPaint\..\PaintedMeshes\CubeTexture.png</file>
     </data>
   </texture>
   <mesh>
@@ -57,7 +57,7 @@
     </data>
   </object>
   <object>
-    <name>PaintedCube</name>
+    <name>PaintedObject</name>
     <data>
       <matrix>1.0 0.0 0.0 0.0 0.0 1.0 0.0 0.0 0.0 0.0 1.0 0.0 0.0 0.0 0.0 1.0</matrix>
       <parent>World</parent>
