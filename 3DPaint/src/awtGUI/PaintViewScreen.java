@@ -17,10 +17,8 @@ import blister.input.KeyboardEventDispatcher;
 import blister.input.KeyboardKeyEventArgs;
 import cs4620.common.Scene;
 import cs4620.common.event.SceneReloadEvent;
-import cs4620.gl.CameraController;
 import cs4620.gl.GridRenderer;
 import cs4620.gl.RenderCamera;
-import cs4620.gl.RenderController;
 import cs4620.gl.Renderer;
 import cs4620.scene.form.RPMaterialData;
 import cs4620.scene.form.RPMeshData;
@@ -48,7 +46,7 @@ public class PaintViewScreen extends GameScreen {
 	
 	RenderController rController;
 	CameraController camController;
-	PaintManipController manipController;
+	ManipController manipController;
 	GridRenderer gridRenderer;
 	
 	@Override
@@ -125,7 +123,7 @@ public class PaintViewScreen extends GameScreen {
 		renderer.buildPasses(rController.env.root);
 		camController = new CameraController(app.scene, rController.env, null);
 		createCamController();
-		manipController = new PaintManipController(rController.env, app.scene);
+		manipController = new ManipController(rController.env, app.scene);
 		gridRenderer = new GridRenderer();
 		
 		//KeyboardEventDispatcher.OnKeyPressed.add(onKeyPress);

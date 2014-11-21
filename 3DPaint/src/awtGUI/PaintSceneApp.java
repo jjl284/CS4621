@@ -468,6 +468,7 @@ public class PaintSceneApp extends MainGame implements ActionListener, ChangeLis
 		}
 		else if(s == mode){
 			paintCanvas.setEdit(!paintCanvas.editMode);
+			scene.setEditMode(!scene.editMode);
 			if(paintCanvas.editMode)
 				mode.setIcon(new ImageIcon("pencil.png"));
 			else
