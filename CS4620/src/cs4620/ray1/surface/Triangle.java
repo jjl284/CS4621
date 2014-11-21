@@ -102,56 +102,56 @@ public class Triangle extends Surface {
    * @return true if the surface intersects the ray
    */
   public boolean intersect(IntersectionRecord outRecord, Ray rayIn) {
-	    // TODO#A2: fill in this function.
-	  System.out.println("Using wrong intersect");
-	  return false;
-  }
-  
-  public boolean intersect (IntersectionRecord outRecord, Vector3 origin, Vector3 direction) {
-		double g = direction.x;
-		double h = direction.y;
-		double i = direction.z;
-		Vector3 v = new Vector3(getPosition(index.x));
-		v.sub(origin);
-		double j = v.x;
-		double k = v.y;
-		double l = v.z;
-		double M = a * (e * i - h * f) + b * (g * f - d * i) + c * (d * h - e * g);
-		double beta = j * (e * i - h * f) + k * (g * f - d * i) + l * (d * h - e * g);
-		double gamma = i * (a * k - j * b) + h * (j * c - a * l) + g * (b * l - k * c);
-		beta /= M;
-		gamma /= M;
-		float t = (float) (f * (a * k - j * b) + e * (j * c - a * l) + d * (b * l - k * c));
-		t = -t / (float) M;
-		double alpha = 1.0d - (beta + gamma);
-		if (!((beta > 0.0d) && (gamma > 0.0d) && (alpha > 0.0d)))
-			return false;
-		
-		IntersectionRecord or = new IntersectionRecord();
-
-		Vector3 loc = new Vector3(origin);
-		Vector3 td = new Vector3(direction);
-		td.mul(t);;
-		loc.add(td);
-		or.location.set(loc);
-		if (mesh.hasUVs())
-		{
-			Vector2d uvs = new Vector2d();
-			Vector2d alphaUV = new Vector2d(getUV(index.x));
-			Vector2d betaUV = new Vector2d(getUV(index.y));
-			Vector2d gammaUV = new Vector2d(getUV(index.z));
-			alphaUV.mul(alpha);
-			betaUV.mul(beta);
-			gammaUV.mul(gamma);
-			uvs.add(alphaUV);
-			uvs.add(betaUV);
-			uvs.add(gammaUV);
-			or.texCoords.set(uvs);
-		}
-		or.surface = this;
-		or.t = t;
-		outRecord.set(or);
-		return true;
+	    // TODO#A2 fill in this function.
+	  
+	    Vector3 v0 = getPosition(index.x);
+	    
+	    double g = rayIn.direction.x;
+	    double h = rayIn.direction.y;
+	    double i = rayIn.direction.z;
+	    double j = v0.x - rayIn.origin.x;
+	    double k = v0.y - rayIn.origin.y;
+	    double l = v0.z - rayIn.origin.z;
+	    double M = a*(e*i-h*f) + b*(g*f-d*i) + c*(d*h-e*g);
+	    
+	    double ei_hf = e*i-h*f;
+	    double gf_di = g*f-d*i;
+	    double dh_eg = d*h-e*g;
+	    double ak_jb = a*k-j*b;
+	    double jc_al = j*c-a*l;
+	    double bl_kc = b*l-k*c;
+	    
+	    double t = -(f*(ak_jb) + e*(jc_al) + d*(bl_kc))/M;
+	    if(t > rayIn.end || t < rayIn.start) return false;
+	    
+	    double beta = (j*(ei_hf) + k*(gf_di) + l*(dh_eg))/M;
+	    if(beta < 0 || beta > 1) return false;
+	    
+	    double gamma = (i*(ak_jb) + h*(jc_al) + g*(bl_kc))/M;
+	    if(gamma < 0 || gamma + beta > 1) return false;
+	    
+	    
+	    // There was an intersection, fill out the intersection record
+	    if (outRecord != null) {
+	      outRecord.t = t;
+	      rayIn.evaluate(outRecord.location, t);
+	      outRecord.surface = this;
+	      
+	      if (norm != null) {
+	        outRecord.normal.set(new Vector3((float)norm.x, (float)norm.y, (float)norm.z));
+	      } else {        
+	    	  outRecord.normal.setZero();
+	      }
+	      outRecord.normal.normalize();
+	      if (mesh.hasUVs()) {
+	        outRecord.texCoords.setZero()
+	        				   .addMultiple(1-beta-gamma, getUV(index.x))
+	        				   .addMultiple(beta, getUV(index.y))
+	        				   .addMultiple(gamma, getUV(index.z));
+	      }
+	    }
+	  
+	    return true;
   }
 
   /**

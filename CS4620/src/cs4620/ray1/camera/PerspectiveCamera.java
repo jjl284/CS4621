@@ -51,18 +51,19 @@ public class PerspectiveCamera extends Camera {
    * @param inV The v coord of the image point (range [0,1])
    */
   public void getRay(Ray outRay, double inU, double inV) {
-    if (!initialized) initView();
-
-    double u = inU * 2 - 1;
-    double v = inV * 2 - 1;
-    
-    // Set the output ray
-    outRay.origin.set(viewPoint);
-    outRay.direction.set(centerDir)
-     				.addMultiple(u * viewWidth / 2, basisU)
-     				.addMultiple(v * viewHeight /2, basisV)
-     				.normalize();
-    
-    outRay.makeOffsetRay();
+	  System.out.println("error");
+//    if (!initialized) initView();
+//
+//    double u = inU * 2 - 1;
+//    double v = inV * 2 - 1;
+//    
+//    // Set the output ray
+//    outRay.origin.set(viewPoint);
+//    outRay.direction.set(centerDir)
+//     				.addMultiple(u * viewWidth / 2, basisU)
+//     				.addMultiple(v * viewHeight /2, basisV)
+//     				.normalize();
+//    
+//    outRay.makeOffsetRay();
   }
 }
