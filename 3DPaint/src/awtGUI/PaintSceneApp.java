@@ -91,6 +91,9 @@ public class PaintSceneApp extends MainGame implements ActionListener, ChangeLis
 	public Scene scene;
 	public PaintTexture paintTexture;
 	public MeshData paintMeshData;
+	public String scenePath;
+	public String sceneName;
+	public String paintTextureName;
 	
 	private JLabel toolSizeLabel;
 
@@ -201,6 +204,37 @@ public class PaintSceneApp extends MainGame implements ActionListener, ChangeLis
 	    mbNew.add(newMesh);
 	    
 	    
+	    // Specify an image to use for the texture
+	    MenuItem mbTex = new MenuItem("Set Texture...");
+	    mbTex.addActionListener(new ActionListener() {
+	    	@Override
+			public void actionPerformed(ActionEvent arg0) {
+				// TODO: Allow user to select a specific mesh of their choosing
+	    		// TODO: Direct user to select a texture size when done selecting mesh
+				FileDialog fd = new FileDialog(mainFrame);
+				fd.setVisible(true);
+				for(File f : fd.getFiles()) {
+					String file = f.getAbsolutePath();
+					if(file != null) {
+						if(scene.textures.get(paintTextureName) != null) {
+							scene.removeTexture(paintTextureName);
+	
+							Texture t = new Texture();
+							paintTexture = new PaintTexture(file, scenePath + sceneName + paintTextureName + ".png");
+							t.setFile(scenePath + sceneName + paintTextureName + ".png");
+							scene.addTexture( new NameBindTexture(paintTextureName, t) );
+							
+							scene.sendEvent(new SceneReloadEvent(scenePath + sceneName + ".xml"));
+							return;
+						} else {
+							System.out.println("3D PAINT ERROR: CANNOT FIND " + paintTextureName + ".png");
+						}
+					}
+				}
+			}
+	    });
+	    
+	    
 	    // Import an existing Scene XML file
 	    MenuItem mbImp=new MenuItem("Import");
 		mbImp.addActionListener(new ActionListener() {
@@ -217,18 +251,19 @@ public class PaintSceneApp extends MainGame implements ActionListener, ChangeLis
 							Scene old = scene;
 							scene = (Scene)o;
 							SceneObject paintedObject = scene.objects.get("PaintedObject");
+							
 							if(paintedObject != null) {
 								String matName = scene.objects.get("PaintedObject").material;
 								String texName = scene.materials.get(matName).inputDiffuse.texture;
 								String texFileName = scene.textures.get(texName).file;
 								paintTexture = new PaintTexture(texFileName);
-								System.out.println("USING IMAGE " + texFileName);
+								System.out.println("USING IMAGE " + texFileName + " while paintTextureName is " + paintTextureName);
 							} else {
 								// ERROR: specified XML file is not valid for 3D Paint App
-								System.out.println("ERROR: The specified XML file does not contain a PaintedObject and is therefore not compatible with 3D Paint");
+								System.out.println("3D PAINT ERROR: The specified XML file does not contain a PaintedObject and is therefore not compatible with 3D Paint");
 							}
+							
 							if(old != null) old.sendEvent(new SceneReloadEvent(file));
-							System.out.println("SCENE "+scene.getClass().toString());
 							return;
 						}
 					}
@@ -286,6 +321,7 @@ public class PaintSceneApp extends MainGame implements ActionListener, ChangeLis
 	    // Attach menu items to menu
 	    
 	    mFile.add(mbNew);
+	    mFile.add(mbTex);
 	    mFile.add(mbImp);
 	    mFile.add(mbExp);
 	   
@@ -494,66 +530,68 @@ public class PaintSceneApp extends MainGame implements ActionListener, ChangeLis
 		
 		switch(shape) {
 			case "Cube":
-				meshGenOpt.setDivLatitude(5);
-				meshGenOpt.setDivLongitude(5);
+				meshGenOpt.setDivLatitude(32);
+				meshGenOpt.setDivLongitude(32);
 				meshGenOpt.setInnerRadius(5);
 				meshGen = new MeshGenCube();
 				meshGen.generate(paintMeshData, meshGenOpt);
 				break;
 			case "Cylinder":
-				meshGenOpt.setDivLatitude(16);
-				meshGenOpt.setDivLongitude(32);
+				meshGenOpt.setDivLatitude(32);
+				meshGenOpt.setDivLongitude(16);
 				meshGenOpt.setInnerRadius(1);
 				meshGen = new MeshGenCylinder();
 				meshGen.generate(paintMeshData, meshGenOpt);
 				break;
 			case "Sphere":
-				meshGenOpt.setDivLatitude(5);
-				meshGenOpt.setDivLongitude(5);
-				meshGenOpt.setInnerRadius(5);
+				meshGenOpt.setDivLatitude(32);
+				meshGenOpt.setDivLongitude(32);
+				meshGenOpt.setInnerRadius(1);
 				meshGen = new MeshGenSphere();
 				meshGen.generate(paintMeshData, meshGenOpt);
 				break;
 			case "Torus":
-				meshGenOpt.setDivLatitude(5);
-				meshGenOpt.setDivLongitude(5);
-				meshGenOpt.setInnerRadius(5);
+				meshGenOpt.setDivLatitude(32);
+				meshGenOpt.setDivLongitude(32);
+				meshGenOpt.setInnerRadius(1);
 				meshGen = new MeshGenTorus();
 				meshGen.generate(paintMeshData, meshGenOpt);
 				break;
 			case "Plane":
-				meshGenOpt.setDivLatitude(5);
-				meshGenOpt.setDivLongitude(5);
-				meshGenOpt.setInnerRadius(5);
+				meshGenOpt.setDivLatitude(32);
+				meshGenOpt.setDivLongitude(32);
+				meshGenOpt.setInnerRadius(1);
 				meshGen = new MeshGenPlane();
 				meshGen.generate(paintMeshData, meshGenOpt);
 				break;
 			default:
-				meshGenOpt.setDivLatitude(5);
-				meshGenOpt.setDivLongitude(5);
-				meshGenOpt.setInnerRadius(5);
+				meshGenOpt.setDivLatitude(32);
+				meshGenOpt.setDivLongitude(32);
+				meshGenOpt.setInnerRadius(1);
 				meshGen = new MeshGenPlane();
 				meshGen.generate(paintMeshData, meshGenOpt);
 				break;		
 		}
 		
-		File f = new File("../PaintedMeshes/"+shape);
-		String file = f.getAbsolutePath();
-		System.out.println("ABS PATH IS " + file);
+		File f = new File("../PaintedMeshes/");
+		scenePath = f.getAbsolutePath()+ "/";
+		sceneName = shape;
+		paintTextureName = "PaintedTexture";
+		System.out.println("ABS PATH IS " + scenePath);
 		
 		Mesh m = new Mesh(); m.setGenerator( meshGen );
 		m.generator.generate(paintMeshData, new MeshGenOptions());
 		scene.addMesh( new NameBindMesh("Default"+shape, m) );
 		
 		Texture t = new Texture();
-		paintTexture = new PaintTexture(1024, 1024, file+"Texture.png");
-		t.setFile(file+"Texture.png");
-		scene.addTexture( new NameBindTexture(shape+"Texture", t) );
+		paintTexture = new PaintTexture(1024, 1024, scenePath+sceneName+paintTextureName+".png");
+		t.setFile(scenePath+sceneName+paintTextureName+".png");
+		scene.addTexture( new NameBindTexture(paintTextureName, t) );
 		
 		Material mat = new Material();
 		mat.setType(Material.T_AMBIENT);
 		InputProvider ip = new InputProvider();
-		ip.setTexture(shape+"Texture");
+		ip.setTexture(paintTextureName);
 		mat.setDiffuse(ip);
 		scene.addMaterial(new NameBindMaterial(shape+"Material", mat));
 		
@@ -570,8 +608,8 @@ public class PaintSceneApp extends MainGame implements ActionListener, ChangeLis
 		scene.removeTexture("NormalMapped");
 		// Attempt to create a new scene file and then reload the display
 		try {
-			scene.saveData(file+".xml");
-			if(old!=null) old.sendEvent(new SceneReloadEvent(file+".xml"));
+			scene.saveData(scenePath+sceneName+".xml");
+			if(old!=null) old.sendEvent(new SceneReloadEvent(scenePath+sceneName+".xml"));
 		} catch (ParserConfigurationException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

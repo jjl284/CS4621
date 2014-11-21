@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <scene>
   <texture>
-    <name>CubeTexture</name>
+    <name>PaintedTexture</name>
     <data>
-      <file>C:\Users\Sachiko\Documents\GitHub\CS4621\3DPaint\..\PaintedMeshes\CubeTexture.png</file>
+      <file>C:\Users\Sachiko\Documents\GitHub\CS4621\3DPaint\..\PaintedMeshes/CubePaintedTexture.png</file>
     </data>
   </texture>
   <mesh>
@@ -33,7 +33,7 @@
     <data>
       <type>Ambient</type>
       <diffuse>
-        <texture>CubeTexture</texture>
+        <texture>PaintedTexture</texture>
       </diffuse>
       <normal>
         <color>128 128 255 255 </color>
