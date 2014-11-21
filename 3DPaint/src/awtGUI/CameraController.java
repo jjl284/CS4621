@@ -14,6 +14,7 @@ import cs4620.mesh.MeshData;
 import cs4620.ray1.IntersectionRecord;
 import cs4620.ray1.surface.Triangle;
 import egl.math.Matrix4;
+import egl.math.Vector2;
 import egl.math.Vector3;
 import egl.math.Vector3i;
 
@@ -70,10 +71,9 @@ public class CameraController {
 		if (thisFrameButtonDown && prevFrameButtonDown) {
 			rotation.add(0, -0.1f * (thisMouseX - prevMouseX), 0);
 			rotation.add(0.1f * (thisMouseY - prevMouseY), 0, 0);
+			paint(thisMouseX, thisMouseY);
 		}
 		prevFrameButtonDown = thisFrameButtonDown;
-		
-		paint(thisMouseX, thisMouseY);
 		
 		prevMouseX = thisMouseX;
 		prevMouseY = thisMouseY;
@@ -121,13 +121,16 @@ public class CameraController {
 	}
 	
 	private void getRay(int mouseX, int mouseY, Vector3 outOrigin, Vector3 outDirection) {
-		Vector3 p1 = new Vector3(mouseX, mouseY, -1);
-		Vector3 p2 = new Vector3(mouseX, mouseY, 1);
+		System.out.println("Old mouse: " + mouseX + " " + mouseY);
+		Vector2 curMousePos = new Vector2(mouseX, mouseY).div(camera.viewportSize.x, camera.viewportSize.y);
+		System.out.println("Adjusted mouse: " + curMousePos.x + " " + curMousePos.y);
+		Vector3 p1 = new Vector3(curMousePos.x, curMousePos.y, -1);
+		Vector3 p2 = new Vector3(curMousePos.x, curMousePos.y, 1);
 		Matrix4 mVPI = camera.mViewProjection.clone().invert();
 		mVPI.mulPos(p1);
 		mVPI.mulPos(p2);
-		outOrigin = p1;
-		outDirection = p2.clone().sub(p1);
+		outOrigin.set(p1);
+		outDirection.set(p2.clone().sub(p1));
 	}
 	
 	protected void paint(int curMouseX, int curMouseY) {
@@ -135,6 +138,10 @@ public class CameraController {
 		Vector3 rayOrigin = new Vector3();
 		Vector3 rayDirection = new Vector3();
 		getRay(curMouseX, curMouseY, rayOrigin, rayDirection);
+		rayDirection.normalize();
+		
+		System.out.println("ray origin " + rayOrigin);
+		System.out.println("ray direction " + rayDirection);
 		
 		//intersect ray with mesh and find intersection point and corresponding uv
 		ArrayList<Triangle> tris = new ArrayList<Triangle>();
@@ -148,10 +155,10 @@ public class CameraController {
 		IntersectionRecord outRecord = new IntersectionRecord();
 		for (Triangle t : tris) {
 			if (t.intersect(outRecord, rayOrigin, rayDirection))
+				System.out.println("Intersected!");
 				break;
 		}
-		
-		paintTexture.addPaint(outRecord.location, outRecord.texCoords, mesh);	
+		paintTexture.addPaint(outRecord.location, outRecord.texCoords, mesh);
 	}
 	
 	/**
