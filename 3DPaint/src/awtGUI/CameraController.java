@@ -12,8 +12,10 @@ import cs4620.gl.RenderEnvironment;
 import cs4620.gl.RenderObject;
 import cs4620.mesh.MeshData;
 import cs4620.ray1.IntersectionRecord;
+import cs4620.ray1.Ray;
 import cs4620.ray1.surface.Triangle;
 import egl.math.Matrix4;
+import egl.math.Vector2;
 import egl.math.Vector3;
 import egl.math.Vector3i;
 
@@ -58,8 +60,8 @@ public class CameraController {
 		if(Keyboard.isKeyDown(Keyboard.KEY_W)) { motion.add(0, 0, -1); }
 		if(Keyboard.isKeyDown(Keyboard.KEY_S)) { motion.add(0, 0, 1); }
 
-		if(Keyboard.isKeyDown(Keyboard.KEY_E)) { rotation.add(0, 0, -1); }
-		if(Keyboard.isKeyDown(Keyboard.KEY_Q)) { rotation.add(0, 0, 1); }
+		if(Keyboard.isKeyDown(Keyboard.KEY_Q)) { rotation.add(0, 0, -1); }
+		if(Keyboard.isKeyDown(Keyboard.KEY_E)) { rotation.add(0, 0, 1); }
 		if(Keyboard.isKeyDown(Keyboard.KEY_A)) { rotation.add(-1, 0, 0); }
 		if(Keyboard.isKeyDown(Keyboard.KEY_D)) { rotation.add(1, 0, 0); }
 		if(Keyboard.isKeyDown(Keyboard.KEY_Z)) { rotation.add(0, -1, 0); }
@@ -70,10 +72,9 @@ public class CameraController {
 		if (thisFrameButtonDown && prevFrameButtonDown) {
 			rotation.add(0, -0.1f * (thisMouseX - prevMouseX), 0);
 			rotation.add(0.1f * (thisMouseY - prevMouseY), 0, 0);
+			paint(thisMouseX, thisMouseY);
 		}
 		prevFrameButtonDown = thisFrameButtonDown;
-		
-		paint(thisMouseX, thisMouseY);
 		
 		prevMouseX = thisMouseX;
 		prevMouseY = thisMouseY;
@@ -120,21 +121,25 @@ public class CameraController {
 		}
 	}
 	
-	private void getRay(int mouseX, int mouseY, Vector3 outOrigin, Vector3 outDirection) {
-		Vector3 p1 = new Vector3(mouseX, mouseY, -1);
-		Vector3 p2 = new Vector3(mouseX, mouseY, 1);
+	private void getRay(int mouseX, int mouseY, Ray outRay) {
+		System.out.println("Old mouse: " + mouseX + " " + mouseY);
+		Vector2 curMousePos = new Vector2(mouseX, mouseY).div(camera.viewportSize.x, camera.viewportSize.y);
+		System.out.println("Adjusted mouse: " + curMousePos.x + " " + curMousePos.y);
+		Vector3 p1 = new Vector3(curMousePos.x, curMousePos.y, -1);
+		Vector3 p2 = new Vector3(curMousePos.x, curMousePos.y, 1);
 		Matrix4 mVPI = camera.mViewProjection.clone().invert();
 		mVPI.mulPos(p1);
 		mVPI.mulPos(p2);
-		outOrigin = p1;
-		outDirection = p2.clone().sub(p1);
+		outRay.set(p1, p2.clone().sub(p1).normalize());
 	}
 	
 	protected void paint(int curMouseX, int curMouseY) {
 		//System.out.println("paint called");
-		Vector3 rayOrigin = new Vector3();
-		Vector3 rayDirection = new Vector3();
-		getRay(curMouseX, curMouseY, rayOrigin, rayDirection);
+		Ray outRay = new Ray();
+		getRay(curMouseX, curMouseY, outRay);
+		
+		System.out.println("ray origin " + outRay.origin);
+		System.out.println("ray direction " + outRay.direction);
 		
 		//intersect ray with mesh and find intersection point and corresponding uv
 		ArrayList<Triangle> tris = new ArrayList<Triangle>();
@@ -147,11 +152,13 @@ public class CameraController {
 		
 		IntersectionRecord outRecord = new IntersectionRecord();
 		for (Triangle t : tris) {
-			if (t.intersect(outRecord, rayOrigin, rayDirection))
+			if (t.intersect(outRecord, outRay)) {
+				System.out.println("Intersected!");
 				break;
+			}
+			System.out.println("no intersect");
 		}
-		
-		paintTexture.addPaint(outRecord.location, outRecord.texCoords, mesh);	
+		paintTexture.addPaint(outRecord.location, outRecord.texCoords, mesh);
 	}
 	
 	/**
