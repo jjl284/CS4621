@@ -36,6 +36,7 @@ public class Scene {
 	/**
 	 * The Name Of The Root Node
 	 */
+	public boolean editMode;
 	public static final String ROOT_NODE_NAME = "World";
 	public static final HashSet<String> DEFAULT_MESHES = new HashSet<>(Arrays.asList("Sphere", "Cube", "Cylinder"));
 	public static final HashSet<String> DEFAULT_MATERIALS = new HashSet<>(Arrays.asList("Generic"));
@@ -95,6 +96,7 @@ public class Scene {
 	private final ArrayList<SceneEventQueue> changeListeners = new ArrayList<>();
 
 	public Scene() {
+		editMode=true;
 		// Add Primitive Shapes
 		Mesh m = new Mesh();
 		m.setGenerator(new MeshGenSphere());
@@ -130,6 +132,9 @@ public class Scene {
 		addObject(new NameBindSceneObject(ROOT_NODE_NAME, so));
 	}
 
+	public void setEditMode(boolean em){
+		editMode=em;
+	}
 	public void addListener(SceneEventQueue q){
 		changeListeners.add(q);
 	}
