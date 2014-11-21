@@ -32,3 +32,11 @@ local.properties
 ehthumbs.db
 Icon?
 Thumbs.db
+
+# Painted Mesh Files
+3DPaint/bin
+3DPaint/data
+3DPaint/.settings
+3DPaint/GLDiag.txt
+3DPaint/*.png
+PaintedMeshes/

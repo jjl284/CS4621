@@ -574,6 +574,7 @@ public class PaintSceneApp extends MainGame implements ActionListener, ChangeLis
 		}
 		
 		File f = new File("../PaintedMeshes/");
+		f.mkdir();
 		scenePath = f.getAbsolutePath()+ "/";
 		sceneName = shape;
 		paintTextureName = "PaintedTexture";
