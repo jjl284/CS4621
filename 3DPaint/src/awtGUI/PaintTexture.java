@@ -36,9 +36,11 @@ public class PaintTexture {
 	protected int height;
 	
 	/** Data array* */
-	protected Colord[][] data;
+	protected Color[][] data;
 	
 	protected String filepath;
+	
+	public PaintCanvas canvas;
 
 	// Creates an image "filename.png" of size w x h and initialized to black
 	public PaintTexture(int w, int h, String file) {
@@ -94,7 +96,7 @@ public class PaintTexture {
 	public void clear() {
 		for (int i = 0; i < width; i++) {
 			for (int j = 0; j < height; j++) {
-				data[i][j] = new Colord(1,1,1);
+				data[i][j] = new Color(1,1,1);
 			}
 		}
 	}
@@ -121,10 +123,10 @@ public class PaintTexture {
 	public void setSize(int newWidth, int newHeight) {
 		width = newWidth;
 		height = newHeight;
-		data = new Colord[width][height];
+		data = new Color[width][height];
 		for (int i=0; i<width; i++) {
 			for (int j=0; j<height; j++) {
-				data[i][j] = new Colord();
+				data[i][j] = new Color();
 			}
 		}
 	}
@@ -169,7 +171,7 @@ public class PaintTexture {
 	
 	/**
 	 * Set the color of a pixel.
-	 * @param inPixel Colord value of pixel (inX, inY)
+	 * @param inPixel Color value of pixel (inX, inY)
 	 * @param inX inX coordinate
 	 * @param inY inY coordinate
 	 */
@@ -215,6 +217,11 @@ public class PaintTexture {
 	 * @param meshData the corresponding MeshData object
 	 */
 	public void addPaint(Vector3 location, Vector2d texCoords, MeshData meshData) {
-		setPixelColor(Colord inPixel, int inX, int inY);
+		System.out.println("Painting");
+		System.out.println("Location:" + location);
+		java.awt.Color activeColor = canvas.activeColor;
+		Color eglColor = new Color(activeColor.getRed(), activeColor.getGreen(), 
+				activeColor.getBlue());
+		setPixelColor(eglColor, (int)location.x, (int)location.y);
 	}
 }

@@ -73,7 +73,7 @@ public class CameraController {
 		}
 		prevFrameButtonDown = thisFrameButtonDown;
 		
-		paint(thisMouseX, thisMouseY);
+		//paint(thisMouseX, thisMouseY);
 		
 		prevMouseX = thisMouseX;
 		prevMouseY = thisMouseY;
