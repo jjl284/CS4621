@@ -6,8 +6,11 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
+import cs4620.mesh.MeshData;
 import egl.math.Color;
 import egl.math.Colord;
+import egl.math.Vector2d;
+import egl.math.Vector3;
 
 public class PaintTexture {
 	
@@ -202,5 +205,16 @@ public class PaintTexture {
 			System.err.println(e);
 			e.printStackTrace();
 		}
+	}
+	
+	/**
+	 * "Paints" the mesh, given the location in coordinates on the mesh it 
+	 * should paint and the point's texture coordinates.
+	 * @param location the coordinates of the center of the spot that should be painted
+	 * @param texCoords coordinates at location
+	 * @param meshData the corresponding MeshData object
+	 */
+	public void addPaint(Vector3 location, Vector2d texCoords, MeshData meshData) {
+		setPixelColor(Colord inPixel, int inX, int inY);
 	}
 }
