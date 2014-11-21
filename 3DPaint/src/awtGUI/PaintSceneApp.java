@@ -281,13 +281,13 @@ public class PaintSceneApp extends MainGame implements ActionListener, ChangeLis
 		
 		
 		// Export (save) this Scene XML and PaintTexture png
-	    MenuItem mbExp=new MenuItem("Export");
-	    mbExp.addActionListener(new ActionListener(){
-			@Override
-			public void actionPerformed(ActionEvent arg0) {
+	    //MenuItem mbExp=new MenuItem("Export");
+	    //mbExp.addActionListener(new ActionListener(){
+		//	@Override
+			//public void actionPerformed(ActionEvent arg0) {
 				// TODO Auto-generated method stub
-				System.out.println("EXP clicked");
-			}});
+			//	System.out.println("EXP clicked");
+		//	}});
 	   
 	    
 	    // Add shading menu options
@@ -331,7 +331,7 @@ public class PaintSceneApp extends MainGame implements ActionListener, ChangeLis
 	    mFile.add(mbNew);
 	    mFile.add(mbTex);
 	    mFile.add(mbImp);
-	    mFile.add(mbExp);
+	  //  mFile.add(mbExp);
 	   
 	    // Attach menu items to submenu
 	    mShading.add(mbBP);
