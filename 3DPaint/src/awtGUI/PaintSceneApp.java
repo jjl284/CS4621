@@ -201,6 +201,7 @@ public class PaintSceneApp extends MainGame implements ActionListener, ChangeLis
 							scene = (Scene)o;
 							if(old != null) old.sendEvent(new SceneReloadEvent(file));
 							System.out.println("SCENE "+scene.getClass().toString());
+							mode.setIcon(new ImageIcon("pencil.png"));
 							return;
 						}
 					}
@@ -263,6 +264,7 @@ public class PaintSceneApp extends MainGame implements ActionListener, ChangeLis
 								String texName = scene.materials.get(matName).inputDiffuse.texture;
 								String texFileName = scene.textures.get(texName).file;
 								paintTexture = new PaintTexture(texFileName);
+								mode.setIcon(new ImageIcon("pencil.png"));
 								System.out.println("USING IMAGE " + texFileName + " while paintTextureName is " + paintTextureName);
 							} else {
 								// ERROR: specified XML file is not valid for 3D Paint App
@@ -533,7 +535,7 @@ public class PaintSceneApp extends MainGame implements ActionListener, ChangeLis
 		paintMeshData = new MeshData();
 		MeshGenerator meshGen; 
 		MeshGenOptions meshGenOpt = new MeshGenOptions();
-		
+		mode.setIcon(new ImageIcon("pencil.png"));
 		switch(shape) {
 			case "Cube":
 				meshGenOpt.setDivLatitude(32);
