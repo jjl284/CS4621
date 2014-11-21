@@ -28,6 +28,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JColorChooser;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JSlider;
@@ -169,7 +170,7 @@ public class PaintSceneApp extends MainGame implements ActionListener, ChangeLis
 	    Menu mEdit = new Menu ("Edit");
 	    Menu mShading=new Menu("Shading");
 	    //Menu mMode=new Menu("Mode");
-	    Menu mToolbars = new Menu("Toolbars");
+	    Menu mHelp = new Menu("Help");
 	    
 	    
 	    // Create MenuItems for new scenes of Default Meshes
@@ -294,17 +295,23 @@ public class PaintSceneApp extends MainGame implements ActionListener, ChangeLis
 	    MenuItem mbBP=new MenuItem("Blinn-Phong");
 	    mbBP.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent arg0) {
-				//paintCanvas.setShading(Shading.PHONG);			
+				Material mat = new Material();
+				mat.setType(Material.T_PHONG);
+				scene.materials.get(0);
 			}});
 	    MenuItem mbLamb=new MenuItem("Lambertian");
 	    mbLamb.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent arg0) {
-				//paintCanvas.setShading(Shading.LAMBERTIAN);			
+				Material mat = new Material();
+				mat.setType(Material.T_LAMBERTIAN);
+				scene.addMaterial(new NameBindMaterial("Lambertian", mat));			
 			}});
 	    MenuItem mbCT=new MenuItem("Cook-Torrance");
 	    mbCT.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent arg0) {
-				//paintCanvas.setShading(Shading.CT);			
+				Material mat = new Material();
+				mat.setType(Material.T_COOKTORRANCE);
+				scene.addMaterial(new NameBindMaterial("CookTorrance", mat));			
 			}});
 	    MenuItem mbUndo=new MenuItem("Undo");
 	    mbUndo.addActionListener(new ActionListener(){
@@ -317,12 +324,24 @@ public class PaintSceneApp extends MainGame implements ActionListener, ChangeLis
 				paintCanvas.LoadNextState(paintCanvas.currState);				
 			}});
 	    
-	    CheckboxMenuItem cShow = new CheckboxMenuItem("Show",true);
+	    MenuItem mCtrl = new MenuItem("Controls");
 	    //CheckboxMenuItem cEdit = new CheckboxMenuItem("Edit Bar",true);
 	    //CheckboxMenuItem cColor=  new CheckboxMenuItem("Color Bar",true);
 	    //CheckboxMenuItem cManip = new CheckboxMenuItem("Manipulator Bar",true);
 	    
-	    cShow.addActionListener(new ToolbarActionListener("Show",cShow.getState(), mainFrame));
+	    mHelp.addActionListener(new ActionListener(){
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				String helpMsg = "W: Zoom in\n" +
+						"S: Zoom out\n" +
+						"Q: - Z \n" +
+						"E: + Z\n" +
+						"A: - X\n" +
+						"D: + X\n" +
+						"Z: - Y\n" +
+						"C: + Y\n";
+				JOptionPane.showMessageDialog(mainFrame, helpMsg);	
+			}});
 	    //cEdit.addActionListener(new ToolbarActionListener("Edit Bar", cEdit.getState(), mainFrame));
 	    //cColor.addActionListener(new ToolbarActionListener("Color Bar", cColor.getState(), mainFrame));
 	    //cManip.addActionListener(new ToolbarActionListener("Manipulator Bar", cManip.getState(), mainFrame));
@@ -342,7 +361,7 @@ public class PaintSceneApp extends MainGame implements ActionListener, ChangeLis
 	    //mMode.add(mbEdit);
 	    //mMode.add(mbView);
 	    
-	    mToolbars.add(cShow);
+	    mHelp.add(mCtrl);
 	    //mToolbars.add(cEdit);
 	    //mToolbars.add(cColor);
 	    //mToolbars.add(cManip);
@@ -352,7 +371,7 @@ public class PaintSceneApp extends MainGame implements ActionListener, ChangeLis
 	    menubar.add(mEdit);
 	    menubar.add(mShading);
 	    //menubar.add(mMode);
-	    menubar.add(mToolbars);
+	    menubar.add(mHelp);
 	   
 	    // Set menu bar to the frame
 	    mainFrame.setMenuBar(menubar);

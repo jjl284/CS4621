@@ -59,8 +59,8 @@ public class CameraController {
 		if(Keyboard.isKeyDown(Keyboard.KEY_W)) { motion.add(0, 0, -1); }
 		if(Keyboard.isKeyDown(Keyboard.KEY_S)) { motion.add(0, 0, 1); }
 
-		if(Keyboard.isKeyDown(Keyboard.KEY_E)) { rotation.add(0, 0, -1); }
-		if(Keyboard.isKeyDown(Keyboard.KEY_Q)) { rotation.add(0, 0, 1); }
+		if(Keyboard.isKeyDown(Keyboard.KEY_Q)) { rotation.add(0, 0, -1); }
+		if(Keyboard.isKeyDown(Keyboard.KEY_E)) { rotation.add(0, 0, 1); }
 		if(Keyboard.isKeyDown(Keyboard.KEY_A)) { rotation.add(-1, 0, 0); }
 		if(Keyboard.isKeyDown(Keyboard.KEY_D)) { rotation.add(1, 0, 0); }
 		if(Keyboard.isKeyDown(Keyboard.KEY_Z)) { rotation.add(0, -1, 0); }
