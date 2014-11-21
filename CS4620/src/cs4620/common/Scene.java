@@ -360,8 +360,6 @@ public class Scene {
 		
 		// Materials
 		for(Material o : materials) {
-			System.out.println("GET ID NAME: " + o.getID().name);
-			System.out.println("Continue? " + DEFAULT_MATERIALS.contains(o.getID().name));
 			if(DEFAULT_MATERIALS.contains(o.getID().name)) continue;
 
 			Element e = doc.createElement("material");

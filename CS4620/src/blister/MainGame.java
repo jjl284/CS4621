@@ -154,7 +154,7 @@ public abstract class MainGame implements IDisposable {
 	 * Destroys The Window And Stops The Program
 	 */
 	public void exit() {
-		Display.destroy();
+		//Display.destroy();
 		GLDiagnostic.dispose();
 		System.exit(0);
 	}

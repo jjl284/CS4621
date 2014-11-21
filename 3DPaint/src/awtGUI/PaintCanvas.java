@@ -21,6 +21,7 @@ public class PaintCanvas extends Canvas{
 		statesList.add(this);
 		this.setColor(Color.BLACK);
 		this.setEdit(true);
+		this.setBackground(Color.BLACK);
 	}
 
 	//public void setActiveTool(ToolType t){

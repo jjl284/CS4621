@@ -55,6 +55,11 @@ import cs4620.common.Texture;
 import cs4620.common.event.SceneReloadEvent;
 import cs4620.common.texture.TexGenUVGrid;
 import cs4620.mesh.gen.MeshGenCube;
+import cs4620.mesh.gen.MeshGenCylinder;
+import cs4620.mesh.gen.MeshGenPlane;
+import cs4620.mesh.gen.MeshGenSphere;
+import cs4620.mesh.gen.MeshGenTorus;
+import cs4620.mesh.gen.MeshGenerator;
 import egl.math.Vector3;
 import ext.java.Parser;
 
@@ -109,7 +114,6 @@ public class PaintSceneApp extends MainGame implements ActionListener, ChangeLis
 		mainFrame.setResizable(false);
 		mainFrame.setSize(MAIN_WIDTH, MAIN_HEIGHT);
 		mainFrame.setTitle("3DPaint Application");
-		mainFrame.setBackground(Color.GRAY);
 		mainFrame.setLayout(new BorderLayout());
 		mainFrame.addWindowListener(new WindowAdapter() {
 			public void windowClosing(WindowEvent e) {
@@ -182,72 +186,13 @@ public class PaintSceneApp extends MainGame implements ActionListener, ChangeLis
 	    // Create MenuItems
 	    Menu mbNew=new Menu("New...");
 	    
-	    MenuItem newSphere = new MenuItem("Sphere");
-	    MenuItem newCube = new MenuItem("Cube");
-	    MenuItem newCylinder = new MenuItem("Cylinder");
-	    MenuItem newPlane = new MenuItem("Plane");
-	    MenuItem newTorus = new MenuItem("Torus");
+	    addDefaultMeshMenu(mbNew, "Sphere");
+	    addDefaultMeshMenu(mbNew, "Cube");
+	    addDefaultMeshMenu(mbNew, "Cylinder");
+	    addDefaultMeshMenu(mbNew, "Plane");
+	    addDefaultMeshMenu(mbNew, "Torus");
+	    
 	    MenuItem newMesh = new MenuItem("Import Mesh...");
-	    
-	    ActionListener newMeshActionListener = new ActionListener() {
-	    	@Override
-			public void actionPerformed(ActionEvent arg0) {
-	    		// Create a new XML file with the given mesh and default texture, then load the mesh
-	    		Scene old = scene;
-	    		scene = new Scene();
-	    		scene.setBackground( new Vector3(40,40,40) );
-	    		
-	    		Mesh m = new Mesh(); m.setGenerator( new MeshGenCube() );
-	    		scene.addMesh( new NameBindMesh("DefaultCube", m) );
-	    		
-	    		Texture t = new Texture();
-	    		//t.setFile("data/textures/EarthLonLat.png");
-	    		//scene.addTexture( new NameBindTexture("CubeTexture", t) );
-	    		paintTexture = new PaintTexture(1024, 1024, "data/textures/CubeTexture.png");
-	    		t.setFile("data/textures/CubeTexture.png");
-	    		scene.addTexture( new NameBindTexture("CubeTexture", t) );
-	    		
-	    		Material mat = new Material();
-	    		mat.setType(Material.T_AMBIENT);
-	    		InputProvider ip = new InputProvider();
-	    		ip.setTexture("CubeTexture");
-	    		mat.setDiffuse(ip);
-	    		scene.addMaterial(new NameBindMaterial("GenericCubeMaterial", mat));
-	    		
-	    		SceneObject o = new SceneObject();
-	    		o.setMaterial("GenericCubeMaterial");
-	    		o.setMesh("DefaultCube");
-	    		scene.addObject(new NameBindSceneObject("PaintedCube", o));
-	    		
-	    		SceneCamera cam = new SceneCamera();
-	    		cam.addTranslation(new Vector3(0,0,2));
-	    		scene.addObject(new NameBindSceneObject("Camera", cam));
-	    		
-	    		
-	    		// Attempt to create a new scene file and then reload the display
-	    		try {
-					scene.saveData("data/scenes/PaintedCube.xml");
-					File f = new File("data/scenes/PaintedCube.xml");
-					String file = f.getAbsolutePath();
-					if(old!=null) old.sendEvent(new SceneReloadEvent(file));
-				} catch (ParserConfigurationException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (TransformerException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-	    		
-	    		System.out.println("Created a new scene with a cube");
-	    		return;
-	    	}
-	    };
-	    
-	    newSphere.addActionListener(newMeshActionListener);
-	    newCube.addActionListener(newMeshActionListener);
-	    newCylinder.addActionListener(newMeshActionListener);
-	    newPlane.addActionListener(newMeshActionListener);
-	    newTorus.addActionListener(newMeshActionListener);
 	    
 	    newMesh.addActionListener(new ActionListener() {
 	    	@Override
@@ -269,11 +214,6 @@ public class PaintSceneApp extends MainGame implements ActionListener, ChangeLis
 							return;}}}}
 	    });
 	    
-	    mbNew.add(newSphere);
-	    mbNew.add(newCube);
-	    mbNew.add(newCylinder);
-	    mbNew.add(newPlane);
-	    mbNew.add(newTorus);
 	    mbNew.add(newMesh);
 	    
 	    mbNew.addActionListener(new ActionListener(){
@@ -546,6 +486,89 @@ public class PaintSceneApp extends MainGame implements ActionListener, ChangeLis
 			toolSizeLabel.setText("    "+String.valueOf(paintCanvas.activeToolSize));
 		}
 		
+	}
+	
+	private void addDefaultMeshMenu(Menu m, final String s) {
+		MenuItem menuItem = new MenuItem(s);
+	    
+	    menuItem.addActionListener(new ActionListener() {
+	    	@Override
+			public void actionPerformed(ActionEvent arg0) {
+	    		createNewScene(s);
+	    		return;
+	    	}
+	    });
+	    
+	    m.add(menuItem);
+	}
+	
+	// Create a new XML file with the given mesh and default texture, then load the mesh
+	private void createNewScene(String shape) {
+		Scene old = scene;
+		scene = new Scene();
+		
+		MeshGenerator meshGen;
+		switch(shape) {
+			case "Cube":
+				meshGen = new MeshGenCube();
+				break;
+			case "Cylinder":
+				meshGen = new MeshGenCylinder();
+				break;
+			case "Sphere":
+				meshGen = new MeshGenSphere();
+				break;
+			case "Torus":
+				meshGen = new MeshGenTorus();
+				break;
+			case "Plane":
+				meshGen = new MeshGenPlane();
+				break;
+			default:
+				meshGen = new MeshGenPlane();
+				break;		
+		}
+		
+		
+		Mesh m = new Mesh(); m.setGenerator( meshGen );
+		scene.addMesh( new NameBindMesh("Default"+shape, m) );
+		
+		Texture t = new Texture();
+		paintTexture = new PaintTexture(1024, 1024, "data/textures/"+shape+"Texture.png");
+		t.setFile("data/textures/"+shape+"Texture.png");
+		scene.addTexture( new NameBindTexture(shape+"Texture", t) );
+		
+		Material mat = new Material();
+		mat.setType(Material.T_AMBIENT);
+		InputProvider ip = new InputProvider();
+		ip.setTexture(shape+"Texture");
+		mat.setDiffuse(ip);
+		scene.addMaterial(new NameBindMaterial(shape+"Material", mat));
+		
+		SceneObject o = new SceneObject();
+		o.setMaterial(shape+"Material");
+		o.setMesh("Default"+shape);
+		scene.addObject(new NameBindSceneObject("Painted"+shape, o));
+		
+		SceneCamera cam = new SceneCamera();
+		cam.addRotation(new Vector3(-30,45,0));
+		cam.addTranslation(new Vector3(1.5f,1.5f,1.5f));
+		scene.addObject(new NameBindSceneObject("Camera", cam));
+		
+		scene.removeTexture("NormalMapped");
+		// Attempt to create a new scene file and then reload the display
+		try {
+			scene.saveData("data/scenes/Painted"+shape+".xml");
+			File f = new File("data/scenes/Painted"+shape+".xml");
+			String file = f.getAbsolutePath();
+			if(old!=null) old.sendEvent(new SceneReloadEvent(file));
+		} catch (ParserConfigurationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (TransformerException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
 	/*class ControlThread implements Runnable {
