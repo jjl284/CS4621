@@ -119,6 +119,12 @@ public class PaintSceneApp extends MainGame implements ActionListener, ChangeLis
 		super("3D Paint Scene Mesh", MAIN_WIDTH, MAIN_HEIGHT, canvas);
 		//otherWindow = new ControlWindow(this);
 		
+		// Create a directory for storing painted meshes
+		File f = new File("../PaintedMeshes/");
+		f.mkdir();
+		scenePath = f.getAbsolutePath()+ "/";
+		
+		// Set up main frame container
 		mainFrame = new Frame();
 		mainFrame.setResizable(false);
 		mainFrame.setSize(MAIN_WIDTH, MAIN_HEIGHT);
@@ -573,12 +579,8 @@ public class PaintSceneApp extends MainGame implements ActionListener, ChangeLis
 				break;		
 		}
 		
-		File f = new File("../PaintedMeshes/");
-		f.mkdir();
-		scenePath = f.getAbsolutePath()+ "/";
 		sceneName = shape;
 		paintTextureName = "PaintedTexture";
-		System.out.println("ABS PATH IS " + scenePath);
 		
 		Mesh m = new Mesh(); m.setGenerator( meshGen );
 		m.generator.generate(paintMeshData, new MeshGenOptions());
