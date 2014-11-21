@@ -122,7 +122,7 @@ public class PaintViewScreen extends GameScreen {
 		rController = new RenderController(app.scene, new Vector2(app.getWidth(), app.getHeight()));
 		renderer.buildPasses(rController.env.root);
 		camController = new CameraController(app.scene, rController.env, null);
-		createCamController();
+		camController.givePaintMeshInfo(app.paintMeshData, app.paintTexture);
 		manipController = new ManipController(rController.env, app.scene);
 		gridRenderer = new GridRenderer();
 		

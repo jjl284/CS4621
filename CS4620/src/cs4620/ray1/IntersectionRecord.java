@@ -1,7 +1,8 @@
 package cs4620.ray1;
 
 import egl.math.Vector2d;
-import egl.math.Vector3d;
+import egl.math.Vector3;
+//import egl.math.Vector3d;
 import cs4620.ray1.surface.Surface;
 
 /**
@@ -13,10 +14,10 @@ import cs4620.ray1.surface.Surface;
 public class IntersectionRecord {
 
   /** The location where the intersection occurred. */
-  public final Vector3d location = new Vector3d();
+  public final Vector3 location = new Vector3();
 
   /** The normal of the surface at the intersection location. */
-  public final Vector3d normal = new Vector3d();
+  public final Vector3 normal = new Vector3();
 
   /** The texture coordinates of the intersection point */
   public final Vector2d texCoords = new Vector2d();
