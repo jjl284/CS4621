@@ -1,6 +1,6 @@
 package cs4620.ray1;
 
-import egl.math.Vector3d;
+import egl.math.Vector3;
 
 /**
  * A ray is simply an origin point and a direction vector.
@@ -17,10 +17,10 @@ public class Ray {
   public static final double EPSILON = 1e-6;
 
   /** The starting point of the ray. */
-  public final Vector3d origin = new Vector3d();
+  public final Vector3 origin = new Vector3();
 
   /** The normalized direction in which the ray travels. */
-  public final Vector3d direction = new Vector3d();
+  public final Vector3 direction = new Vector3();
   
 
   /**
@@ -48,7 +48,7 @@ public class Ray {
    * @param newOrigin The origin of the new ray.
    * @param newDirection The direction of the new ray.
    */
-  public Ray(Vector3d newOrigin, Vector3d newDirection) {
+  public Ray(Vector3 newOrigin, Vector3 newDirection) {
 
     origin.set(newOrigin);
     direction.set(newDirection);
@@ -66,7 +66,7 @@ public class Ray {
    * @param newOrigin the new origin point
    * @param newDirection the new direction vector
    */
-  public void set(Vector3d newOrigin, Vector3d newDirection) {
+  public void set(Vector3 newOrigin, Vector3 newDirection) {
 
 	  origin.set(newOrigin);
 	  direction.set(newDirection);
@@ -78,9 +78,9 @@ public class Ray {
    * @param outPoint the output point
    * @param t The distance along the ray.
    */
-  public void evaluate(Vector3d outPoint, double t) {
+  public void evaluate(Vector3 outPoint, double t) {
 
-    outPoint.set(origin).addMultiple(t, direction);
+    outPoint.set(origin).addMultiple((float)t, direction);
   }
 
   
