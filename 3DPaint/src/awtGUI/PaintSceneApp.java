@@ -58,6 +58,8 @@ import cs4620.common.Texture;
 import cs4620.common.event.SceneReloadEvent;
 import cs4620.common.texture.TexGenUVGrid;
 import cs4620.mesh.MeshData;
+import cs4620.mesh.OBJMesh;
+import cs4620.mesh.OBJParser;
 import cs4620.mesh.gen.MeshGenCube;
 import cs4620.mesh.gen.MeshGenCylinder;
 import cs4620.mesh.gen.MeshGenOptions;
@@ -151,7 +153,7 @@ public class PaintSceneApp extends MainGame implements ActionListener, ChangeLis
 		
 		mainFrame.pack();
 		
-		createNewScene("Cube"); //Default mesh to load
+		createNewScene("Default"); //Default mesh to load
 	}
 	
 	public static void main(String[] args) throws LWJGLException {
@@ -172,8 +174,17 @@ public class PaintSceneApp extends MainGame implements ActionListener, ChangeLis
 	    Menu mToolbars = new Menu("Toolbars");
 	    
 	    
+	    // Option to rename XML file
+	    MenuItem mbRename = new MenuItem("Rename XML");
+	    mbRename.addActionListener(new ActionListener() {
+	    	@Override
+			public void actionPerformed(ActionEvent arg0) {
+	    		//TODO: Create text dialog for renaming
+	    	}
+	    });
+	    
 	    // Create MenuItems for new scenes of Default Meshes
-	    Menu mbNew=new Menu("New...");
+	    Menu mbNew=new Menu("New from...");
 	    
 	    addDefaultMeshMenu(mbNew, "Sphere");
 	    addDefaultMeshMenu(mbNew, "Cube");
@@ -183,31 +194,39 @@ public class PaintSceneApp extends MainGame implements ActionListener, ChangeLis
 	    
 	    
 	    // Menu item for new scene from an imported mesh
-	    MenuItem newMesh = new MenuItem("Import Mesh...");
+	    MenuItem newMesh = new MenuItem("Set Mesh...");
 	    newMesh.addActionListener(new ActionListener() {
 	    	@Override
 			public void actionPerformed(ActionEvent arg0) {
 				// TODO: Allow user to select a specific mesh of their choosing
-	    		// TODO: Direct user to select a texture size when done selecting mesh
 				FileDialog fd = new FileDialog(mainFrame);
 				fd.setVisible(true);
 				for(File f : fd.getFiles()) {
 					String file = f.getAbsolutePath();
 					if(file != null) {
-						Parser p = new Parser();
-						Object o = p.parse(file, Scene.class);
-						if(o != null) {
-							Scene old = scene;
-							scene = (Scene)o;
-							if(old != null) old.sendEvent(new SceneReloadEvent(file));
-							System.out.println("SCENE "+scene.getClass().toString());
+						OBJMesh objm = OBJParser.parse(file);
+						if(objm != null) {
+							paintMeshData = objm.flatten();
+							
+							if(scene.meshes.get("PaintedMesh") != null) {
+								scene.removeMesh("PaintedMesh");
+								
+								Mesh m = new Mesh();
+								m.setFile(file);
+								scene.addMesh(new NameBindMesh("PaintedMesh", m));
+								
+							} else {
+								// ERROR: specified XML file is not valid for 3D Paint App
+								System.out.println("3D PAINT ERROR: The specified XML file does not contain a PaintedMesh and is therefore not compatible with 3D Paint");
+							}
+							
+							scene.sendEvent(new SceneReloadEvent(file));
 							return;
 						}
 					}
 				}
 			}
 	    });
-	    mbNew.add(newMesh);
 	    
 	    
 	    // Specify an image to use for the texture
@@ -215,8 +234,6 @@ public class PaintSceneApp extends MainGame implements ActionListener, ChangeLis
 	    mbTex.addActionListener(new ActionListener() {
 	    	@Override
 			public void actionPerformed(ActionEvent arg0) {
-				// TODO: Allow user to select a specific mesh of their choosing
-	    		// TODO: Direct user to select a texture size when done selecting mesh
 				FileDialog fd = new FileDialog(mainFrame);
 				fd.setVisible(true);
 				for(File f : fd.getFiles()) {
@@ -242,7 +259,7 @@ public class PaintSceneApp extends MainGame implements ActionListener, ChangeLis
 	    
 	    
 	    // Import an existing Scene XML file
-	    MenuItem mbImp=new MenuItem("Import");
+	    MenuItem mbImp=new MenuItem("Import XML...");
 		mbImp.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -283,7 +300,6 @@ public class PaintSceneApp extends MainGame implements ActionListener, ChangeLis
 	    mbExp.addActionListener(new ActionListener(){
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				// TODO Auto-generated method stub
 				System.out.println("EXP clicked");
 			}});
 	   
@@ -327,8 +343,10 @@ public class PaintSceneApp extends MainGame implements ActionListener, ChangeLis
 	    // Attach menu items to menu
 	    
 	    mFile.add(mbNew);
+	    mFile.add(newMesh);
 	    mFile.add(mbTex);
 	    mFile.add(mbImp);
+	    mFile.add(mbRename);
 	    mFile.add(mbExp);
 	   
 	    // Attach menu items to submenu
@@ -357,7 +375,6 @@ public class PaintSceneApp extends MainGame implements ActionListener, ChangeLis
 	}
 	
 
-	// TODO: Create actual panels we're using
 	private void init_Panels() {
 		//EDIT PANEL
 		JToolBar ep = makeToolBar();
@@ -452,7 +469,6 @@ public class PaintSceneApp extends MainGame implements ActionListener, ChangeLis
 
 	@Override
 	protected void fullInitialize() {
-		// TODO Auto-generated method stub
 		
 	}
 
@@ -573,10 +589,10 @@ public class PaintSceneApp extends MainGame implements ActionListener, ChangeLis
 			default:
 				meshGenOpt.setDivLatitude(32);
 				meshGenOpt.setDivLongitude(32);
-				meshGenOpt.setInnerRadius(1);
-				meshGen = new MeshGenPlane();
+				meshGenOpt.setInnerRadius(5);
+				meshGen = new MeshGenCube();
 				meshGen.generate(paintMeshData, meshGenOpt);
-				break;		
+				break;	
 		}
 		
 		sceneName = shape;
@@ -584,7 +600,7 @@ public class PaintSceneApp extends MainGame implements ActionListener, ChangeLis
 		
 		Mesh m = new Mesh(); m.setGenerator( meshGen );
 		m.generator.generate(paintMeshData, new MeshGenOptions());
-		scene.addMesh( new NameBindMesh("Default"+shape, m) );
+		scene.addMesh( new NameBindMesh("PaintedMesh", m) );
 		
 		Texture t = new Texture();
 		paintTexture = new PaintTexture(1024, 1024, scenePath+sceneName+paintTextureName+".png");
@@ -600,7 +616,7 @@ public class PaintSceneApp extends MainGame implements ActionListener, ChangeLis
 		
 		SceneObject o = new SceneObject();
 		o.setMaterial(shape+"Material");
-		o.setMesh("Default"+shape);
+		o.setMesh("PaintedMesh");
 		scene.addObject(new NameBindSceneObject("PaintedObject", o));
 		
 		SceneCamera cam = new SceneCamera();
@@ -614,10 +630,8 @@ public class PaintSceneApp extends MainGame implements ActionListener, ChangeLis
 			scene.saveData(scenePath+sceneName+".xml");
 			if(old!=null) old.sendEvent(new SceneReloadEvent(scenePath+sceneName+".xml"));
 		} catch (ParserConfigurationException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (TransformerException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}

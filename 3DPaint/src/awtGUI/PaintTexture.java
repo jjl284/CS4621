@@ -59,7 +59,7 @@ public class PaintTexture {
 			    setSize(image.getWidth(), image.getHeight());
 				for (int i = 0; i < width; i++) {
 					for (int j = 0; j < height; j++) {
-						data[i][j].set(Color.fromIntRGB( image.getRGB(i, j) ));
+						data[i][j].set(Color.fromIntRGB( image.getRGB(i, height - 1 - j) ));
 					}
 				}
 			} catch (IOException e) {
@@ -79,7 +79,7 @@ public class PaintTexture {
 		    setSize(oldImage.getWidth(), oldImage.getHeight());
 			for (int i = 0; i < width; i++) {
 				for (int j = 0; j < height; j++) {
-					data[i][j].set(Color.fromIntRGB( oldImage.getRGB(i, j) ));
+					data[i][j].set(Color.fromIntRGB( oldImage.getRGB(i, height - 1 - j) ));
 				}
 			}
 			write(this.filepath);
@@ -89,7 +89,7 @@ public class PaintTexture {
 	}
 	
 	/**
-	 * Set the image to black
+	 * Set the image to white
 	 */
 	public void clear() {
 		for (int i = 0; i < width; i++) {
