@@ -83,7 +83,15 @@ public abstract class MainGame implements IDisposable {
 	 * Instances Of The Game's Current Time
 	 */
 	private GameTime lastTime, curTime;
-
+	/**
+	 * OpenGL Context
+	 */
+	private ContextAttribs glContext = new ContextAttribs(2, 1);
+	/**
+	 * OpenGL Backbuffer Pixel Format
+	 */
+	private org.lwjgl.opengl.PixelFormat glPixelFormat = new PixelFormat(8, 24, 8);
+	
 	/**
 	 * Event Called When The Window Resizes
 	 */
@@ -95,7 +103,7 @@ public abstract class MainGame implements IDisposable {
 	 * @param w Desired Window Width
 	 * @param h Desired Window Height
 	 */
-	public MainGame(String title, int w, int h) {
+	public MainGame(String title, int w, int h, ContextAttribs context, org.lwjgl.opengl.PixelFormat pixelFormat) {
 		Display.setVSyncEnabled(true);
 		// Display.setResizable(true);
 		Display.setTitle(title);
@@ -110,6 +118,12 @@ public abstract class MainGame implements IDisposable {
 
 		curTime = new GameTime();
 		lastTime = new GameTime();
+		
+		if(context != null) glContext = context;
+		if(pixelFormat != null) glPixelFormat = pixelFormat;
+	}
+	public MainGame(String title, int w, int h) {
+		this(title, w, h, null, null);
 	}
 	
 	/**
@@ -154,7 +168,7 @@ public abstract class MainGame implements IDisposable {
 	 * Destroys The Window And Stops The Program
 	 */
 	public void exit() {
-		//Display.destroy();
+		Display.destroy();
 		GLDiagnostic.dispose();
 		System.exit(0);
 	}
@@ -188,9 +202,7 @@ public abstract class MainGame implements IDisposable {
 	private void createDisplay() {
 		try{
 			Display.setDisplayMode(new DisplayMode(eWR.width, eWR.height));
-			org.lwjgl.opengl.PixelFormat pf = new PixelFormat(8, 24, 8);
-			ContextAttribs ca = new ContextAttribs(2, 1);
-			Display.create(pf, ca);			
+			Display.create(glPixelFormat, glContext);
 			GLState.enableAll();
 			
 			GL11.glViewport(0, 0, eWR.width, eWR.height);
@@ -232,7 +244,7 @@ public abstract class MainGame implements IDisposable {
 	/**
 	 * Updates Input From The Keyboard/Mouse And Sends Events
 	 */
-	private void checkInput() {
+	protected void checkInput() {
 		// Check Display Input
 		if(Display.wasResized()) {
 			eWR.x = Display.getX();
