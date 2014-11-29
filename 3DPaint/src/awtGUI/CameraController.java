@@ -72,7 +72,7 @@ public class CameraController {
 		if (thisFrameButtonDown && prevFrameButtonDown) {
 			rotation.add(0, -0.1f * (thisMouseX - prevMouseX), 0);
 			rotation.add(0.1f * (thisMouseY - prevMouseY), 0, 0);
-			paint(thisMouseX, thisMouseY);
+			if (scene.editMode) paint(thisMouseX, thisMouseY);
 		}
 		prevFrameButtonDown = thisFrameButtonDown;
 		
@@ -131,7 +131,11 @@ public class CameraController {
 		Matrix4 mVPI = camera.mViewProjection.clone().invert();
 		mVPI.mulPos(p1);
 		mVPI.mulPos(p2);
-		outRay.set(p1, p2.clone().sub(p1).normalize());
+		p2.sub(p1);
+		System.out.println(p2);
+		p2.set(p2.x, p2.y-120, p2.z);
+		p2.normalize();
+		outRay.set(p1, p2);
 		outRay.start = 0.0d;
 		outRay.end = Double.MAX_VALUE;
 		return outRay;

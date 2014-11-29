@@ -643,8 +643,9 @@ public class PaintSceneApp extends PaintMainGame implements ActionListener, Chan
 		scene.addObject(new NameBindSceneObject("PaintedObject", o));
 		
 		SceneCamera cam = new SceneCamera();
-		cam.addRotation(new Vector3(-30,45,0));
-		cam.addTranslation(new Vector3(1.5f,1.5f,1.5f));
+		//cam.addRotation(new Vector3(-30,45,0));
+		//cam.addTranslation(new Vector3(1.5f,1.5f,1.5f));
+		cam.addTranslation(new Vector3(0f,0f,2f));
 		scene.addObject(new NameBindSceneObject("Camera", cam));
 		
 		scene.removeTexture("NormalMapped");
@@ -662,28 +663,8 @@ public class PaintSceneApp extends PaintMainGame implements ActionListener, Chan
 	public static void reloadScene() {
 		String file = scenePath + sceneName + ".xml";
 		if(file != null) {
-			Parser p = new Parser();
-			Object o = p.parse(file, Scene.class);
-			if(o != null) {
-				Scene old = scene;
-				scene = (Scene)o;
-				SceneObject paintedObject = scene.objects.get("PaintedObject");
-				
-				if(paintedObject != null) {
-					String matName = scene.objects.get("PaintedObject").material;
-					String texName = scene.materials.get(matName).inputDiffuse.texture;
-					String texFileName = scene.textures.get(texName).file;
-					paintTexture = new PaintTexture(texFileName);
-					mode.setIcon(new ImageIcon("pencil.png"));
-					System.out.println("USING IMAGE " + texFileName + " while paintTextureName is " + paintTextureName);
-				} else {
-					// ERROR: specified XML file is not valid for 3D Paint App
-					System.out.println("3D PAINT ERROR: The specified XML file does not contain a PaintedObject and is therefore not compatible with 3D Paint");
-				}
-				
-				if(old != null) old.sendEvent(new SceneReloadEvent(file));
+			scene.sendEvent(new SceneReloadEvent(file));
 				return;
-			}
 		}
 	}
 }

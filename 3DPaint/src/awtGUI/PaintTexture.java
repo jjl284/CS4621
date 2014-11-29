@@ -9,6 +9,7 @@ import javax.imageio.ImageIO;
 import cs4620.mesh.MeshData;
 import egl.math.Color;
 import egl.math.Colord;
+import egl.math.MathHelper;
 import egl.math.Vector2d;
 import egl.math.Vector3;
 
@@ -129,6 +130,17 @@ public class PaintTexture {
 		}
 	}
 	
+	public void paintSquare(Color color, int posX, int posY, int squareWidth) {
+		int halfSquare = (int)(squareWidth/2.0);
+		for (int i = posX - halfSquare; i <= posX + halfSquare; i++) {
+			for (int j = posY - halfSquare; j <= posY + halfSquare; j++) {
+				int pixelX = MathHelper.clamp(i, 0, width-1);
+				int pixelY = MathHelper.clamp(j, 0, height-1);
+				setPixelColor(color, pixelX, pixelY);
+			}
+		}
+	}
+	
 	/**
 	 * Get the color of a pixel.
 	 *
@@ -215,11 +227,7 @@ public class PaintTexture {
 	 * @param meshData the corresponding MeshData object
 	 */
 	public void addPaint(Vector2d texCoords, MeshData meshData) {
-		for (int i = 0; i < 50; i++) {
-			for (int j = 0; j < 50; j++) {
-				setPixelColor(Color.Black, i, j);
-			}
-		}
+		paintSquare(Color.Aqua, (int)(texCoords.x*width+0.5), (int)(texCoords.y*height+0.5), 40);
 		write(filepath);
 		PaintSceneApp.reloadScene();
 	}
