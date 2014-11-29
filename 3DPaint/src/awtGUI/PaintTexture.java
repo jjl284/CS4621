@@ -214,7 +214,7 @@ public class PaintTexture {
 	 * @param texCoords coordinates at location
 	 * @param meshData the corresponding MeshData object
 	 */
-	public void addPaint(Vector3 location, Vector2d texCoords, MeshData meshData) {
+	public void addPaint(Vector2d texCoords, MeshData meshData) {
 		for (int i = 0; i < 50; i++) {
 			for (int j = 0; j < 50; j++) {
 				setPixelColor(Color.Black, i, j);
