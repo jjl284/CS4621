@@ -6,7 +6,7 @@ import java.util.ArrayList;
 
 public class PaintCanvas extends Canvas{
 	//public ToolType activeTool;
-	public Color activeColor;
+	public static Color activeColor;
 	public int activeToolSize;
 	
 	public boolean editMode; //true: editMode false: viewMode

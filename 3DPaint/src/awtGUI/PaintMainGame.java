@@ -1,6 +1,5 @@
-package blister;
+package awtGUI;
 
-import java.awt.Canvas;
 import java.io.OutputStreamWriter;
 import java.util.Calendar;
 
@@ -14,6 +13,11 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.PixelFormat;
 
+import blister.MainGame;
+import blister.GameTime;
+import blister.IGameScreen;
+import blister.ScreenList;
+import blister.ScreenState;
 import blister.input.KeyPressEventArgs;
 import blister.input.KeyboardEventDispatcher;
 import blister.input.KeyboardKeyEventArgs;
@@ -34,7 +38,7 @@ import ext.csharp.EventArgs;
  * @author Cristian
  *
  */
-public abstract class MainGame implements IDisposable {
+public abstract class PaintMainGame extends MainGame implements IDisposable {
 	/**
 	 * Window Resize Event Struct
 	 * @author Cristian
@@ -60,7 +64,7 @@ public abstract class MainGame implements IDisposable {
 	private final MouseMoveEventArgs eMM;
 	private final WindowResizeArgs eWR;
 
-	private Canvas canvas;
+	protected PaintCanvas canvas;
 	
 	/**
 	 * List Of Screens That Must Be Built
@@ -103,11 +107,9 @@ public abstract class MainGame implements IDisposable {
 	 * @param w Desired Window Width
 	 * @param h Desired Window Height
 	 */
-	public MainGame(String title, int w, int h, ContextAttribs context, org.lwjgl.opengl.PixelFormat pixelFormat) {
-		Display.setVSyncEnabled(true);
-		// Display.setResizable(true);
-		Display.setTitle(title);
-
+	public PaintMainGame(String title, int w, int h, ContextAttribs context, org.lwjgl.opengl.PixelFormat pixelFormat) {
+		super(title, w, h, context, pixelFormat);
+		canvas = new PaintCanvas();
 		eKP = new KeyPressEventArgs();
 		eKK = new KeyboardKeyEventArgs();
 		ms = new MouseState();
@@ -122,7 +124,7 @@ public abstract class MainGame implements IDisposable {
 		if(context != null) glContext = context;
 		if(pixelFormat != null) glPixelFormat = pixelFormat;
 	}
-	public MainGame(String title, int w, int h) {
+	public PaintMainGame(String title, int w, int h) {
 		this(title, w, h, null, null);
 	}
 	
@@ -133,23 +135,9 @@ public abstract class MainGame implements IDisposable {
 	 * @param h Desired Window Height
 	 * @throws LWJGLException 
 	 */
-	public MainGame(String title, int w, int h, Canvas pCanvas) throws LWJGLException {
+	public PaintMainGame(String title, int w, int h, PaintCanvas pCanvas) throws LWJGLException {
+		this(title, w, h, null, null);
 		canvas = pCanvas;
-		
-		Display.setVSyncEnabled(true);
-		// Display.setResizable(true);
-		Display.setTitle(title);
-
-		eKP = new KeyPressEventArgs();
-		eKK = new KeyboardKeyEventArgs();
-		ms = new MouseState();
-		eMB = new MouseButtonEventArgs(ms);
-		eMW = new MouseWheelEventArgs(ms);
-		eMM = new MouseMoveEventArgs(ms);
-		eWR = new WindowResizeArgs(0, 0, w, h);
-
-		curTime = new GameTime();
-		lastTime = new GameTime();
 	}
 	
 	/**
@@ -166,7 +154,7 @@ public abstract class MainGame implements IDisposable {
 	 * Destroys The Window And Stops The Program
 	 */
 	public void exit() {
-		Display.destroy();
+		//Display.destroy();
 		GLDiagnostic.dispose();
 		System.exit(0);
 	}
