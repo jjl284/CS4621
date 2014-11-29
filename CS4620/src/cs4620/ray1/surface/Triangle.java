@@ -122,7 +122,7 @@ public class Triangle extends Surface {
 	    double bl_kc = b*l-k*c;
 	    
 	    double t = -(f*(ak_jb) + e*(jc_al) + d*(bl_kc))/M;
-	    if(t > rayIn.end || t < rayIn.start) return false;
+	    if (t > rayIn.end || t < rayIn.start) return false;
 	    
 	    double beta = (j*(ei_hf) + k*(gf_di) + l*(dh_eg))/M;
 	    if(beta < 0 || beta > 1) return false;

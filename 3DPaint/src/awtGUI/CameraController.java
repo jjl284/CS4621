@@ -121,9 +121,10 @@ public class CameraController {
 		}
 	}
 	
-	private void getRay(int mouseX, int mouseY, Ray outRay) {
+	private Ray getRay(int mouseX, int mouseY) {
+		Ray outRay = new Ray();
 		System.out.println("Old mouse: " + mouseX + " " + mouseY);
-		Vector2 curMousePos = new Vector2(mouseX, mouseY).div(camera.viewportSize.x, camera.viewportSize.y);
+		Vector2 curMousePos = new Vector2(mouseX, mouseY).add(0.5f).mul(2).div(camera.viewportSize.x, camera.viewportSize.y).sub(1);
 		System.out.println("Adjusted mouse: " + curMousePos.x + " " + curMousePos.y);
 		Vector3 p1 = new Vector3(curMousePos.x, curMousePos.y, -1);
 		Vector3 p2 = new Vector3(curMousePos.x, curMousePos.y, 1);
@@ -131,17 +132,15 @@ public class CameraController {
 		mVPI.mulPos(p1);
 		mVPI.mulPos(p2);
 		outRay.set(p1, p2.clone().sub(p1).normalize());
+		outRay.start = 0.0d;
+		outRay.end = Double.MAX_VALUE;
+		return outRay;
 	}
 	
 	protected void paint(int curMouseX, int curMouseY) {
-		//System.out.println("paint called");
-		Ray outRay = new Ray();
-		getRay(curMouseX, curMouseY, outRay);
-		
-		System.out.println("ray origin " + outRay.origin);
-		System.out.println("ray direction " + outRay.direction);
-		
-		//intersect ray with mesh and find intersection point and corresponding uv
+		Ray outRay = getRay(curMouseX, curMouseY);
+
+		//Generate triangles from mesh
 		ArrayList<Triangle> tris = new ArrayList<Triangle>();
 		for (int i=0; i < mesh.indexCount / 3; i++) {
 			Vector3i triVec = new Vector3i(mesh.indices.get(3*i),
@@ -150,15 +149,22 @@ public class CameraController {
 			tris.add(t);
 		}
 		
+		//intersect ray with mesh and find intersection point and corresponding uv
 		IntersectionRecord outRecord = new IntersectionRecord();
+		boolean doesIntersect = false;
 		for (Triangle t : tris) {
 			if (t.intersect(outRecord, outRay)) {
+				doesIntersect = true;
+				outRay.end = outRecord.t;
 				System.out.println("Intersected!");
-				break;
 			}
-			System.out.println("no intersect");
 		}
-		paintTexture.addPaint(outRecord.location, outRecord.texCoords, mesh);
+		
+		System.out.println("Final intersection location: " + outRecord.location);
+		System.out.println("Final intersection tex coords: " + outRecord.texCoords);
+		
+		if (doesIntersect)
+			paintTexture.addPaint(outRecord.texCoords, mesh);
 	}
 	
 	/**
@@ -176,4 +182,3 @@ public class CameraController {
 		}		
 	}
 }
-
