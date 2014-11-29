@@ -215,6 +215,12 @@ public class PaintTexture {
 	 * @param meshData the corresponding MeshData object
 	 */
 	public void addPaint(Vector3 location, Vector2d texCoords, MeshData meshData) {
-		//setPixelColor(Colord inPixel, int inX, int inY);
+		for (int i = 0; i < 50; i++) {
+			for (int j = 0; j < 50; j++) {
+				setPixelColor(Color.Black, i, j);
+			}
+		}
+		write(filepath);
+		PaintSceneApp.reloadScene();
 	}
 }
