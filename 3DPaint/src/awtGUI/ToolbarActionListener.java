@@ -26,7 +26,7 @@ public class ToolbarActionListener implements ActionListener{
 				frame.add(ep);
 			    ep.setVisible(true);
 			    ep.updateUI();
-
+			    
 			    System.out.println("ep.setVisibleTrue");
 			    break;	 
 			case "Color Bar":

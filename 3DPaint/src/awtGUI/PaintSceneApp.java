@@ -1,5 +1,7 @@
 package awtGUI;
 
+import awtGUI.PaintMainGame;
+
 import java.awt.BorderLayout;
 import java.awt.CheckboxMenuItem;
 import java.awt.Color;
@@ -50,6 +52,7 @@ import javax.swing.event.ChangeListener;
 
 import org.lwjgl.LWJGLException;
 import org.lwjgl.input.Keyboard;
+import org.lwjgl.opengl.ContextAttribs;
 
 import blister.FalseFirstScreen;
 import blister.MainGame;
@@ -77,10 +80,11 @@ import cs4620.mesh.gen.MeshGenPlane;
 import cs4620.mesh.gen.MeshGenSphere;
 import cs4620.mesh.gen.MeshGenTorus;
 import cs4620.mesh.gen.MeshGenerator;
+import egl.math.Colord;
 import egl.math.Vector3;
 import ext.java.Parser;
 
-public class PaintSceneApp extends MainGame implements ActionListener, ChangeListener{
+public class PaintSceneApp extends PaintMainGame implements ActionListener, ChangeListener{
 	
 	/**
 	 * The Thread That Runs The Other Window
@@ -99,13 +103,14 @@ public class PaintSceneApp extends MainGame implements ActionListener, ChangeLis
 	public static int MAIN_HEIGHT = 600;
 	
 	private Frame mainFrame;
-	private PaintCanvas paintCanvas;
-	public Scene scene;
-	public PaintTexture paintTexture;
-	public MeshData paintMeshData;
-	public String scenePath;
-	public String sceneName;
-	public String paintTextureName;
+	
+	public static Scene scene;
+	public static PaintTexture paintTexture;
+	public static MeshData paintMeshData;
+	public static String scenePath;
+	public static String sceneName;
+	public static String paintTextureName;
+
 	public PaintViewScreen paintViewScreen;
 	private JLabel toolSizeLabel;
 
@@ -114,7 +119,7 @@ public class PaintSceneApp extends MainGame implements ActionListener, ChangeLis
 	
 	private JButton colorButton;
 	
-	private JButton mode;
+	private static JButton mode;
 	
 	private JSlider toolSizeSlider;
 	private final int sliderMin = 0;
@@ -131,8 +136,9 @@ public class PaintSceneApp extends MainGame implements ActionListener, ChangeLis
 	 * @param canvas
 	 * @throws LWJGLException
 	 */
-	public PaintSceneApp(PaintCanvas canvas) throws LWJGLException {
-		super("3D Paint Scene Mesh", MAIN_WIDTH, MAIN_HEIGHT, canvas);
+	public PaintSceneApp() throws LWJGLException {
+		super("3D Paint Scene Mesh", MAIN_WIDTH, MAIN_HEIGHT, new ContextAttribs(3, 0), null);		
+		//super("3D Paint Scene Mesh", MAIN_WIDTH, MAIN_HEIGHT, canvas);
 		//otherWindow = new ControlWindow(this);
 		
 		// Create a directory for storing painted meshes
@@ -154,11 +160,10 @@ public class PaintSceneApp extends MainGame implements ActionListener, ChangeLis
 		});
 		mainFrame.setVisible(true);
 		
-		paintCanvas = canvas;
-		paintCanvas.setVisible(true);
-		paintCanvas.setFocusable(true);
-		paintCanvas.setIgnoreRepaint(true);
-		mainFrame.add(paintCanvas);
+		canvas.setVisible(true);
+		canvas.setFocusable(true);
+		canvas.setIgnoreRepaint(true);
+		mainFrame.add(canvas);
 		
 		scene = new Scene();
 		
@@ -171,7 +176,7 @@ public class PaintSceneApp extends MainGame implements ActionListener, ChangeLis
 	}
 	
 	public static void main(String[] args) throws LWJGLException {
-		PaintSceneApp app = new PaintSceneApp(new PaintCanvas());
+		PaintSceneApp app = new PaintSceneApp();
 		app.run();
 		app.dispose();
 	}
@@ -359,12 +364,12 @@ public class PaintSceneApp extends MainGame implements ActionListener, ChangeLis
 	    MenuItem mbUndo=new MenuItem("Undo");
 	    mbUndo.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent arg0) {
-				paintCanvas.LoadPrevState(paintCanvas.currState);				
+				canvas.LoadPrevState(canvas.currState);				
 			}});
 	    MenuItem mbRedo=new MenuItem("Redo");
 	    mbRedo.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent arg0) {
-				paintCanvas.LoadNextState(paintCanvas.currState);				
+				canvas.LoadNextState(canvas.currState);				
 			}});
 	    
 
@@ -373,6 +378,7 @@ public class PaintSceneApp extends MainGame implements ActionListener, ChangeLis
 	    mHelp.addActionListener(new ActionListener(){
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
+
 				String[] ctrlNames = {"Zoom in","Zoom out","Tilt right","Tilt left","Up","Down","Move left ","Move right "};
 
 				JDialog diag = new JDialog(mainFrame,"Controls");
@@ -388,7 +394,7 @@ public class PaintSceneApp extends MainGame implements ActionListener, ChangeLis
 				diag.add(jPan);
 				
 				diag.setVisible(true);
-				
+
 			}});
 	    for(int i=0;i<controls.length;i++){
 	    	controls[i].setEditable(false);
@@ -467,7 +473,7 @@ public class PaintSceneApp extends MainGame implements ActionListener, ChangeLis
 		statusPanel.setBorder(new BevelBorder(BevelBorder.LOWERED));
 		statusPanel.setPreferredSize(new Dimension(getWidth(),18));
 		statusPanel.setLayout(new GridLayout(1,1));
-		toolSizeLabel = new JLabel ("    "+String.valueOf(paintCanvas.activeToolSize));
+		toolSizeLabel = new JLabel ("    "+String.valueOf(canvas.activeToolSize));
 
 		statusPanel.add(toolSizeLabel);
 		
@@ -494,7 +500,7 @@ public class PaintSceneApp extends MainGame implements ActionListener, ChangeLis
 		eraser.addActionListener(this);
 		
 		colorButton = new JButton();
-		colorButton.setIcon(iconOfColor(paintCanvas.activeColor, iconSize));
+		colorButton.setIcon(iconOfColor(canvas.activeColor, iconSize));
 		colorButton.addActionListener(this);
 		
 
@@ -539,11 +545,13 @@ public class PaintSceneApp extends MainGame implements ActionListener, ChangeLis
 		
 	@Override
 	protected void buildScreenList() {
+
 		paintViewScreen=new PaintViewScreen();
 		screenList = new ScreenList(this, 0,
 			new FalseFirstScreen(1),
 			paintViewScreen
 			);
+
 	}
 
 	@Override
@@ -584,9 +592,9 @@ public class PaintSceneApp extends MainGame implements ActionListener, ChangeLis
 			}
 		}
 		else if(s == mode){
-			paintCanvas.setEdit(!paintCanvas.editMode);
+			canvas.setEdit(!canvas.editMode);
 			scene.setEditMode(!scene.editMode);
-			if(paintCanvas.editMode)
+			if(canvas.editMode)
 				mode.setIcon(new ImageIcon("pencil.png"));
 			else
 				mode.setIcon(new ImageIcon("view.png"));
@@ -600,8 +608,8 @@ public class PaintSceneApp extends MainGame implements ActionListener, ChangeLis
 		
 		if(s == toolSizeSlider){
 			int newToolSize = ((JSlider)s).getValue();
-			paintCanvas.setToolSize(newToolSize);
-			toolSizeLabel.setText("    "+String.valueOf(paintCanvas.activeToolSize));
+			canvas.setToolSize(newToolSize);
+			toolSizeLabel.setText("    "+String.valueOf(canvas.activeToolSize));
 		}
 		
 	}
@@ -702,8 +710,9 @@ public class PaintSceneApp extends MainGame implements ActionListener, ChangeLis
 		scene.addObject(new NameBindSceneObject("PaintedObject", o));
 		
 		SceneCamera cam = new SceneCamera();
-		cam.addRotation(new Vector3(-30,45,0));
-		cam.addTranslation(new Vector3(1.5f,1.5f,1.5f));
+		//cam.addRotation(new Vector3(-30,45,0));
+		//cam.addTranslation(new Vector3(1.5f,1.5f,1.5f));
+		cam.addTranslation(new Vector3(0f,0f,2f));
 		scene.addObject(new NameBindSceneObject("Camera", cam));
 		
 		scene.removeTexture("NormalMapped");
@@ -715,6 +724,14 @@ public class PaintSceneApp extends MainGame implements ActionListener, ChangeLis
 			e.printStackTrace();
 		} catch (TransformerException e) {
 			e.printStackTrace();
+		}
+	}
+	
+	public static void reloadScene() {
+		String file = scenePath + sceneName + ".xml";
+		if(file != null) {
+			scene.sendEvent(new SceneReloadEvent(file));
+				return;
 		}
 	}
 }
