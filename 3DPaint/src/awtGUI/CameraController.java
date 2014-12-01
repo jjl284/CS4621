@@ -1,6 +1,9 @@
 package awtGUI;
 
+import java.awt.event.KeyEvent;
 import java.util.ArrayList;
+
+import javax.swing.JTextField;
 
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
@@ -28,8 +31,8 @@ public class CameraController {
 	protected int prevMouseX, prevMouseY;
 	private MeshData mesh;
 	private PaintTexture paintTexture;
-	
-	//protected boolean orbitMode = true;
+	public int[] controls={Keyboard.KEY_W,Keyboard.KEY_S,Keyboard.KEY_Q,Keyboard.KEY_E,Keyboard.KEY_A,Keyboard.KEY_D,
+			Keyboard.KEY_Z,Keyboard.KEY_C};
 	
 	public CameraController(Scene s, RenderEnvironment re, RenderCamera c) {
 		scene = s;
@@ -40,6 +43,17 @@ public class CameraController {
 	public void givePaintMeshInfo(MeshData meshData, PaintTexture pTexture) {
 		mesh = meshData;
 		paintTexture = pTexture;
+	}
+	public void setControls(int i, int keycode){
+		controls[i]=Keyboard.getKeyIndex(KeyEvent.getKeyText(keycode));
+	}
+	
+	public int indexOf (KeyEvent e){
+		for(int i=0; i<controls.length;i++){
+			if(Keyboard.getKeyName(controls[i]).equalsIgnoreCase(KeyEvent.getKeyText(e.getKeyCode())))
+				return i;
+		}
+		return -1;
 	}
 	
 	/**
@@ -56,16 +70,15 @@ public class CameraController {
 	public void update(double et) {
 		Vector3 motion = new Vector3();
 		Vector3 rotation = new Vector3();
-		
-		if(Keyboard.isKeyDown(Keyboard.KEY_W)) { motion.add(0, 0, -1); }
-		if(Keyboard.isKeyDown(Keyboard.KEY_S)) { motion.add(0, 0, 1); }
+		if(Keyboard.isKeyDown(controls[0])) { motion.add(0, 0, -1); }
+		if(Keyboard.isKeyDown(controls[1])) { motion.add(0, 0, 1); }
 
-		if(Keyboard.isKeyDown(Keyboard.KEY_Q)) { rotation.add(0, 0, -1); }
-		if(Keyboard.isKeyDown(Keyboard.KEY_E)) { rotation.add(0, 0, 1); }
-		if(Keyboard.isKeyDown(Keyboard.KEY_A)) { rotation.add(-1, 0, 0); }
-		if(Keyboard.isKeyDown(Keyboard.KEY_D)) { rotation.add(1, 0, 0); }
-		if(Keyboard.isKeyDown(Keyboard.KEY_Z)) { rotation.add(0, -1, 0); }
-		if(Keyboard.isKeyDown(Keyboard.KEY_C)) { rotation.add(0, 1, 0); }
+		if(Keyboard.isKeyDown(controls[2])) { rotation.add(0, 0, -1); }
+		if(Keyboard.isKeyDown(controls[3])) { rotation.add(0, 0, 1); }
+		if(Keyboard.isKeyDown(controls[4])) { rotation.add(-1, 0, 0); }
+		if(Keyboard.isKeyDown(controls[5])) { rotation.add(1, 0, 0); }
+		if(Keyboard.isKeyDown(controls[6])) { rotation.add(0, -1, 0); }
+		if(Keyboard.isKeyDown(controls[7])) { rotation.add(0, 1, 0); }
 		
 		boolean thisFrameButtonDown = Mouse.isButtonDown(0) && !(Keyboard.isKeyDown(Keyboard.KEY_LCONTROL) || Keyboard.isKeyDown(Keyboard.KEY_RCONTROL));
 		int thisMouseX = Mouse.getX(), thisMouseY = Mouse.getY();

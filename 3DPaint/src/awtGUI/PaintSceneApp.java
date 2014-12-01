@@ -5,6 +5,7 @@ import java.awt.CheckboxMenuItem;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FileDialog;
+import java.awt.FlowLayout;
 import java.awt.Frame;
 import java.awt.Graphics2D;
 import java.awt.GridLayout;
@@ -13,12 +14,18 @@ import java.awt.MenuBar;
 import java.awt.MenuItem;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.InputStream;
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 import javax.swing.BoxLayout;
 import javax.xml.parsers.ParserConfigurationException;
@@ -27,11 +34,13 @@ import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JColorChooser;
+import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JSlider;
+import javax.swing.JTextField;
 import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
 import javax.swing.border.BevelBorder;
@@ -97,7 +106,7 @@ public class PaintSceneApp extends MainGame implements ActionListener, ChangeLis
 	public String scenePath;
 	public String sceneName;
 	public String paintTextureName;
-	
+	public PaintViewScreen paintViewScreen;
 	private JLabel toolSizeLabel;
 
 	private JToggleButton pencil;
@@ -112,7 +121,11 @@ public class PaintSceneApp extends MainGame implements ActionListener, ChangeLis
 	private final int sliderMax = 50;
 	private final int sliderInit = 0;
 	private int iconSize = 48;	
-	
+	private JTextField[] controls ={new JTextField(Keyboard.getKeyName(Keyboard.KEY_W)),
+			new JTextField(Keyboard.getKeyName(Keyboard.KEY_S)),new JTextField(Keyboard.getKeyName(Keyboard.KEY_Q)),
+			new JTextField(Keyboard.getKeyName(Keyboard.KEY_E)),new JTextField(Keyboard.getKeyName(Keyboard.KEY_A)),
+			new JTextField(Keyboard.getKeyName(Keyboard.KEY_D)),new JTextField(Keyboard.getKeyName(Keyboard.KEY_Z)),
+			new JTextField(Keyboard.getKeyName(Keyboard.KEY_C))};
 	/**
 	 * Constructor
 	 * @param canvas
@@ -312,16 +325,29 @@ public class PaintSceneApp extends MainGame implements ActionListener, ChangeLis
 	    MenuItem mbBP=new MenuItem("Blinn-Phong");
 	    mbBP.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent arg0) {
-				Material mat = new Material();
-				mat.setType(Material.T_PHONG);
-				scene.materials.get(0);
+				scene.removeMaterial("Generic");
+				
+				Material m = new Material();
+				m.setType(Material.T_PHONG);
+				scene.addMaterial( new NameBindMaterial("Generic", m) );
+				
+				scene.sendEvent(new SceneReloadEvent(scenePath + sceneName + ".xml"));
+				return;
+				
 			}});
 	    MenuItem mbLamb=new MenuItem("Lambertian");
 	    mbLamb.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent arg0) {
+				try{
+					scene.removeMaterial(scene.materials.get(0).toString());
+				}catch(Exception e){};
 				Material mat = new Material();
 				mat.setType(Material.T_LAMBERTIAN);
-				scene.addMaterial(new NameBindMaterial("Lambertian", mat));			
+				scene.addMaterial(new NameBindMaterial(Material.T_LAMBERTIAN, mat));
+				
+				scene.sendEvent(new SceneReloadEvent(scenePath + sceneName + ".xml"));
+				
+				return;			
 			}});
 	    MenuItem mbCT=new MenuItem("Cook-Torrance");
 	    mbCT.addActionListener(new ActionListener(){
@@ -341,24 +367,52 @@ public class PaintSceneApp extends MainGame implements ActionListener, ChangeLis
 				paintCanvas.LoadNextState(paintCanvas.currState);				
 			}});
 	    
+
 	    MenuItem mCtrl = new MenuItem("Controls");
-	    //CheckboxMenuItem cEdit = new CheckboxMenuItem("Edit Bar",true);
-	    //CheckboxMenuItem cColor=  new CheckboxMenuItem("Color Bar",true);
-	    //CheckboxMenuItem cManip = new CheckboxMenuItem("Manipulator Bar",true);
 	    
 	    mHelp.addActionListener(new ActionListener(){
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				String helpMsg = "W: Zoom in\n" +
-						"S: Zoom out\n" +
-						"Q: - Z \n" +
-						"E: + Z\n" +
-						"A: - X\n" +
-						"D: + X\n" +
-						"Z: - Y\n" +
-						"C: + Y\n";
-				JOptionPane.showMessageDialog(mainFrame, helpMsg);	
+				String[] ctrlNames = {"Zoom in","Zoom out","Tilt right","Tilt left","Up","Down","Move left ","Move right "};
+
+				JDialog diag = new JDialog(mainFrame,"Controls");
+				diag.setLayout(new FlowLayout());
+				diag.setSize(150, 200);
+				diag.setResizable(false);
+				JPanel jPan = new JPanel();
+				jPan.setLayout(new GridLayout(8,2));
+				for(int i=0;i<ctrlNames.length;i++){
+					jPan.add(new JLabel(ctrlNames[i]));
+					jPan.add(controls[i]);
+				}
+				diag.add(jPan);
+				
+				diag.setVisible(true);
+				
 			}});
+	    for(int i=0;i<controls.length;i++){
+	    	controls[i].setEditable(false);
+	    	controls[i].addKeyListener(new KeyListener(){
+				@Override
+				public void keyPressed(KeyEvent e) {
+				}
+
+				@Override
+				public void keyReleased(KeyEvent e) {
+					int existingIndex = paintViewScreen.camController.indexOf(e); 
+					if(existingIndex>=0){
+						paintViewScreen.camController.setControls(existingIndex, KeyEvent.VK_WINDOWS);
+						controls[existingIndex].setText("null");
+					}	
+					int index = Arrays.asList(controls).indexOf(e.getSource());
+					((JTextField)e.getSource()).setText(String.valueOf(e.getKeyChar()).toUpperCase());
+					paintViewScreen.camController.setControls(index, e.getKeyCode());
+				}
+
+				@Override
+				public void keyTyped(KeyEvent e) {
+				}});
+	    }
 	    //cEdit.addActionListener(new ToolbarActionListener("Edit Bar", cEdit.getState(), mainFrame));
 	    //cColor.addActionListener(new ToolbarActionListener("Color Bar", cColor.getState(), mainFrame));
 	    //cManip.addActionListener(new ToolbarActionListener("Manipulator Bar", cManip.getState(), mainFrame));
@@ -447,6 +501,8 @@ public class PaintSceneApp extends MainGame implements ActionListener, ChangeLis
 		mode = new JButton();
 		mode.setIcon(new ImageIcon("pencil.png"));
 		mode.addActionListener(this);
+		paintCanvas.setEdit(true);
+		scene.setEditMode(true);
 		
 
 		//MANIP PANEL (probably not neccessary anymore?)
@@ -483,9 +539,10 @@ public class PaintSceneApp extends MainGame implements ActionListener, ChangeLis
 		
 	@Override
 	protected void buildScreenList() {
+		paintViewScreen=new PaintViewScreen();
 		screenList = new ScreenList(this, 0,
 			new FalseFirstScreen(1),
-			new PaintViewScreen()
+			paintViewScreen
 			);
 	}
 
@@ -509,6 +566,7 @@ public class PaintSceneApp extends MainGame implements ActionListener, ChangeLis
 		super.exit();
 	}
 
+	
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		Object s = e.getSource();
@@ -571,6 +629,8 @@ public class PaintSceneApp extends MainGame implements ActionListener, ChangeLis
 		paintMeshData = new MeshData();
 		MeshGenerator meshGen; 
 		MeshGenOptions meshGenOpt = new MeshGenOptions();
+		paintCanvas.setEdit(true);
+		scene.setEditMode(true);
 		mode.setIcon(new ImageIcon("pencil.png"));
 		switch(shape) {
 			case "Cube":
