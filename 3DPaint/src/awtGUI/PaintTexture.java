@@ -9,13 +9,13 @@ import javax.imageio.ImageIO;
 
 import org.lwjgl.opengl.GL11;
 
+import cs4620.gl.RenderEnvironment;
 import cs4620.mesh.MeshData;
 import egl.NativeMem;
 import egl.math.Color;
 import egl.math.Colord;
 import egl.math.MathHelper;
 import egl.math.Vector2d;
-import egl.math.Vector3;
 
 public class PaintTexture {
 	
@@ -244,6 +244,6 @@ public class PaintTexture {
 			}
 		}
 		bb.flip();
-		PaintViewScreen.rController.env.paintTextureGL.updateImage((int)(texCoords.x*width+0.5), (int)(texCoords.y*height+0.5), 50, 50, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, bb);
+		RenderEnvironment.paintTextureGL.updateImage((int)(texCoords.x*width+0.5), (int)(texCoords.y*height+0.5), 50, 50, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, bb);
 	}
 }

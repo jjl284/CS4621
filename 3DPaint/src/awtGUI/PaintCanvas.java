@@ -5,6 +5,11 @@ import java.awt.Color;
 import java.util.ArrayList;
 
 public class PaintCanvas extends Canvas{
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	
 	//public ToolType activeTool;
 	public static Color activeColor;
 	public int activeToolSize;

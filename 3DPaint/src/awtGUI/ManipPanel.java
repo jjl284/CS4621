@@ -1,13 +1,11 @@
 package awtGUI;
 
-import java.awt.Component;
 import java.awt.GridLayout;
-import java.awt.event.ComponentListener;
 
 import javax.swing.ButtonGroup;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
-import javax.swing.JToolBar;
+
 
 public class ManipPanel extends JPanel{
 	/**

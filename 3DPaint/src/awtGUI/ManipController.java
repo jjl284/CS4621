@@ -1,6 +1,5 @@
 package awtGUI;
 
-import java.awt.Component;
 import java.util.HashMap;
 import java.util.Map.Entry;
 

@@ -3,7 +3,6 @@ package awtGUI;
 import awtGUI.PaintMainGame;
 
 import java.awt.BorderLayout;
-import java.awt.CheckboxMenuItem;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FileDialog;
@@ -18,19 +17,12 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.InputStream;
-import java.lang.reflect.Array;
-import java.nio.ByteBuffer;
-import java.util.ArrayList;
 import java.util.Arrays;
 
-import javax.swing.BoxLayout;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.swing.ButtonGroup;
@@ -39,9 +31,7 @@ import javax.swing.JButton;
 import javax.swing.JColorChooser;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JRadioButton;
 import javax.swing.JSlider;
 import javax.swing.JTextField;
 import javax.swing.JToggleButton;
@@ -56,7 +46,6 @@ import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.ContextAttribs;
 
 import blister.FalseFirstScreen;
-import blister.MainGame;
 import blister.ScreenList;
 import cs4620.common.Material;
 import cs4620.common.Material.InputProvider;
@@ -70,7 +59,6 @@ import cs4620.common.SceneCamera;
 import cs4620.common.SceneObject;
 import cs4620.common.Texture;
 import cs4620.common.event.SceneReloadEvent;
-import cs4620.common.texture.TexGenUVGrid;
 import cs4620.mesh.MeshData;
 import cs4620.mesh.OBJMesh;
 import cs4620.mesh.OBJParser;
@@ -81,8 +69,6 @@ import cs4620.mesh.gen.MeshGenPlane;
 import cs4620.mesh.gen.MeshGenSphere;
 import cs4620.mesh.gen.MeshGenTorus;
 import cs4620.mesh.gen.MeshGenerator;
-import egl.GLTexture;
-import egl.math.Colord;
 import egl.math.Vector3;
 import ext.java.Parser;
 
@@ -104,7 +90,7 @@ public class PaintSceneApp extends PaintMainGame implements ActionListener, Chan
 	public static int MAIN_WIDTH = 800;
 	public static int MAIN_HEIGHT = 600;
 	
-	private Frame mainFrame;
+	public static Frame mainFrame;
 	
 	public static Scene scene;
 	public static PaintTexture paintTexture;
@@ -120,6 +106,8 @@ public class PaintSceneApp extends PaintMainGame implements ActionListener, Chan
 	private JToggleButton eraser;
 	
 	private JButton colorButton;
+	
+	private BrushPanel brushPanel;
 	
 	private static JButton mode;
 	
@@ -166,6 +154,8 @@ public class PaintSceneApp extends PaintMainGame implements ActionListener, Chan
 		canvas.setFocusable(true);
 		canvas.setIgnoreRepaint(true);
 		mainFrame.add(canvas);
+		
+		brushPanel = new BrushPanel();
 		
 		scene = new Scene();
 		
@@ -326,6 +316,26 @@ public class PaintSceneApp extends PaintMainGame implements ActionListener, Chan
 				// TODO Auto-generated method stub
 			//	System.out.println("EXP clicked");
 		//	}});
+		
+		
+		// Edit options
+		MenuItem mbUndo=new MenuItem("Undo");
+	    mbUndo.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent arg0) {
+				canvas.LoadPrevState(canvas.currState);				
+			}});
+	    MenuItem mbRedo=new MenuItem("Redo");
+	    mbRedo.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent arg0) {
+				canvas.LoadNextState(canvas.currState);				
+			}});
+	    
+	    MenuItem mbBrush=new MenuItem("Brush Panel");
+	    mbRedo.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent arg0) {
+				// TODO: Load Brush Panel
+				
+			}});
 	   
 	    
 	    // Add shading menu options
@@ -362,16 +372,6 @@ public class PaintSceneApp extends PaintMainGame implements ActionListener, Chan
 				Material mat = new Material();
 				mat.setType(Material.T_COOKTORRANCE);
 				scene.addMaterial(new NameBindMaterial("CookTorrance", mat));			
-			}});
-	    MenuItem mbUndo=new MenuItem("Undo");
-	    mbUndo.addActionListener(new ActionListener(){
-			public void actionPerformed(ActionEvent arg0) {
-				canvas.LoadPrevState(canvas.currState);				
-			}});
-	    MenuItem mbRedo=new MenuItem("Redo");
-	    mbRedo.addActionListener(new ActionListener(){
-			public void actionPerformed(ActionEvent arg0) {
-				canvas.LoadNextState(canvas.currState);				
 			}});
 	    
 
@@ -439,6 +439,7 @@ public class PaintSceneApp extends PaintMainGame implements ActionListener, Chan
 	    mShading.add(mbCT);
 	    mEdit.add(mbUndo);
 	    mEdit.add(mbRedo);
+	    mEdit.add(mbBrush);
 	    //mMode.add(mbEdit);
 	    //mMode.add(mbView);
 	    
@@ -502,7 +503,7 @@ public class PaintSceneApp extends PaintMainGame implements ActionListener, Chan
 		eraser.addActionListener(this);
 		
 		colorButton = new JButton();
-		colorButton.setIcon(iconOfColor(canvas.activeColor, iconSize));
+		colorButton.setIcon(iconOfColor(PaintCanvas.activeColor, iconSize));
 		colorButton.addActionListener(this);
 		
 
