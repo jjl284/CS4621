@@ -6,6 +6,8 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
+import org.lwjgl.opengl.GL11;
+
 import cs4620.mesh.MeshData;
 import egl.math.Color;
 import egl.math.Colord;
@@ -227,8 +229,21 @@ public class PaintTexture {
 	 * @param meshData the corresponding MeshData object
 	 */
 	public void addPaint(Vector2d texCoords, MeshData meshData) {
-		paintSquare(Color.Aqua, (int)(texCoords.x*width+0.5), (int)(texCoords.y*height+0.5), 40);
-		write(filepath);
-		PaintSceneApp.reloadScene();
+		//paintSquare(Color.Aqua, (int)(texCoords.x*width+0.5), (int)(texCoords.y*height+0.5), 40);
+		//write(filepath);
+		//PaintSceneApp.reloadScene();
+		PaintSceneApp.paintBuffer.put(4, (byte) 0);
+		PaintSceneApp.paintBuffer.put(5, (byte)0);
+		PaintSceneApp.paintBuffer.put(6, (byte)0);
+		PaintSceneApp.paintBuffer.put(7, (byte)1);
+		PaintSceneApp.paintBuffer.put(8, (byte)0);
+		PaintSceneApp.paintBuffer.put(9,(byte) 0);
+		PaintSceneApp.paintBuffer.put(10, (byte)0);
+		PaintSceneApp.paintBuffer.put(11, (byte)1);
+		PaintSceneApp.paintBuffer.put(12, (byte)0);
+		PaintSceneApp.paintBuffer.put(13, (byte)0);
+		PaintSceneApp.paintBuffer.put(14, (byte)0);
+		PaintSceneApp.paintBuffer.put(15, (byte) 1);
+		PaintSceneApp.paintTextureGL.updateImage(0, 0, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, PaintSceneApp.paintBuffer);
 	}
 }

@@ -26,6 +26,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.InputStream;
 import java.lang.reflect.Array;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -80,6 +81,7 @@ import cs4620.mesh.gen.MeshGenPlane;
 import cs4620.mesh.gen.MeshGenSphere;
 import cs4620.mesh.gen.MeshGenTorus;
 import cs4620.mesh.gen.MeshGenerator;
+import egl.GLTexture;
 import egl.math.Colord;
 import egl.math.Vector3;
 import ext.java.Parser;
@@ -110,6 +112,8 @@ public class PaintSceneApp extends PaintMainGame implements ActionListener, Chan
 	public static String scenePath;
 	public static String sceneName;
 	public static String paintTextureName;
+	public static ByteBuffer paintBuffer;
+	public static GLTexture paintTextureGL;
 
 	public PaintViewScreen paintViewScreen;
 	private JLabel toolSizeLabel;

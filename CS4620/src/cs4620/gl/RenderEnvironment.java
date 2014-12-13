@@ -116,6 +116,7 @@ public class RenderEnvironment implements IDisposable {
 
 		// Add To Dictionary
 		textures.put(t.getID().name, rt);
+		awtGUI.PaintSceneApp.paintTextureGL = rt;
 	}
 	public boolean removeTexture(String name) {
 		GLTexture t = textures.get(name);
