@@ -112,7 +112,6 @@ public class PaintSceneApp extends PaintMainGame implements ActionListener, Chan
 	public static String scenePath;
 	public static String sceneName;
 	public static String paintTextureName;
-	public static GLTexture paintTextureGL;
 
 	public PaintViewScreen paintViewScreen;
 	private JLabel toolSizeLabel;
