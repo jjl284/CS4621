@@ -3,12 +3,14 @@ package awtGUI;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.nio.ByteBuffer;
 
 import javax.imageio.ImageIO;
 
 import org.lwjgl.opengl.GL11;
 
 import cs4620.mesh.MeshData;
+import egl.NativeMem;
 import egl.math.Color;
 import egl.math.Colord;
 import egl.math.MathHelper;
@@ -232,18 +234,16 @@ public class PaintTexture {
 		//paintSquare(Color.Aqua, (int)(texCoords.x*width+0.5), (int)(texCoords.y*height+0.5), 40);
 		//write(filepath);
 		//PaintSceneApp.reloadScene();
-		PaintSceneApp.paintBuffer.put(4, (byte) 0);
-		PaintSceneApp.paintBuffer.put(5, (byte)0);
-		PaintSceneApp.paintBuffer.put(6, (byte)0);
-		PaintSceneApp.paintBuffer.put(7, (byte)1);
-		PaintSceneApp.paintBuffer.put(8, (byte)0);
-		PaintSceneApp.paintBuffer.put(9,(byte) 0);
-		PaintSceneApp.paintBuffer.put(10, (byte)0);
-		PaintSceneApp.paintBuffer.put(11, (byte)1);
-		PaintSceneApp.paintBuffer.put(12, (byte)0);
-		PaintSceneApp.paintBuffer.put(13, (byte)0);
-		PaintSceneApp.paintBuffer.put(14, (byte)0);
-		PaintSceneApp.paintBuffer.put(15, (byte) 1);
-		PaintSceneApp.paintTextureGL.updateImage(0, 0, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, PaintSceneApp.paintBuffer);
+		ByteBuffer bb = NativeMem.createByteBuffer(50 * 50 * 4);
+		for (int i = 0; i < 50; i++) {
+			for (int j = 0; j < 50; j++) {				
+				bb.put(Color.Aqua.R);
+				bb.put(Color.Aqua.G);
+				bb.put(Color.Aqua.B);
+				bb.put(Color.Aqua.A);
+			}
+		}
+		bb.flip();
+		PaintViewScreen.rController.env.paintTextureGL.updateImage((int)(texCoords.x*width+0.5), (int)(texCoords.y*height+0.5), 50, 50, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, bb);
 	}
 }

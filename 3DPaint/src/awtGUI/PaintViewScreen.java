@@ -44,7 +44,7 @@ public class PaintViewScreen extends GameScreen {
 	RPMaterialData dataMaterial;
 	RPTextureData dataTexture;
 	
-	RenderController rController;
+	public static RenderController rController;
 	CameraController camController;
 	ManipController manipController;
 	GridRenderer gridRenderer;
