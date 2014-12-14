@@ -634,10 +634,14 @@ public class PaintSceneApp extends PaintMainGame implements ActionListener, Chan
 		}
 		else if (s == pencil){
 			//set tool as pencil
+			scene.setEditMode(true);
+			canvas.setEdit(true);
 			PaintCanvas.activeTool = "Brush";
 		}
 		else if (s == eraser){
 			//set tool as eraser
+			scene.setEditMode(true);
+			canvas.setEdit(true);
 			PaintCanvas.activeTool = "Eraser";
 		}
 		else if(s == colorButton){
