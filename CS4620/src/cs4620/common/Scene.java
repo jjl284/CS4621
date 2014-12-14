@@ -96,7 +96,6 @@ public class Scene {
 	private final ArrayList<SceneEventQueue> changeListeners = new ArrayList<>();
 
 	public Scene() {
-		editMode=true;
 		// Add Primitive Shapes
 		Mesh m = new Mesh();
 		m.setGenerator(new MeshGenSphere());

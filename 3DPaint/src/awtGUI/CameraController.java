@@ -83,7 +83,7 @@ public class CameraController {
 		if (thisFrameButtonDown && prevFrameButtonDown) {
 			rotation.add(0, -0.1f * (thisMouseX - prevMouseX), 0);
 			rotation.add(0.1f * (thisMouseY - prevMouseY), 0, 0);
-			if (scene.editMode) paint(thisMouseX, thisMouseY);
+			if (PaintMainGame.canvas.editMode) paint(thisMouseX, thisMouseY);
 		}
 		prevFrameButtonDown = thisFrameButtonDown;
 		
@@ -117,7 +117,7 @@ public class CameraController {
 	 * @param rotation  The rotation in degrees, as Euler angles (rotation angles about x, y, z axes)
 	 */
 	protected void rotate(Matrix4 parentWorld, Matrix4 transformation, Vector3 rotation) {
-		if(!scene.editMode){
+		if(!PaintMainGame.canvas.editMode){
 			rotation = rotation.clone().mul((float)(Math.PI / 180.0));
 			Matrix4 mRot = Matrix4.createRotationX(rotation.x);
 			mRot.mulAfter(Matrix4.createRotationY(rotation.y));
@@ -185,7 +185,7 @@ public class CameraController {
 	 * @param motion  The translation in camera-space units
 	 */
 	protected void translate(Matrix4 parentWorld, Matrix4 transformation, Vector3 motion) {
-		if(!scene.editMode){
+		if(!PaintMainGame.canvas.editMode){
 			Matrix4 mTrans = Matrix4.createTranslation(motion);
 			transformation.mulBefore(mTrans);
 		}		

@@ -26,7 +26,7 @@ public class PaintCanvas extends Canvas{
 		// TODO Auto-generated constructor stub
 		statesList.add(this);
 		this.setColor(new Color(0,0,0));
-		this.setEdit(true);
+		this.setEdit(false);
 		this.setBackground(java.awt.Color.BLACK);
 		this.activeToolSize = Brush.DEFAULT_BRUSH_SIZE;
 	}
@@ -46,7 +46,7 @@ public class PaintCanvas extends Canvas{
 	}
 	
 	public void setEdit(boolean m){
-		editMode=m;
+		editMode = m;
 	}
 	
 	//public void setShading(Shading s){

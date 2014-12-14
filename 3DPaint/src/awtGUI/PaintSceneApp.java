@@ -506,8 +506,9 @@ public class PaintSceneApp extends PaintMainGame implements ActionListener, Chan
 		
 		ButtonGroup tools = new ButtonGroup();
 		
-		viewmodebutton = new JToggleButton(new ImageIcon("pointer.png"));
-		viewmodebutton.setToolTipText("pointer");
+		viewmodebutton = new JToggleButton(new ImageIcon("view.png"));
+		viewmodebutton.setToolTipText("manipulate");
+		//viewmodebutton.setSelected(true);
 		viewmodebutton.addActionListener(this);
 		
 		pencil = new JToggleButton(new ImageIcon("brush.png"));
@@ -555,7 +556,6 @@ public class PaintSceneApp extends PaintMainGame implements ActionListener, Chan
 		//mode.setIcon(new ImageIcon("pencil.png"));
 		//mode.addActionListener(this);
 		canvas.setEdit(true);
-		scene.setEditMode(true);
 		
 
 		//MANIP PANEL (probably not neccessary anymore?)
@@ -631,19 +631,16 @@ public class PaintSceneApp extends PaintMainGame implements ActionListener, Chan
 		
 		if (s == viewmodebutton){
 			//set edit to false
-			scene.setEditMode(false);
 			canvas.setEdit(false);
 			PaintCanvas.activeTool = "Pointer";
 		}
 		else if (s == pencil){
 			//set tool as pencil
-			scene.setEditMode(true);
 			canvas.setEdit(true);
 			PaintCanvas.activeTool = "Brush";
 		}
 		else if (s == eraser){
 			//set tool as eraser
-			scene.setEditMode(true);
 			canvas.setEdit(true);
 			PaintCanvas.activeTool = "Eraser";
 		}
@@ -783,6 +780,7 @@ public class PaintSceneApp extends PaintMainGame implements ActionListener, Chan
 		try {
 			scene.saveData(scenePath+sceneName+".xml");
 			if(old!=null) old.sendEvent(new SceneReloadEvent(scenePath+sceneName+".xml"));
+			
 		} catch (ParserConfigurationException e) {
 			e.printStackTrace();
 		} catch (TransformerException e) {
