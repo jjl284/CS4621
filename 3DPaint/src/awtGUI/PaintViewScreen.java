@@ -14,6 +14,7 @@ import cs4620.scene.form.RPMaterialData;
 import cs4620.scene.form.RPMeshData;
 import cs4620.scene.form.RPTextureData;
 import cs4620.scene.form.ScenePanel;
+import egl.BlendState;
 import egl.GLError;
 import egl.math.Vector2;
 import egl.math.Vector3;
@@ -182,9 +183,13 @@ public class PaintViewScreen extends GameScreen {
 		}
 		
 		Vector3 bg = PaintSceneApp.scene.background;
-		GL11.glClearColor(bg.x, bg.y, bg.z, 0);
+		
+		//GL11.glClearColor(bg.x, bg.y, bg.z, 1f);
+		GL11.glClearColor(0f, 0f, 0f, 1f);
 		GL11.glClearDepth(1.0);
 		GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
+		
+		//BlendState.ALPHA_BLEND.set();
 		
 		if(camController.camera != null){
 			renderer.draw(camController.camera, rController.env.lights);

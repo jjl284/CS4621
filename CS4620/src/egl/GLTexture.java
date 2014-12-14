@@ -169,6 +169,10 @@ public class GLTexture implements IDisposable {
     public void updateImage(int offsetX, int offsetY, int updateWidth, int updateHeight, int pixelFormat, int pixelType, ByteBuffer buf) {
     	GL11.glTexSubImage2D(target, 0, offsetX, offsetY, updateWidth, updateHeight, pixelFormat, pixelType, buf);
     }
+    
+    public void readImage(int offsetX, int offsetY, int updateWidth, int updateHeight, int pixelFormat, int pixelType, ByteBuffer buf) {
+    	GL11.glReadPixels(offsetX, offsetY, updateWidth, updateHeight, pixelFormat, pixelType, buf);
+    }
 
     public void setImage(int[] dim, int pixelFormat, int pixelType, ByteBuffer buf, boolean mipMap) throws Exception {
         if(dim == null || dim.length < 1 || dim.length > 3)

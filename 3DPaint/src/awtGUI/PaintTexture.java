@@ -254,6 +254,20 @@ public class PaintTexture {
 		int y  = MathHelper.clamp(paintY, 0, height);
 		
 		ByteBuffer brushBuffer = BrushPanel.selectedBrush.getByteBuffer();
+		ByteBuffer oldBuffer = NativeMem.createByteBuffer(size * size * 4);
+		RenderEnvironment.paintTextureGL.readImage(x, y, size, size, 
+				GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, oldBuffer);
+		
+		for (int i= 0; i < brushBuffer.capacity(); i+=4) {
+			if (brushBuffer.get(i+3) >= 0) {
+				brushBuffer.put(i, oldBuffer.get(i));
+				brushBuffer.put(i+1, oldBuffer.get(i+1));
+				brushBuffer.put(i+2, oldBuffer.get(i+2));
+				brushBuffer.put(i+3, oldBuffer.get(i+3));
+			}
+			//System.out.println(brushBuffer.get(i+3));
+		}
+		
 		RenderEnvironment.paintTextureGL.updateImage(x, y, size, size, 
 				GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, brushBuffer);
 	}
