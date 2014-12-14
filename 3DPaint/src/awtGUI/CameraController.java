@@ -134,17 +134,15 @@ public class CameraController {
 	
 	private Ray getRay(int mouseX, int mouseY) {
 		Ray outRay = new Ray();
-		System.out.println("Old mouse: " + mouseX + " " + mouseY);
+		mouseX -= 12;
+		mouseY = (int)((mouseY*9 + 400*1) / 10.0f) - 32;
 		Vector2 curMousePos = new Vector2(mouseX, mouseY).add(0.5f).mul(2).div(camera.viewportSize.x, camera.viewportSize.y).sub(1);
-		System.out.println("Adjusted mouse: " + curMousePos.x + " " + curMousePos.y);
-		Vector3 p1 = new Vector3(curMousePos.x, curMousePos.y, -1);
-		Vector3 p2 = new Vector3(curMousePos.x, curMousePos.y, 1);
+		Vector3 p1 = new Vector3(curMousePos.x, curMousePos.y, -1.0f);
+		Vector3 p2 = new Vector3(curMousePos.x, curMousePos.y, 1.0f);
 		Matrix4 mVPI = camera.mViewProjection.clone().invert();
 		mVPI.mulPos(p1);
 		mVPI.mulPos(p2);
 		p2.sub(p1);
-		System.out.println(p2);
-		p2.set(p2.x, p2.y-120, p2.z);
 		p2.normalize();
 		outRay.set(p1, p2);
 		outRay.start = 0.0d;
@@ -155,7 +153,7 @@ public class CameraController {
 	protected void paint(int curMouseX, int curMouseY) {
 		Ray outRay = getRay(curMouseX, curMouseY);
 
-		//Generate triangles from mesh
+		// Generate triangles from mesh
 		ArrayList<Triangle> tris = new ArrayList<Triangle>();
 		for (int i=0; i < mesh.indexCount / 3; i++) {
 			Vector3i triVec = new Vector3i(mesh.indices.get(3*i),
@@ -164,19 +162,15 @@ public class CameraController {
 			tris.add(t);
 		}
 		
-		//intersect ray with mesh and find intersection point and corresponding uv
+		// Intersect ray with mesh and find intersection point and corresponding uv's
 		IntersectionRecord outRecord = new IntersectionRecord();
 		boolean doesIntersect = false;
 		for (Triangle t : tris) {
 			if (t.intersect(outRecord, outRay)) {
 				doesIntersect = true;
 				outRay.end = outRecord.t;
-				System.out.println("Intersected!");
 			}
 		}
-		
-		System.out.println("Final intersection location: " + outRecord.location);
-		System.out.println("Final intersection tex coords: " + outRecord.texCoords);
 		
 		if (doesIntersect)
 			paintTexture.addPaint(outRecord.texCoords, mesh);
