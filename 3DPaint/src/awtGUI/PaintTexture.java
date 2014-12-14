@@ -3,10 +3,13 @@ package awtGUI;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.io.Writer;
 import java.nio.ByteBuffer;
 
 import javax.imageio.ImageIO;
+import javax.imageio.stream.ImageOutputStream;
 
+import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 
 import cs4620.gl.RenderEnvironment;
@@ -221,6 +224,15 @@ public class PaintTexture {
 			System.err.println(e);
 			e.printStackTrace();
 		}
+	}
+	
+	public void writeFromGL(String filename) throws IOException {
+		ByteBuffer bb = BufferUtils.createByteBuffer(4*width*height);
+		RenderEnvironment.paintTextureGL.writeToImage(GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, bb);
+		
+		BufferedImage img = new BufferedImage(width, height, BufferedImage.TYPE_4BYTE_ABGR);
+		img.getAlphaRaster().setDataElements(0, 0, width, height, bb);
+		ImageIO.write(img, "PNG", new File(filename));
 	}
 	
 	/**

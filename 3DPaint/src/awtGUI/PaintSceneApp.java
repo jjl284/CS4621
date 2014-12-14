@@ -23,6 +23,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Date;
 
@@ -340,6 +341,18 @@ public class PaintSceneApp extends PaintMainGame implements ActionListener, Chan
 				brushPanel.setVisible(true);
 				return;
 			}});
+	    
+	    MenuItem mbSaveTexture=new MenuItem("Save Texture");
+	    mbSaveTexture.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent arg0) {
+				try {
+					paintTexture.writeFromGL(paintTextureName);
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				return;
+			}});
 	   
 	    
 	    // Add shading menu options
@@ -435,6 +448,7 @@ public class PaintSceneApp extends PaintMainGame implements ActionListener, Chan
 	    mFile.add(mbTex);
 	    mFile.add(mbImp);
 	    mFile.add(mbRename);
+	    mFile.add(mbSaveTexture);
 	  //  mFile.add(mbExp);
 	   
 	    // Attach menu items to submenu
