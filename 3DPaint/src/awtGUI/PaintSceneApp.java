@@ -236,7 +236,7 @@ public class PaintSceneApp extends PaintMainGame implements ActionListener, Chan
 							}
 							
 							scene.sendEvent(new SceneReloadEvent(file));
-							mode.setIcon(new ImageIcon("pencil.png"));
+							//mode.setIcon(new ImageIcon("pencil.png"));
 							return;
 						}
 					}
@@ -296,7 +296,7 @@ public class PaintSceneApp extends PaintMainGame implements ActionListener, Chan
 								String texName = scene.materials.get(matName).inputDiffuse.texture;
 								String texFileName = scene.textures.get(texName).file;
 								paintTexture = new PaintTexture(texFileName);
-								mode.setIcon(new ImageIcon("pencil.png"));
+								//mode.setIcon(new ImageIcon("pencil.png"));
 								System.out.println("USING IMAGE " + texFileName + " while paintTextureName is " + paintTextureName);
 							} else {
 								// ERROR: specified XML file is not valid for 3D Paint App
@@ -506,8 +506,8 @@ public class PaintSceneApp extends PaintMainGame implements ActionListener, Chan
 		
 		ButtonGroup tools = new ButtonGroup();
 		
-		viewmodebutton = new JToggleButton(new ImageIcon("view.png"));
-		viewmodebutton.setToolTipText("eraser");
+		viewmodebutton = new JToggleButton(new ImageIcon("pointer.png"));
+		viewmodebutton.setToolTipText("pointer");
 		viewmodebutton.addActionListener(this);
 		
 		pencil = new JToggleButton(new ImageIcon("brush.png"));
@@ -516,7 +516,7 @@ public class PaintSceneApp extends PaintMainGame implements ActionListener, Chan
 		pencil.addActionListener(this);
 		pencil.addMouseListener(new MouseListener(){
 			Date pressedTime;
-			long timeClicked;
+			//long timeClicked;
 			@Override
 			public void mouseClicked(MouseEvent arg0) {}
 
@@ -533,6 +533,8 @@ public class PaintSceneApp extends PaintMainGame implements ActionListener, Chan
 					//pause time of 500 milliseconds
 				}
 				brushPanel.setVisible(true);
+				mainFrame.setVisible(true);
+				return;
 			}
 
 			@Override
@@ -549,9 +551,9 @@ public class PaintSceneApp extends PaintMainGame implements ActionListener, Chan
 		colorButton.addActionListener(this);
 		
 
-		mode = new JButton();
-		mode.setIcon(new ImageIcon("pencil.png"));
-		mode.addActionListener(this);
+		//mode = new JButton();
+		//mode.setIcon(new ImageIcon("pencil.png"));
+		//mode.addActionListener(this);
 		canvas.setEdit(true);
 		scene.setEditMode(true);
 		
@@ -574,7 +576,8 @@ public class PaintSceneApp extends PaintMainGame implements ActionListener, Chan
 			p = new JPanel();
 			toolBar.add(p);
 		}
-		toolBar.add(mode,BorderLayout.SOUTH);
+		
+		//toolBar.add(mode,BorderLayout.SOUTH);
 		//toolBar.add(mp);
 		
 		return toolBar;
@@ -651,14 +654,14 @@ public class PaintSceneApp extends PaintMainGame implements ActionListener, Chan
 				PaintCanvas.activeColor = egl.math.Color.fromIntRGB(newColor.getRGB()); //(newColor);
 			}
 		}
-		else if(s == mode){
+		/*else if(s == mode){
 			canvas.setEdit(!canvas.editMode);
 			scene.setEditMode(!scene.editMode);
 			if(canvas.editMode)
 				mode.setIcon(new ImageIcon("pencil.png"));
 			else
 				mode.setIcon(new ImageIcon("view.png"));
-		}
+		}*/
 
 	}
 
@@ -697,9 +700,9 @@ public class PaintSceneApp extends PaintMainGame implements ActionListener, Chan
 		paintMeshData = new MeshData();
 		MeshGenerator meshGen; 
 		MeshGenOptions meshGenOpt = new MeshGenOptions();
-		canvas.setEdit(true);
-		scene.setEditMode(true);
-		mode.setIcon(new ImageIcon("pencil.png"));
+		//canvas.setEdit(true);
+		//scene.setEditMode(true);
+		//mode.setIcon(new ImageIcon("pencil.png"));
 		switch(shape) {
 			case "Cube":
 				meshGenOpt.setDivLatitude(32);
