@@ -236,39 +236,48 @@ public class PaintTexture {
 	}
 	
 	/**
-	 * "Paints" the mesh, given the location in coordinates on the mesh it 
-	 * should paint and the point's texture coordinates.
-	 * @param location the coordinates of the center of the spot that should be painted
-	 * @param texCoords coordinates at location
-	 * @param meshData the corresponding MeshData object
+	 * "Paints" the mesh, given the current point's texture coordinates.
+	 * You can opt to give it lastTexCoords, which will interpolate points 
+	 * across the texture coordinates. If interpolation is not needed, set 
+	 * this value to the same as currTexCoords.
+	 * @param currTexCoords texture coordinates at current location
+	 * @param lastTexCoords texture coordinates at last registered click (when held down)
 	 */
-	public void addPaint(Vector2d texCoords, MeshData meshData) {
+	public void addPaint(Vector2d currTexCoords, Vector2d lastTexCoords) {
 		int size = BrushPanel.selectedBrush.getSize(); // Brush size
+		Vector2d texCoords;
 		
-		// Center paint around click
-		int paintX = (int)(texCoords.x*width + 0.5) - (int)(size/2.0);
-		int paintY = (int)(texCoords.y*height + 0.5) - (int)(size/2.0);
-		
-		// Clamp painted location to image bounds
-		int x = MathHelper.clamp(paintX, 0, width);
-		int y  = MathHelper.clamp(paintY, 0, height);
-		
-		ByteBuffer brushBuffer = BrushPanel.selectedBrush.getByteBuffer();
-		ByteBuffer oldBuffer = NativeMem.createByteBuffer(size * size * 4);
-		RenderEnvironment.paintTextureGL.readImage(x, y, size, size, 
-				GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, oldBuffer);
-		
-		for (int i= 0; i < brushBuffer.capacity(); i+=4) {
-			if (brushBuffer.get(i+3) >= 0) {
-				brushBuffer.put(i, oldBuffer.get(i));
-				brushBuffer.put(i+1, oldBuffer.get(i+1));
-				brushBuffer.put(i+2, oldBuffer.get(i+2));
-				brushBuffer.put(i+3, oldBuffer.get(i+3));
+		for (int r = 0; r <= 100; r++) {
+			double lerpRatio = r * 0.01;
+			texCoords = lastTexCoords.lerp(currTexCoords, lerpRatio);
+			
+			// Center paint around click
+			int paintX = (int)(texCoords.x*width + 0.5) - (int)(size/2.0);
+			int paintY = (int)(texCoords.y*height + 0.5) - (int)(size/2.0);
+			
+			// Clamp painted location to image bounds
+			int x = MathHelper.clamp(paintX, 0, width);
+			int y  = MathHelper.clamp(paintY, 0, height);
+			
+			ByteBuffer brushBuffer = BrushPanel.selectedBrush.getByteBuffer();
+			ByteBuffer oldBuffer = NativeMem.createByteBuffer(size * size * 4);
+			RenderEnvironment.paintTextureGL.readImage(x, y, size, size, 
+					GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, oldBuffer);
+			
+			for (int i = 0; i < brushBuffer.capacity(); i+=4) {
+				if (brushBuffer.get(i+3) >= 0) {
+					brushBuffer.put(i, oldBuffer.get(i));
+					brushBuffer.put(i+1, oldBuffer.get(i+1));
+					brushBuffer.put(i+2, oldBuffer.get(i+2));
+					brushBuffer.put(i+3, oldBuffer.get(i+3));
+				}
+				//System.out.println(brushBuffer.get(i+3));
 			}
-			//System.out.println(brushBuffer.get(i+3));
+			
+			RenderEnvironment.paintTextureGL.updateImage(x, y, size, size, 
+					GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, brushBuffer);
+			
+			if (texCoords == currTexCoords) break;
 		}
-		
-		RenderEnvironment.paintTextureGL.updateImage(x, y, size, size, 
-				GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, brushBuffer);
 	}
 }

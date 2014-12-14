@@ -17,6 +17,7 @@ import cs4620.ray1.Ray;
 import cs4620.ray1.surface.Triangle;
 import egl.math.Matrix4;
 import egl.math.Vector2;
+import egl.math.Vector2d;
 import egl.math.Vector3;
 import egl.math.Vector3i;
 
@@ -29,6 +30,8 @@ public class CameraController {
 	protected int prevMouseX, prevMouseY;
 	private MeshData mesh;
 	private PaintTexture paintTexture;
+	private ArrayList<Triangle> triangles;
+	private IntersectionRecord prevRecord;
 	public int[] controls={Keyboard.KEY_W,Keyboard.KEY_S,Keyboard.KEY_Q,Keyboard.KEY_E,Keyboard.KEY_A,Keyboard.KEY_D,
 			Keyboard.KEY_Z,Keyboard.KEY_C};
 	
@@ -36,6 +39,19 @@ public class CameraController {
 		scene = s;
 		rEnv = re;
 		camera = c;
+	}
+	
+	// Returns ArrayList of Triangles for the current mesh.
+	private ArrayList<Triangle> getTriangles() {
+		if (triangles == null) {
+			triangles = new ArrayList<Triangle>();
+			for (int i=0; i < mesh.indexCount / 3; i++) {
+				Vector3i triVec = new Vector3i(mesh.indices.get(3*i), 
+						mesh.indices.get(3*i+1), mesh.indices.get(3*i+2));
+				triangles.add(new Triangle(mesh, triVec));
+			}
+		}
+		return triangles;
 	}
 	
 	public void givePaintMeshInfo(MeshData meshData, PaintTexture pTexture) {
@@ -83,7 +99,10 @@ public class CameraController {
 		if (thisFrameButtonDown && prevFrameButtonDown) {
 			rotation.add(0, -0.1f * (thisMouseX - prevMouseX), 0);
 			rotation.add(0.1f * (thisMouseY - prevMouseY), 0, 0);
-			if (PaintMainGame.canvas.editMode) paint(thisMouseX, thisMouseY);
+			if (PaintMainGame.canvas.editMode) 
+				paint(thisMouseX, thisMouseY);
+		}else{
+			prevRecord = null;
 		}
 		prevFrameButtonDown = thisFrameButtonDown;
 		
@@ -151,15 +170,7 @@ public class CameraController {
 	
 	protected void paint(int curMouseX, int curMouseY) {
 		Ray outRay = getRay(curMouseX, curMouseY);
-
-		// Generate triangles from mesh
-		ArrayList<Triangle> tris = new ArrayList<Triangle>();
-		for (int i=0; i < mesh.indexCount / 3; i++) {
-			Vector3i triVec = new Vector3i(mesh.indices.get(3*i),
-					mesh.indices.get(3*i+1), mesh.indices.get(3*i+2));
-			Triangle t = new Triangle(mesh, new Vector3i(triVec));
-			tris.add(t);
-		}
+		ArrayList<Triangle> tris = getTriangles();
 		
 		// Intersect ray with mesh and find intersection point and corresponding uv's
 		IntersectionRecord outRecord = new IntersectionRecord();
@@ -171,8 +182,11 @@ public class CameraController {
 			}
 		}
 		
-		if (doesIntersect)
-			paintTexture.addPaint(outRecord.texCoords, mesh);
+		if (doesIntersect) {
+			Vector2d lastPoint = (prevRecord != null) ? prevRecord.texCoords : outRecord.texCoords;
+			prevRecord = outRecord;
+			paintTexture.addPaint(outRecord.texCoords, lastPoint);
+		}
 	}
 	
 	/**

@@ -64,7 +64,8 @@ public class Brush {
 			}
 		};
 		
-		button = new JToggleButton(new ImageIcon(file.toString()));
+		button = new JToggleButton(new ImageIcon(((new ImageIcon(file.toString()))
+				.getImage()).getScaledInstance(50, 50, java.awt.Image.SCALE_SMOOTH)));
 		button.setPreferredSize(new Dimension(50, 50));
 		button.setToolTipText(file.getName());
 		button.addActionListener( actionListener);
