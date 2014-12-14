@@ -100,7 +100,7 @@ public class PaintSceneApp extends PaintMainGame implements ActionListener, Chan
 	public static String paintTextureName;
 
 	public PaintViewScreen paintViewScreen;
-	private JLabel toolSizeLabel;
+	public static JLabel toolSizeLabel;
 
 	private JToggleButton pencil;
 	private JToggleButton eraser;
@@ -112,9 +112,9 @@ public class PaintSceneApp extends PaintMainGame implements ActionListener, Chan
 	private static JButton mode;
 	
 	public static JSlider toolSizeSlider;
-	private final int sliderMin = 0;
-	private final int sliderMax = 50;
-	private final int sliderInit = 0;
+	public static final int sliderMin = 1;
+	public static final int sliderMax = 200;
+	public static final int sliderInit = 10;
 	private int iconSize = 48;	
 	private JTextField[] controls ={new JTextField(Keyboard.getKeyName(Keyboard.KEY_W)),
 			new JTextField(Keyboard.getKeyName(Keyboard.KEY_S)),new JTextField(Keyboard.getKeyName(Keyboard.KEY_Q)),
@@ -465,8 +465,15 @@ public class PaintSceneApp extends PaintMainGame implements ActionListener, Chan
 		JToolBar ep = makeToolBar();
 	    
 		//TOOL SIZE SLIDER BAR
-		toolSizeSlider = new JSlider(JSlider.VERTICAL,sliderMin, sliderMax, sliderInit);
-		toolSizeSlider.addChangeListener(this);
+		toolSizeSlider = new JSlider(JSlider.VERTICAL, sliderMin, sliderMax, sliderInit);
+		ChangeListener changeListener = new ChangeListener() {
+			@Override
+			public void stateChanged(ChangeEvent e) {
+				BrushPanel.setBrushSize((int)toolSizeSlider.getValue());
+				PaintMainGame.canvas.setToolSize(BrushPanel.selectedBrush.getSize());					
+			}
+        };
+		toolSizeSlider.addChangeListener(changeListener);
 		toolSizeSlider.setMinorTickSpacing(1);
 		toolSizeSlider.setPaintTicks(true);
 		toolSizeSlider.setSnapToTicks(true);

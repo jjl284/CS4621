@@ -16,7 +16,7 @@ import javax.swing.JToggleButton;
 
 public class Brush {
 
-	public int DEFAULT_BRUSH_SIZE = 10;
+	public static int DEFAULT_BRUSH_SIZE = 10;
 	
 	private int size;
 	private int id;

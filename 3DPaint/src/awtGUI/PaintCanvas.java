@@ -27,6 +27,7 @@ public class PaintCanvas extends Canvas{
 		this.setColor(Color.BLACK);
 		this.setEdit(true);
 		this.setBackground(Color.BLACK);
+		this.activeToolSize = Brush.DEFAULT_BRUSH_SIZE;
 	}
 
 	//public void setActiveTool(ToolType t){
@@ -40,6 +41,7 @@ public class PaintCanvas extends Canvas{
 	public void setToolSize(int ts){
 		activeToolSize = ts;
 		PaintSceneApp.toolSizeSlider.setValue(ts);
+		PaintSceneApp.toolSizeLabel.setText("  " + ts);
 	}
 	
 	public void setEdit(boolean m){
