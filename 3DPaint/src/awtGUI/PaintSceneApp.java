@@ -40,9 +40,11 @@ import javax.swing.JSlider;
 import javax.swing.JTextField;
 import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
+import javax.swing.UIManager;
 import javax.swing.border.BevelBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+
 
 
 import org.lwjgl.LWJGLException;
@@ -120,7 +122,7 @@ public class PaintSceneApp extends PaintMainGame implements ActionListener, Chan
 	public static final int sliderMin = 1;
 	public static final int sliderMax = 200;
 	public static final int sliderInit = 10;
-	private int iconSize = 48;	
+	private int iconSize = 64;	
 	private JTextField[] controls ={new JTextField(Keyboard.getKeyName(Keyboard.KEY_W)),
 			new JTextField(Keyboard.getKeyName(Keyboard.KEY_S)),new JTextField(Keyboard.getKeyName(Keyboard.KEY_Q)),
 			new JTextField(Keyboard.getKeyName(Keyboard.KEY_E)),new JTextField(Keyboard.getKeyName(Keyboard.KEY_A)),
@@ -170,6 +172,11 @@ public class PaintSceneApp extends PaintMainGame implements ActionListener, Chan
 		
 		createNewScene("Default"); //Default mesh to load
 		brushPanel = new BrushPanel();
+		
+		try { 
+		    UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+		} catch (Exception e) {
+		}
 	}
 	
 	public static void main(String[] args) throws LWJGLException {
