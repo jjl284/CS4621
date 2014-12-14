@@ -575,6 +575,7 @@ public class PaintSceneApp extends PaintMainGame implements ActionListener, Chan
 		
 		colorButton = new JButton();
 		colorButton.setBorderPainted(false);
+		colorButton.setToolTipText("active color");
 		colorButton.setIcon(iconOfColor(new Color(PaintCanvas.activeColor.toIntRGB()), iconSize));
 		colorButton.addActionListener(this);
 		
