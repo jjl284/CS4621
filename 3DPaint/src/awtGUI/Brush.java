@@ -1,6 +1,7 @@
 package awtGUI;
 
 import java.awt.Dimension;
+import java.awt.Graphics2D;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
@@ -16,6 +17,9 @@ import javax.swing.JPanel;
 import javax.swing.JToggleButton;
 
 import org.lwjgl.BufferUtils;
+
+import egl.NativeMem;
+import egl.math.Color;
 
 public class Brush {
 
@@ -37,6 +41,12 @@ public class Brush {
 		
 		try {
 		    img = ImageIO.read(file);
+		    BufferedImage newImage = new BufferedImage(img.getWidth(), img.getHeight(), BufferedImage.TYPE_INT_ARGB);
+		    Graphics2D g = newImage.createGraphics();
+		    g.scale(1,-1);
+	        g.drawImage(img, 0, -img.getHeight(), null);
+		    
+		    g.dispose();
 		} catch (IOException e) {
 			System.out.println("Unable to load brush image file");
 		}
@@ -94,30 +104,32 @@ public class Brush {
 	public ByteBuffer getByteBuffer(){
 		int width = image.getWidth();
 		int height = image.getHeight();
-		int[] rgbArray = new int[width*height];
-	    image.getRGB(0, 0, width, height, rgbArray, 0, width);
-	    ByteBuffer buffer = BufferUtils.createByteBuffer(4*size*size);
-	    for(int y = 0; y < size; y++){
-	    	for(int x = 0; x < size; x++){
-	    		int pixelIndex = (y/size)*height*width + (x/size)*width;
-	    		int pixel = rgbArray[pixelIndex];
-	    		/*byte r = (byte) ((pixel >> 16) & 0xFF);
+		
+		ByteBuffer bb = NativeMem.createByteBuffer(size * size * 4);
+		for(int y = 0;y < size;y++) {
+			int texY = (int)((y + 0.5f) / (size) * height);
+			for(int x = 0;x < size;x++) {
+				int texX = (int)((x + 0.5f) / (size) * width);
+				int pixel = image.getRGB(texX,texY);
+				byte r = (byte) ((pixel >> 16) & 0xFF);
 	    		byte g = (byte) ((pixel >> 8) & 0xFF);
 	    		byte b = (byte) (pixel & 0xFF);
 	    		byte a = (byte) ((pixel >> 24) & 0xFF);
-	    		if (a > 0) {
+	    		if (a < 0) {
 	    			r = PaintCanvas.activeColor.R;
 	    			g = PaintCanvas.activeColor.G;
 	    			b = PaintCanvas.activeColor.B;
-	    		}*/
-	    		buffer.put((byte) PaintCanvas.activeColor.R);	// Red
-	    		buffer.put((byte) PaintCanvas.activeColor.G);	// Green
-	    		buffer.put((byte) PaintCanvas.activeColor.B);	// Blue
-	    		buffer.put((byte) ((pixel >> 24) & 0xFF));	// Alpha
-	    	}
-	    }
-	    buffer.flip();
-	    return buffer;
+	    		}
+				bb.put(r);
+				bb.put(g);
+				bb.put(b);
+				bb.put(a);
+				//System.out.println(r+","+g+","+b+","+a+ " :: " + texX + ", " + texY);
+			}
+		}
+		
+	    bb.flip();
+	    return bb;
 	}
 
 }
