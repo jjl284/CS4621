@@ -17,11 +17,14 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.Arrays;
+import java.util.Date;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
@@ -505,6 +508,31 @@ public class PaintSceneApp extends PaintMainGame implements ActionListener, Chan
 		pencil.setToolTipText("pencil");
 		pencil.setSelected(true);
 		pencil.addActionListener(this);
+		pencil.addMouseListener(new MouseListener(){
+			Date pressedTime;
+			long timeClicked;
+			@Override
+			public void mouseClicked(MouseEvent arg0) {}
+
+			@Override
+			public void mouseEntered(MouseEvent arg0) {}
+
+			@Override
+			public void mouseExited(MouseEvent arg0) {}
+
+			@Override
+			public void mousePressed(MouseEvent arg0) {
+				pressedTime = new Date();	
+				while(new Date().getTime()-pressedTime.getTime()<500){
+					//pause time of 500 milliseconds
+				}
+				brushPanel.setVisible(true);
+			}
+
+			@Override
+			public void mouseReleased(MouseEvent arg0) {
+			}});
+
 		
 		eraser = new JToggleButton(new ImageIcon("eraser.png"));
 		eraser.setToolTipText("eraser");
