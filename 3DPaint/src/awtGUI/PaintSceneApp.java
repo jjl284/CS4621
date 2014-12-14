@@ -647,6 +647,7 @@ public class PaintSceneApp extends PaintMainGame implements ActionListener, Chan
 		else if(s == colorButton){
 			Color newColor = JColorChooser.showDialog(mainFrame, "Foreground Color", Color.BLACK);
 			if(newColor!=null){
+				colorButton.setIcon(iconOfColor(newColor, iconSize));
 				PaintCanvas.activeColor = egl.math.Color.fromIntRGB(newColor.getRGB()); //(newColor);
 			}
 		}
