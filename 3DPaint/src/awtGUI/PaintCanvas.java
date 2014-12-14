@@ -39,6 +39,7 @@ public class PaintCanvas extends Canvas{
 	
 	public void setToolSize(int ts){
 		activeToolSize = ts;
+		PaintSceneApp.toolSizeSlider.setValue(ts);
 	}
 	
 	public void setEdit(boolean m){

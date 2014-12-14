@@ -107,11 +107,11 @@ public class PaintSceneApp extends PaintMainGame implements ActionListener, Chan
 	
 	private JButton colorButton;
 	
-	private BrushPanel brushPanel;
+	public static BrushPanel brushPanel;
 	
 	private static JButton mode;
 	
-	private JSlider toolSizeSlider;
+	public static JSlider toolSizeSlider;
 	private final int sliderMin = 0;
 	private final int sliderMax = 50;
 	private final int sliderInit = 0;
@@ -141,6 +141,7 @@ public class PaintSceneApp extends PaintMainGame implements ActionListener, Chan
 		mainFrame.setResizable(false);
 		mainFrame.setSize(MAIN_WIDTH, MAIN_HEIGHT);
 		mainFrame.setTitle("3DPaint Application");
+		mainFrame.setLocation(200,200);
 		mainFrame.setLayout(new BorderLayout());
 		mainFrame.addWindowListener(new WindowAdapter() {
 			public void windowClosing(WindowEvent e) {
@@ -155,8 +156,6 @@ public class PaintSceneApp extends PaintMainGame implements ActionListener, Chan
 		canvas.setIgnoreRepaint(true);
 		mainFrame.add(canvas);
 		
-		brushPanel = new BrushPanel();
-		
 		scene = new Scene();
 		
 		init_MenuBar(); // Add the menu bar to the frame
@@ -165,6 +164,7 @@ public class PaintSceneApp extends PaintMainGame implements ActionListener, Chan
 		mainFrame.pack();
 		
 		createNewScene("Default"); //Default mesh to load
+		brushPanel = new BrushPanel();
 	}
 	
 	public static void main(String[] args) throws LWJGLException {
@@ -331,10 +331,10 @@ public class PaintSceneApp extends PaintMainGame implements ActionListener, Chan
 			}});
 	    
 	    MenuItem mbBrush=new MenuItem("Brush Panel");
-	    mbRedo.addActionListener(new ActionListener(){
+	    mbBrush.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent arg0) {
-				// TODO: Load Brush Panel
-				
+				brushPanel.setVisible(true);
+				return;
 			}});
 	   
 	    

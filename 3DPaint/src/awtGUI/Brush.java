@@ -1,10 +1,18 @@
 package awtGUI;
 
+import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 
 import javax.imageio.ImageIO;
+import javax.swing.AbstractButton;
+import javax.swing.ButtonGroup;
+import javax.swing.ImageIcon;
+import javax.swing.JPanel;
+import javax.swing.JToggleButton;
 
 public class Brush {
 
@@ -14,8 +22,9 @@ public class Brush {
 	private int id;
 	private String filename;
 	private BufferedImage image;
+	private JToggleButton button;
 	
-	public Brush(int id, File file) {
+	public Brush(final int id, File file, JPanel panel, ButtonGroup group, boolean selected) {
 		// TODO Auto-generated constructor stub
 		this.id = id;
 		this.size = DEFAULT_BRUSH_SIZE;
@@ -30,6 +39,25 @@ public class Brush {
 		}
 		
 		this.image = img;
+		
+		ActionListener actionListener = new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				//AbstractButton abstractButton = (AbstractButton) e.getSource();
+		        //boolean selected = abstractButton.getModel().isSelected();
+		        BrushPanel.setSelected(id);
+		        PaintMainGame.canvas.setToolSize(size);
+		        return;
+			}
+		};
+		
+		button = new JToggleButton(new ImageIcon(file.toString()));
+		button.setPreferredSize(new Dimension(50, 50));
+		button.setToolTipText(file.getName());
+		button.addActionListener( actionListener);
+		if (selected) button.setSelected(true);
+		group.add(button);
+		panel.add(button);
 	}
 	
 	/**
