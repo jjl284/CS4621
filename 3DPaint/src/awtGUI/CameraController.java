@@ -134,8 +134,7 @@ public class CameraController {
 	
 	private Ray getRay(int mouseX, int mouseY) {
 		Ray outRay = new Ray();
-		mouseX -= 12;
-		mouseY = (int)((mouseY*9 + 400*1) / 10.0f) - 32;
+		mouseY = (int)((mouseY*9 + 400) / 10.0f) - 40;
 		Vector2 curMousePos = new Vector2(mouseX, mouseY).add(0.5f).mul(2).div(camera.viewportSize.x, camera.viewportSize.y).sub(1);
 		Vector3 p1 = new Vector3(curMousePos.x, curMousePos.y, -1.0f);
 		Vector3 p2 = new Vector3(curMousePos.x, curMousePos.y, 1.0f);

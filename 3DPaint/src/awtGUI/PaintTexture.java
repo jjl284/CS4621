@@ -246,8 +246,8 @@ public class PaintTexture {
 		int size = BrushPanel.selectedBrush.getSize(); // Brush size
 		
 		// Center paint around click
-		int paintX = (int)(texCoords.x*width + 0.5) - (int)(size/2.0 + 0.5);
-		int paintY = (int)(texCoords.y*height + 0.5) + (int)(size/2.0 + 0.5);
+		int paintX = (int)(texCoords.x*width + 0.5) - (int)(size/2.0);
+		int paintY = (int)(texCoords.y*height + 0.5) - (int)(size/2.0);
 		
 		// Clamp painted location to image bounds
 		int x = MathHelper.clamp(paintX, 0, width);
