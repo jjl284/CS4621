@@ -3,8 +3,6 @@ package awtGUI;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 
-import javax.swing.JTextField;
-
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 

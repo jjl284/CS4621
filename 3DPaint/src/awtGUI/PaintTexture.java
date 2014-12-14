@@ -3,15 +3,19 @@ package awtGUI;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.nio.ByteBuffer;
 
 import javax.imageio.ImageIO;
 
+import org.lwjgl.opengl.GL11;
+
+import cs4620.gl.RenderEnvironment;
 import cs4620.mesh.MeshData;
+import egl.NativeMem;
 import egl.math.Color;
 import egl.math.Colord;
 import egl.math.MathHelper;
 import egl.math.Vector2d;
-import egl.math.Vector3;
 
 public class PaintTexture {
 	
@@ -227,8 +231,19 @@ public class PaintTexture {
 	 * @param meshData the corresponding MeshData object
 	 */
 	public void addPaint(Vector2d texCoords, MeshData meshData) {
-		paintSquare(Color.Aqua, (int)(texCoords.x*width+0.5), (int)(texCoords.y*height+0.5), 40);
-		write(filepath);
-		PaintSceneApp.reloadScene();
+		//paintSquare(Color.Aqua, (int)(texCoords.x*width+0.5), (int)(texCoords.y*height+0.5), 40);
+		//write(filepath);
+		//PaintSceneApp.reloadScene();
+		ByteBuffer bb = NativeMem.createByteBuffer(50 * 50 * 4);
+		for (int i = 0; i < 50; i++) {
+			for (int j = 0; j < 50; j++) {				
+				bb.put(Color.Aqua.R);
+				bb.put(Color.Aqua.G);
+				bb.put(Color.Aqua.B);
+				bb.put(Color.Aqua.A);
+			}
+		}
+		bb.flip();
+		RenderEnvironment.paintTextureGL.updateImage((int)(texCoords.x*width+0.5), (int)(texCoords.y*height+0.5), 50, 50, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, bb);
 	}
 }

@@ -18,7 +18,6 @@ import egl.GL.TextureUnit;
 import egl.GLBuffer;
 import egl.GLProgram;
 import egl.GLRenderTarget;
-import egl.GLTexture;
 import egl.GLUniform;
 import egl.GL.BufferTarget;
 import egl.NativeMem;

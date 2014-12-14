@@ -62,6 +62,8 @@ public class RenderEnvironment implements IDisposable {
 
 	public TexCubeMap cubemap = new TexCubeMap();
 	
+	public static GLTexture paintTextureGL;
+	
 	public RenderEnvironment(Vector2 viewSize) {
 		viewportSize.set(viewSize);
 	}
@@ -116,6 +118,7 @@ public class RenderEnvironment implements IDisposable {
 
 		// Add To Dictionary
 		textures.put(t.getID().name, rt);
+		paintTextureGL = rt;
 	}
 	public boolean removeTexture(String name) {
 		GLTexture t = textures.get(name);

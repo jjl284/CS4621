@@ -64,7 +64,7 @@ public abstract class PaintMainGame extends MainGame implements IDisposable {
 	private final MouseMoveEventArgs eMM;
 	private final WindowResizeArgs eWR;
 
-	protected PaintCanvas canvas;
+	public static PaintCanvas canvas;
 	
 	/**
 	 * List Of Screens That Must Be Built

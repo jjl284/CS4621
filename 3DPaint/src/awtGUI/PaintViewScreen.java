@@ -1,11 +1,5 @@
 package awtGUI;
 
-import java.awt.FileDialog;
-import java.io.File;
-
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerException;
-
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
@@ -13,10 +7,6 @@ import org.lwjgl.opengl.GL11;
 import blister.GameScreen;
 import blister.GameTime;
 import blister.ScreenState;
-import blister.input.KeyboardEventDispatcher;
-import blister.input.KeyboardKeyEventArgs;
-import cs4620.common.Scene;
-import cs4620.common.event.SceneReloadEvent;
 import cs4620.gl.GridRenderer;
 import cs4620.gl.RenderCamera;
 import cs4620.gl.Renderer;
@@ -27,8 +17,6 @@ import cs4620.scene.form.ScenePanel;
 import egl.GLError;
 import egl.math.Vector2;
 import egl.math.Vector3;
-import ext.csharp.ACEventFunc;
-import ext.java.Parser;
 
 public class PaintViewScreen extends GameScreen {
 	Renderer renderer = new Renderer();
@@ -44,7 +32,7 @@ public class PaintViewScreen extends GameScreen {
 	RPMaterialData dataMaterial;
 	RPTextureData dataTexture;
 	
-	RenderController rController;
+	public static RenderController rController;
 	CameraController camController;
 	ManipController manipController;
 	GridRenderer gridRenderer;
@@ -119,12 +107,12 @@ public class PaintViewScreen extends GameScreen {
 	public void onEntry(GameTime gameTime) {
 		cameraIndex = 0;
 		
-		rController = new RenderController(app.scene, new Vector2(app.getWidth(), app.getHeight()));
+		rController = new RenderController(PaintSceneApp.scene, new Vector2(app.getWidth(), app.getHeight()));
 		renderer.buildPasses(rController.env.root);
-		camController = new CameraController(app.scene, rController.env, null);
-		camController.givePaintMeshInfo(app.paintMeshData, app.paintTexture);
+		camController = new CameraController(PaintSceneApp.scene, rController.env, null);
+		camController.givePaintMeshInfo(PaintSceneApp.paintMeshData, PaintSceneApp.paintTexture);
 		createCamController();
-		manipController = new ManipController(rController.env, app.scene);
+		manipController = new ManipController(rController.env, PaintSceneApp.scene);
 		gridRenderer = new GridRenderer();
 		
 		//KeyboardEventDispatcher.OnKeyPressed.add(onKeyPress);
@@ -193,7 +181,7 @@ public class PaintViewScreen extends GameScreen {
 			manipController.checkPicking(renderer, camController.camera, Mouse.getX(), Mouse.getY());
 		}
 		
-		Vector3 bg = app.scene.background;
+		Vector3 bg = PaintSceneApp.scene.background;
 		GL11.glClearColor(bg.x, bg.y, bg.z, 0);
 		GL11.glClearDepth(1.0);
 		GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);

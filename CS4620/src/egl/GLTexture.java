@@ -18,6 +18,7 @@ import java.util.HashMap;
 
 import javax.imageio.ImageIO;
 
+import org.lwjgl.opengl.GL11;
 //import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL30;
 
@@ -159,6 +160,10 @@ public class GLTexture implements IDisposable {
     }
     public void unbind() {
         if(getIsBound()) refBind.Unbind();
+    }
+    
+    public void updateImage(int offsetX, int offsetY, int updateWidth, int updateHeight, int pixelFormat, int pixelType, ByteBuffer buf) {
+    	GL11.glTexSubImage2D(target, 0, offsetX, offsetY, updateWidth, updateHeight, pixelFormat, pixelType, buf);
     }
 
     public void setImage(int[] dim, int pixelFormat, int pixelType, ByteBuffer buf, boolean mipMap) throws Exception {

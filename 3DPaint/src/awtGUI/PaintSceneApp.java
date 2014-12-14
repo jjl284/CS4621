@@ -3,7 +3,6 @@ package awtGUI;
 import awtGUI.PaintMainGame;
 
 import java.awt.BorderLayout;
-import java.awt.CheckboxMenuItem;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FileDialog;
@@ -18,18 +17,12 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.InputStream;
-import java.lang.reflect.Array;
-import java.util.ArrayList;
 import java.util.Arrays;
 
-import javax.swing.BoxLayout;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.swing.ButtonGroup;
@@ -38,9 +31,7 @@ import javax.swing.JButton;
 import javax.swing.JColorChooser;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JRadioButton;
 import javax.swing.JSlider;
 import javax.swing.JTextField;
 import javax.swing.JToggleButton;
@@ -55,7 +46,6 @@ import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.ContextAttribs;
 
 import blister.FalseFirstScreen;
-import blister.MainGame;
 import blister.ScreenList;
 import cs4620.common.Material;
 import cs4620.common.Material.InputProvider;
@@ -69,7 +59,6 @@ import cs4620.common.SceneCamera;
 import cs4620.common.SceneObject;
 import cs4620.common.Texture;
 import cs4620.common.event.SceneReloadEvent;
-import cs4620.common.texture.TexGenUVGrid;
 import cs4620.mesh.MeshData;
 import cs4620.mesh.OBJMesh;
 import cs4620.mesh.OBJParser;
@@ -80,7 +69,6 @@ import cs4620.mesh.gen.MeshGenPlane;
 import cs4620.mesh.gen.MeshGenSphere;
 import cs4620.mesh.gen.MeshGenTorus;
 import cs4620.mesh.gen.MeshGenerator;
-import egl.math.Colord;
 import egl.math.Vector3;
 import ext.java.Parser;
 
@@ -102,7 +90,7 @@ public class PaintSceneApp extends PaintMainGame implements ActionListener, Chan
 	public static int MAIN_WIDTH = 800;
 	public static int MAIN_HEIGHT = 600;
 	
-	private Frame mainFrame;
+	public static Frame mainFrame;
 	
 	public static Scene scene;
 	public static PaintTexture paintTexture;
@@ -112,19 +100,21 @@ public class PaintSceneApp extends PaintMainGame implements ActionListener, Chan
 	public static String paintTextureName;
 
 	public PaintViewScreen paintViewScreen;
-	private JLabel toolSizeLabel;
+	public static JLabel toolSizeLabel;
 
 	private JToggleButton pencil;
 	private JToggleButton eraser;
 	
 	private JButton colorButton;
 	
+	public static BrushPanel brushPanel;
+	
 	private static JButton mode;
 	
-	private JSlider toolSizeSlider;
-	private final int sliderMin = 0;
-	private final int sliderMax = 50;
-	private final int sliderInit = 0;
+	public static JSlider toolSizeSlider;
+	public static final int sliderMin = 1;
+	public static final int sliderMax = 200;
+	public static final int sliderInit = 10;
 	private int iconSize = 48;	
 	private JTextField[] controls ={new JTextField(Keyboard.getKeyName(Keyboard.KEY_W)),
 			new JTextField(Keyboard.getKeyName(Keyboard.KEY_S)),new JTextField(Keyboard.getKeyName(Keyboard.KEY_Q)),
@@ -151,6 +141,7 @@ public class PaintSceneApp extends PaintMainGame implements ActionListener, Chan
 		mainFrame.setResizable(false);
 		mainFrame.setSize(MAIN_WIDTH, MAIN_HEIGHT);
 		mainFrame.setTitle("3DPaint Application");
+		mainFrame.setLocation(200,200);
 		mainFrame.setLayout(new BorderLayout());
 		mainFrame.addWindowListener(new WindowAdapter() {
 			public void windowClosing(WindowEvent e) {
@@ -173,6 +164,7 @@ public class PaintSceneApp extends PaintMainGame implements ActionListener, Chan
 		mainFrame.pack();
 		
 		createNewScene("Default"); //Default mesh to load
+		brushPanel = new BrushPanel();
 	}
 	
 	public static void main(String[] args) throws LWJGLException {
@@ -324,6 +316,26 @@ public class PaintSceneApp extends PaintMainGame implements ActionListener, Chan
 				// TODO Auto-generated method stub
 			//	System.out.println("EXP clicked");
 		//	}});
+		
+		
+		// Edit options
+		MenuItem mbUndo=new MenuItem("Undo");
+	    mbUndo.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent arg0) {
+				canvas.LoadPrevState(canvas.currState);				
+			}});
+	    MenuItem mbRedo=new MenuItem("Redo");
+	    mbRedo.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent arg0) {
+				canvas.LoadNextState(canvas.currState);				
+			}});
+	    
+	    MenuItem mbBrush=new MenuItem("Brush Panel");
+	    mbBrush.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent arg0) {
+				brushPanel.setVisible(true);
+				return;
+			}});
 	   
 	    
 	    // Add shading menu options
@@ -360,16 +372,6 @@ public class PaintSceneApp extends PaintMainGame implements ActionListener, Chan
 				Material mat = new Material();
 				mat.setType(Material.T_COOKTORRANCE);
 				scene.addMaterial(new NameBindMaterial("CookTorrance", mat));			
-			}});
-	    MenuItem mbUndo=new MenuItem("Undo");
-	    mbUndo.addActionListener(new ActionListener(){
-			public void actionPerformed(ActionEvent arg0) {
-				canvas.LoadPrevState(canvas.currState);				
-			}});
-	    MenuItem mbRedo=new MenuItem("Redo");
-	    mbRedo.addActionListener(new ActionListener(){
-			public void actionPerformed(ActionEvent arg0) {
-				canvas.LoadNextState(canvas.currState);				
 			}});
 	    
 
@@ -437,6 +439,7 @@ public class PaintSceneApp extends PaintMainGame implements ActionListener, Chan
 	    mShading.add(mbCT);
 	    mEdit.add(mbUndo);
 	    mEdit.add(mbRedo);
+	    mEdit.add(mbBrush);
 	    //mMode.add(mbEdit);
 	    //mMode.add(mbView);
 	    
@@ -462,8 +465,15 @@ public class PaintSceneApp extends PaintMainGame implements ActionListener, Chan
 		JToolBar ep = makeToolBar();
 	    
 		//TOOL SIZE SLIDER BAR
-		toolSizeSlider = new JSlider(JSlider.VERTICAL,sliderMin, sliderMax, sliderInit);
-		toolSizeSlider.addChangeListener(this);
+		toolSizeSlider = new JSlider(JSlider.VERTICAL, sliderMin, sliderMax, sliderInit);
+		ChangeListener changeListener = new ChangeListener() {
+			@Override
+			public void stateChanged(ChangeEvent e) {
+				BrushPanel.setBrushSize((int)toolSizeSlider.getValue());
+				PaintMainGame.canvas.setToolSize(BrushPanel.selectedBrush.getSize());					
+			}
+        };
+		toolSizeSlider.addChangeListener(changeListener);
 		toolSizeSlider.setMinorTickSpacing(1);
 		toolSizeSlider.setPaintTicks(true);
 		toolSizeSlider.setSnapToTicks(true);
@@ -501,7 +511,7 @@ public class PaintSceneApp extends PaintMainGame implements ActionListener, Chan
 		eraser.addActionListener(this);
 		
 		colorButton = new JButton();
-		colorButton.setIcon(iconOfColor(canvas.activeColor, iconSize));
+		colorButton.setIcon(iconOfColor(PaintCanvas.activeColor, iconSize));
 		colorButton.addActionListener(this);
 		
 
@@ -652,7 +662,7 @@ public class PaintSceneApp extends PaintMainGame implements ActionListener, Chan
 			case "Cylinder":
 				meshGenOpt.setDivLatitude(32);
 				meshGenOpt.setDivLongitude(16);
-				meshGenOpt.setInnerRadius(1);
+				meshGenOpt.setInnerRadius(5);
 				meshGen = new MeshGenCylinder();
 				meshGen.generate(paintMeshData, meshGenOpt);
 				break;
@@ -690,7 +700,7 @@ public class PaintSceneApp extends PaintMainGame implements ActionListener, Chan
 		paintTextureName = "PaintedTexture";
 		
 		Mesh m = new Mesh(); m.setGenerator( meshGen );
-		m.generator.generate(paintMeshData, new MeshGenOptions());
+		//m.generator.generate(paintMeshData, new MeshGenOptions());
 		scene.addMesh( new NameBindMesh("PaintedMesh", m) );
 		
 		Texture t = new Texture();
