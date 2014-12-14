@@ -661,7 +661,7 @@ public class PaintSceneApp extends PaintMainGame implements ActionListener, Chan
 			case "Cylinder":
 				meshGenOpt.setDivLatitude(32);
 				meshGenOpt.setDivLongitude(16);
-				meshGenOpt.setInnerRadius(1);
+				meshGenOpt.setInnerRadius(5);
 				meshGen = new MeshGenCylinder();
 				meshGen.generate(paintMeshData, meshGenOpt);
 				break;
@@ -699,7 +699,7 @@ public class PaintSceneApp extends PaintMainGame implements ActionListener, Chan
 		paintTextureName = "PaintedTexture";
 		
 		Mesh m = new Mesh(); m.setGenerator( meshGen );
-		m.generator.generate(paintMeshData, new MeshGenOptions());
+		//m.generator.generate(paintMeshData, new MeshGenOptions());
 		scene.addMesh( new NameBindMesh("PaintedMesh", m) );
 		
 		Texture t = new Texture();
