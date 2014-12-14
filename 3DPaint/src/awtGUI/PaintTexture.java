@@ -231,19 +231,18 @@ public class PaintTexture {
 	 * @param meshData the corresponding MeshData object
 	 */
 	public void addPaint(Vector2d texCoords, MeshData meshData) {
-		//paintSquare(Color.Aqua, (int)(texCoords.x*width+0.5), (int)(texCoords.y*height+0.5), 40);
-		//write(filepath);
-		//PaintSceneApp.reloadScene();
-		ByteBuffer bb = NativeMem.createByteBuffer(50 * 50 * 4);
-		for (int i = 0; i < 50; i++) {
-			for (int j = 0; j < 50; j++) {				
-				bb.put(PaintCanvas.activeColor.R);
-				bb.put(PaintCanvas.activeColor.G);
-				bb.put(PaintCanvas.activeColor.B);
-				bb.put(PaintCanvas.activeColor.A);
-			}
-		}
-		bb.flip();
-		RenderEnvironment.paintTextureGL.updateImage((int)(texCoords.x*width+0.5), (int)(texCoords.y*height+0.5), 50, 50, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, bb);
+		int size = BrushPanel.selectedBrush.getSize(); // Brush size
+		
+		// Center paint around click
+		int paintX = (int)(texCoords.x*width + 0.5) - (int)(size/2.0 + 0.5);
+		int paintY = (int)(texCoords.y*height + 0.5) + (int)(size/2.0 + 0.5);
+		
+		// Clamp painted location to image bounds
+		int x = MathHelper.clamp(paintX, 0, width);
+		int y  = MathHelper.clamp(paintY, 0, height);
+		
+		ByteBuffer brushBuffer = BrushPanel.selectedBrush.getByteBuffer();
+		RenderEnvironment.paintTextureGL.updateImage(x, y, size, size, 
+				GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, brushBuffer);
 	}
 }

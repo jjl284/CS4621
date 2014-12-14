@@ -6,6 +6,7 @@ import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.nio.ByteBuffer;
 
 import javax.imageio.ImageIO;
 import javax.swing.AbstractButton;
@@ -13,6 +14,8 @@ import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
 import javax.swing.JPanel;
 import javax.swing.JToggleButton;
+
+import org.lwjgl.BufferUtils;
 
 public class Brush {
 
@@ -86,6 +89,26 @@ public class Brush {
 	 */
 	public BufferedImage getImage() {
 		return this.image;
+	}
+	
+	public ByteBuffer getByteBuffer(){
+		int width = image.getWidth();
+		int height = image.getHeight();
+		int[] rgbArray = new int[width*height];
+	    image.getRGB(0, 0, width, height, rgbArray, 0, width);
+	    ByteBuffer buffer = BufferUtils.createByteBuffer(4*size*size);
+	    for(int y = 0; y < size; y++){
+	    	for(int x = 0; x < size; x++){
+	    		int pixelIndex = (y/size)*height*width + (x/size)*width;
+	    		int pixel = rgbArray[pixelIndex];
+	    		buffer.put((byte) ((pixel >> 16) & 0xFF));	// Red
+	    		buffer.put((byte) ((pixel >> 8) & 0xFF));	// Green
+	    		buffer.put((byte) (pixel & 0xFF));			// Blue
+	    		buffer.put((byte) ((pixel >> 24) & 0xFF));	// Alpha
+	    	}
+	    }
+	    buffer.flip();
+	    return buffer;
 	}
 
 }
