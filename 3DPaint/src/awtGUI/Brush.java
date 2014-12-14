@@ -101,9 +101,17 @@ public class Brush {
 	    	for(int x = 0; x < size; x++){
 	    		int pixelIndex = (y/size)*height*width + (x/size)*width;
 	    		int pixel = rgbArray[pixelIndex];
-	    		buffer.put((byte) ((pixel >> 16) & 0xFF));	// Red
-	    		buffer.put((byte) ((pixel >> 8) & 0xFF));	// Green
-	    		buffer.put((byte) (pixel & 0xFF));			// Blue
+	    		byte r = (byte) ((pixel >> 16) & 0xFF);
+	    		byte g = (byte) ((pixel >> 8) & 0xFF);
+	    		byte b = (byte) (pixel & 0xFF);
+	    		if (r == 0 && g == 0 && b == 0) {
+	    			r = PaintCanvas.activeColor.R;
+	    			g = PaintCanvas.activeColor.G;
+	    			b = PaintCanvas.activeColor.B;
+	    		}
+	    		buffer.put(r);	// Red
+	    		buffer.put(g);	// Green
+	    		buffer.put(b);	// Blue
 	    		buffer.put((byte) ((pixel >> 24) & 0xFF));	// Alpha
 	    	}
 	    }

@@ -2,8 +2,10 @@ package awtGUI;
 
 import java.awt.Dimension;
 import java.awt.GridLayout;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FilenameFilter;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 
 import javax.swing.BoxLayout;
@@ -17,6 +19,8 @@ import javax.swing.SpinnerModel;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+
+import org.lwjgl.BufferUtils;
 
 public class BrushPanel extends JDialog {
 
@@ -112,5 +116,4 @@ public class BrushPanel extends JDialog {
 		selectedBrush.setSize(r);
 		sizeSpin.setValue(r);
 	}
-
 }
