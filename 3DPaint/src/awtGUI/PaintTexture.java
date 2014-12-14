@@ -237,10 +237,10 @@ public class PaintTexture {
 		ByteBuffer bb = NativeMem.createByteBuffer(50 * 50 * 4);
 		for (int i = 0; i < 50; i++) {
 			for (int j = 0; j < 50; j++) {				
-				bb.put(Color.Aqua.R);
-				bb.put(Color.Aqua.G);
-				bb.put(Color.Aqua.B);
-				bb.put(Color.Aqua.A);
+				bb.put(PaintCanvas.activeColor.R);
+				bb.put(PaintCanvas.activeColor.G);
+				bb.put(PaintCanvas.activeColor.B);
+				bb.put(PaintCanvas.activeColor.A);
 			}
 		}
 		bb.flip();

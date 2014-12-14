@@ -105,6 +105,7 @@ public class PaintSceneApp extends PaintMainGame implements ActionListener, Chan
 	public PaintViewScreen paintViewScreen;
 	public static JLabel toolSizeLabel;
 
+	private JToggleButton viewmodebutton;
 	private JToggleButton pencil;
 	private JToggleButton eraser;
 	
@@ -504,6 +505,11 @@ public class PaintSceneApp extends PaintMainGame implements ActionListener, Chan
 		JPanel[] panelHolder = new JPanel[1];
 		
 		ButtonGroup tools = new ButtonGroup();
+		
+		viewmodebutton = new JToggleButton(new ImageIcon("view.png"));
+		viewmodebutton.setToolTipText("eraser");
+		viewmodebutton.addActionListener(this);
+		
 		pencil = new JToggleButton(new ImageIcon("brush.png"));
 		pencil.setToolTipText("pencil");
 		pencil.setSelected(true);
@@ -539,7 +545,7 @@ public class PaintSceneApp extends PaintMainGame implements ActionListener, Chan
 		eraser.addActionListener(this);
 		
 		colorButton = new JButton();
-		colorButton.setIcon(iconOfColor(PaintCanvas.activeColor, iconSize));
+		colorButton.setIcon(iconOfColor(new Color(PaintCanvas.activeColor.toIntRGB()), iconSize));
 		colorButton.addActionListener(this);
 		
 
@@ -553,12 +559,14 @@ public class PaintSceneApp extends PaintMainGame implements ActionListener, Chan
 		//MANIP PANEL (probably not neccessary anymore?)
 		//ManipPanel mp = new ManipPanel();	
 		//So that JToggleButtons can only have 1 active at a time
+		tools.add(viewmodebutton);
 		tools.add(pencil);
 		tools.add(eraser);
 		
 		JToolBar toolBar = new JToolBar(JToolBar.VERTICAL);
 		toolBar.setFloatable(false);
 		toolBar.setRollover(true);
+		toolBar.add(viewmodebutton);
 		toolBar.add(pencil);
 		toolBar.add(eraser);
 		toolBar.add(colorButton);
@@ -618,16 +626,24 @@ public class PaintSceneApp extends PaintMainGame implements ActionListener, Chan
 	public void actionPerformed(ActionEvent e) {
 		Object s = e.getSource();
 		
-		if (s == pencil){
+		if (s == viewmodebutton){
+			//set edit to false
+			scene.setEditMode(false);
+			canvas.setEdit(false);
+			PaintCanvas.activeTool = "Pointer";
+		}
+		else if (s == pencil){
 			//set tool as pencil
+			PaintCanvas.activeTool = "Brush";
 		}
 		else if (s == eraser){
 			//set tool as eraser
+			PaintCanvas.activeTool = "Eraser";
 		}
 		else if(s == colorButton){
 			Color newColor = JColorChooser.showDialog(mainFrame, "Foreground Color", Color.BLACK);
 			if(newColor!=null){
-				
+				PaintCanvas.activeColor = egl.math.Color.fromIntRGB(newColor.getRGB()); //(newColor);
 			}
 		}
 		else if(s == mode){

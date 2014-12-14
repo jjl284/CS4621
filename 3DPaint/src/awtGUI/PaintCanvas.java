@@ -1,7 +1,7 @@
 package awtGUI;
 
 import java.awt.Canvas;
-import java.awt.Color;
+import egl.math.Color;
 import java.util.ArrayList;
 
 public class PaintCanvas extends Canvas{
@@ -13,6 +13,7 @@ public class PaintCanvas extends Canvas{
 	//public ToolType activeTool;
 	public static Color activeColor;
 	public int activeToolSize;
+	public static String activeTool; // "Brush" "Eraser" or "Pointer"
 	
 	public boolean editMode; //true: editMode false: viewMode
 	
@@ -24,9 +25,9 @@ public class PaintCanvas extends Canvas{
 	public PaintCanvas() {
 		// TODO Auto-generated constructor stub
 		statesList.add(this);
-		this.setColor(Color.BLACK);
+		this.setColor(new Color(0,0,0));
 		this.setEdit(true);
-		this.setBackground(Color.BLACK);
+		this.setBackground(java.awt.Color.BLACK);
 		this.activeToolSize = Brush.DEFAULT_BRUSH_SIZE;
 	}
 
