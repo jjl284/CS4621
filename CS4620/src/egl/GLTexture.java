@@ -166,6 +166,10 @@ public class GLTexture implements IDisposable {
     	GL11.glGetTexImage(target, 0, pixelFormat, pixelType, img);
     }
     
+    public void getTexImage(int pixelFormat, int pixelType, ByteBuffer img) {
+    	GL11.glGetTexImage(target, 0, pixelFormat, pixelType, img);
+    }
+    
     public void updateImage(int offsetX, int offsetY, int updateWidth, int updateHeight, int pixelFormat, int pixelType, ByteBuffer buf) {
     	GL11.glTexSubImage2D(target, 0, offsetX, offsetY, updateWidth, updateHeight, pixelFormat, pixelType, buf);
     }

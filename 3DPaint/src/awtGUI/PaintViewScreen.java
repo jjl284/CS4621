@@ -1,5 +1,7 @@
 package awtGUI;
 
+import java.io.IOException;
+
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
@@ -147,6 +149,15 @@ public class PaintViewScreen extends GameScreen {
 		pick = false;
 		int curCamScroll = 0;
 
+		if(Keyboard.isKeyDown(Keyboard.KEY_TAB)) {
+			try {
+				PaintSceneApp.paintTexture.writeFromGL(PaintSceneApp.paintTexture.filepath);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		
 		if(Keyboard.isKeyDown(Keyboard.KEY_EQUALS)) curCamScroll++;
 		if(Keyboard.isKeyDown(Keyboard.KEY_MINUS)) curCamScroll--;
 		if(rController.env.cameras.size() != 0 && curCamScroll != 0 && prevCamScroll != curCamScroll) {

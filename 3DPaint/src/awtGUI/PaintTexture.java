@@ -47,6 +47,8 @@ public class PaintTexture {
 	protected Colord[][] data;
 	
 	protected String filepath;
+	
+	private ByteBuffer oldBuffer;
 
 	// Creates an image "filename.png" of size w x h and initialized to black
 	public PaintTexture(int w, int h, String file) {
@@ -228,10 +230,23 @@ public class PaintTexture {
 	
 	public void writeFromGL(String filename) throws IOException {
 		ByteBuffer bb = BufferUtils.createByteBuffer(4*width*height);
-		RenderEnvironment.paintTextureGL.writeToImage(GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, bb);
-		
+		//RenderEnvironment.paintTextureGL.readImage(0,0,width,height,GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, bb);
+		if(oldBuffer == null) {
+			RenderEnvironment.paintTextureGL.writeToImage(GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, bb);
+		} else {
+			bb = oldBuffer;
+		}
 		BufferedImage img = new BufferedImage(width, height, BufferedImage.TYPE_4BYTE_ABGR);
-		img.getAlphaRaster().setDataElements(0, 0, width, height, bb);
+		int i = 0;
+		for (int x = 0; x < width; x++) {
+			for (int y = 0; y < height; y++) {
+				//Color c = new Color();
+				//c = Color.fromIntRGB( bb.getInt(i) );
+				img.setRGB(x,y,bb.getInt(i));
+				i+=4;
+			}
+		}
+		//img.getAlphaRaster().setDataElements(0, 0, width, height, bb);
 		ImageIO.write(img, "PNG", new File(filename));
 	}
 	
@@ -246,7 +261,12 @@ public class PaintTexture {
 	public void addPaint(Vector2d currTexCoords, Vector2d lastTexCoords) {
 		int size = BrushPanel.selectedBrush.getSize(); // Brush size
 		Vector2d texCoords;
-		
+		/*try {
+			writeFromGL(filepath);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}*/
 		for (int r = 0; r <= 100; r++) {
 			double lerpRatio = r * 0.01;
 			texCoords = lastTexCoords.lerp(currTexCoords, lerpRatio);
@@ -259,11 +279,12 @@ public class PaintTexture {
 			int x = MathHelper.clamp(paintX, 0, width);
 			int y  = MathHelper.clamp(paintY, 0, height);
 			
-			ByteBuffer oldBuffer = NativeMem.createByteBuffer(size * size * 4);
-			RenderEnvironment.paintTextureGL.readImage(x, y, size, size, 
-					GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, oldBuffer);
+			if (oldBuffer == null) oldBuffer = NativeMem.createByteBuffer(height * width * 4);
+			RenderEnvironment.paintTextureGL.getTexImage(GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, oldBuffer);
+			//RenderEnvironment.paintTextureGL.readImage(x,y,width,height,GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, oldBuffer);
 			
-			ByteBuffer brushBuffer = BrushPanel.selectedBrush.getByteBuffer(oldBuffer);
+			
+			ByteBuffer brushBuffer = BrushPanel.selectedBrush.getByteBuffer(x,y,width,height,oldBuffer);
 			
 			RenderEnvironment.paintTextureGL.updateImage(x, y, size, size, 
 					GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, brushBuffer);
