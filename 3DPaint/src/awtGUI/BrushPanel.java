@@ -45,7 +45,7 @@ public class BrushPanel extends JDialog {
 		this.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
 		this.setAlwaysOnTop(true);
 		this.setTitle("Brush Panel");
-		this.setSize(300, 400);
+		this.setSize(280, 400);
 		this.setLocation(100,300);
 		sizeSpin = null;
 		
@@ -58,7 +58,7 @@ public class BrushPanel extends JDialog {
 		if (dir.isDirectory()) { // make sure it's a directory
 			int numBrushes = dir.listFiles(IMAGE_FILTER).length;
 			JPanel panel = new JPanel();
-			panel.setPreferredSize(new Dimension(280, 650));
+			panel.setPreferredSize(new Dimension(280, 450));
 			panel.setLayout(new GridLayout(numBrushes/3,3,5,5));
 			ButtonGroup brushButtons = new ButtonGroup();
 			

@@ -102,30 +102,42 @@ public class Brush {
 		return this.image;
 	}
 	
-	public ByteBuffer getByteBuffer(){
+	public ByteBuffer getByteBuffer(ByteBuffer oldBuffer){
 		int width = image.getWidth();
 		int height = image.getHeight();
 		
 		ByteBuffer bb = NativeMem.createByteBuffer(size * size * 4);
+		int i = 0;
 		for(int y = 0;y < size;y++) {
 			int texY = (int)((y + 0.5f) / (size) * height);
 			for(int x = 0;x < size;x++) {
 				int texX = (int)((x + 0.5f) / (size) * width);
 				int pixel = image.getRGB(texX,texY);
-				byte r = (byte) ((pixel >> 16) & 0xFF);
-	    		byte g = (byte) ((pixel >> 8) & 0xFF);
-	    		byte b = (byte) (pixel & 0xFF);
-	    		byte a = (byte) ((pixel >> 24) & 0xFF);
-	    		if (a < 0) {
-	    			r = PaintCanvas.activeColor.R;
-	    			g = PaintCanvas.activeColor.G;
-	    			b = PaintCanvas.activeColor.B;
-	    		}
-				bb.put(r);
-				bb.put(g);
-				bb.put(b);
-				bb.put(a);
+				
+	    		float a2 = ((pixel >> 24) & 0xFF);
+	    		float r2 = PaintCanvas.activeColor.R;
+	    		float g2 = PaintCanvas.activeColor.G;
+	    		float b2 = PaintCanvas.activeColor.B;
+	    		//System.out.println(r2+","+g2+","+b2+","+a2+ " :: " + texX + ", " + texY);
+	    		
+	    		//float a1 = oldBuffer.get(i+3);
+	    	    float r1 = oldBuffer.get(i);
+	    	    float g1 = oldBuffer.get(i+1);
+	    	    float b1 = oldBuffer.get(i+2);
+	    	    //System.out.println(r1+","+g1+","+b1+","+a1+ " :: " + texX + ", " + texY);
+	    	    
+	    	    float a = 255;
+	    	    float r = (r2 * a2 / 255 + r1 * (-255 + a2));
+	    	    float g = (g2 * a2 / 255 + g1 * (-255 + a2));
+	    	    float b = (b2 * a2 / 255 + b1 * (-255 + a2));
+	    	    //System.out.println(r+","+g+","+b+","+a+ " :: " + texX + ", " + texY);
+	    	    
+	    		bb.put((byte)r);
+				bb.put((byte)g);
+				bb.put((byte)b);
+				bb.put((byte)a);
 				//System.out.println(r+","+g+","+b+","+a+ " :: " + texX + ", " + texY);
+				i += 4;
 			}
 		}
 		
