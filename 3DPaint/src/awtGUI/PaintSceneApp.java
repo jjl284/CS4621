@@ -493,6 +493,7 @@ public class PaintSceneApp extends PaintMainGame implements ActionListener, Chan
 		ButtonGroup tools = new ButtonGroup();
 		pencil = new JToggleButton(new ImageIcon("brush.png"));
 		pencil.setToolTipText("pencil");
+		pencil.setSelected(true);
 		pencil.addActionListener(this);
 		
 		eraser = new JToggleButton(new ImageIcon("eraser.png"));
@@ -507,7 +508,7 @@ public class PaintSceneApp extends PaintMainGame implements ActionListener, Chan
 		mode = new JButton();
 		mode.setIcon(new ImageIcon("pencil.png"));
 		mode.addActionListener(this);
-		paintCanvas.setEdit(true);
+		canvas.setEdit(true);
 		scene.setEditMode(true);
 		
 
@@ -637,7 +638,7 @@ public class PaintSceneApp extends PaintMainGame implements ActionListener, Chan
 		paintMeshData = new MeshData();
 		MeshGenerator meshGen; 
 		MeshGenOptions meshGenOpt = new MeshGenOptions();
-		paintCanvas.setEdit(true);
+		canvas.setEdit(true);
 		scene.setEditMode(true);
 		mode.setIcon(new ImageIcon("pencil.png"));
 		switch(shape) {
