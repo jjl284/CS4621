@@ -121,20 +121,20 @@ public class Brush {
 	    		//System.out.println(r2+","+g2+","+b2+","+a2+ " :: " + texX + ", " + texY);
 	    		
 	    		//float a1 = oldBuffer.get(i);
-	    	    float r1 = oldBuffer.get(i+1);
-	    	    float g1 = oldBuffer.get(i+2);
-	    	    float b1 = oldBuffer.get(i+3);
+	    	    float r1 = oldBuffer.get(i);
+	    	    float g1 = oldBuffer.get(i+1);
+	    	    float b1 = oldBuffer.get(i+2);
 	    	    //System.out.println(r1+","+g1+","+b1+","+a1+ " :: " + texX + ", " + texY);
 	    	    
-	    	    float a = 255;
-	    	    float r = (r2 * a2 / 255 + r1 * (-255 + a2));
-	    	    float g = (g2 * a2 / 255 + g1 * (-255 + a2));
-	    	    float b = (b2 * a2 / 255 + b1 * (-255 + a2));
-	    	    //System.out.println(r+","+g+","+b+","+a+ " :: " + texX + ", " + texY);
-	    	    
-	    		bb.put((byte)r); oldBuffer.put(i, (byte)r);
-				bb.put((byte)g); oldBuffer.put(i+1, (byte)g);
-				bb.put((byte)b); oldBuffer.put(i+2, (byte)b); 
+	    	    float r,g,b,a;
+	    	    	a = 255;
+	    	    	r = (r2 * a2 / 255 + r1 * (-255 + a2));
+	    	    	g = (g2 * a2 / 255 + g1 * (-255 + a2));
+	    	    	b = (b2 * a2 / 255 + b1 * (-255 + a2));
+
+	    		bb.put((byte)r); //oldBuffer.put(i, (byte)r);
+				bb.put((byte)g); //oldBuffer.put(i+1, (byte)g);
+				bb.put((byte)b); //oldBuffer.put(i+2, (byte)b); 
 				bb.put((byte)a); //oldBuffer.put(i+3, (byte)a);
 				//System.out.println(r+","+g+","+b+","+a+ " :: " + texX + ", " + texY);
 				i += 4;

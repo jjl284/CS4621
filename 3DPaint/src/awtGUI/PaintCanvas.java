@@ -24,13 +24,11 @@ public class PaintCanvas extends Canvas{
 	//public Shading shading;
 	
 	public PaintCanvas() {
-		// TODO Auto-generated constructor stub
-		statesList.add(this);
-		this.setColor(new Color(0,0,0));
+		// TODO Auto-generated constr
 		this.setEdit(false);
 		this.setBackground(java.awt.Color.BLACK);
 		this.activeToolSize = Brush.DEFAULT_BRUSH_SIZE;
-		this.oldColor = Color.White;
+		this.oldColor = Color.Black;
 		this.activeColor = Color.Black;
 	}
 

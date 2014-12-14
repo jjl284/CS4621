@@ -672,7 +672,6 @@ public class PaintSceneApp extends PaintMainGame implements ActionListener, Chan
 			//set tool as eraser
 			canvas.setEdit(true);
 			PaintCanvas.activeTool = "Eraser";
-			PaintCanvas.oldColor = PaintCanvas.activeColor;
 			PaintCanvas.activeColor = egl.math.Color.fromIntRGB(Color.WHITE.getRGB());
 		}
 		else if(s == colorButton){
