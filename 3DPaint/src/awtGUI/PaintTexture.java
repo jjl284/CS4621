@@ -240,7 +240,11 @@ public class PaintTexture {
 		int i = 0;
 		for (int x = 0; x < width; x++) {
 			for (int y = 0; y < height; y++) {
-				//Color c = new Color();
+				//byte r = bb.get(i);
+				//byte g = bb.get(i-1);
+				//byte b = bb.get(i-2);
+				//byte a = bb.get(i-3);
+				//java.awt.Color c = new java.awt.Color(r,g,b,a);//new Color(r,g,b,a);
 				//c = Color.fromIntRGB( bb.getInt(i) );
 				img.setRGB(x,y,bb.getInt(i));
 				i+=4;

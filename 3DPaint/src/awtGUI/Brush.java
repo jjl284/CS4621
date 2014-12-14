@@ -120,7 +120,7 @@ public class Brush {
 	    		float b2 = PaintCanvas.activeColor.B;
 	    		//System.out.println(r2+","+g2+","+b2+","+a2+ " :: " + texX + ", " + texY);
 	    		
-	    		float a1 = oldBuffer.get(i);
+	    		//float a1 = oldBuffer.get(i);
 	    	    float r1 = oldBuffer.get(i+1);
 	    	    float g1 = oldBuffer.get(i+2);
 	    	    float b1 = oldBuffer.get(i+3);
@@ -135,7 +135,7 @@ public class Brush {
 	    		bb.put((byte)r); oldBuffer.put(i, (byte)r);
 				bb.put((byte)g); oldBuffer.put(i+1, (byte)g);
 				bb.put((byte)b); oldBuffer.put(i+2, (byte)b); 
-				bb.put((byte)a); oldBuffer.put(i+3, (byte)a);
+				bb.put((byte)a); //oldBuffer.put(i+3, (byte)a);
 				//System.out.println(r+","+g+","+b+","+a+ " :: " + texX + ", " + texY);
 				i += 4;
 			}

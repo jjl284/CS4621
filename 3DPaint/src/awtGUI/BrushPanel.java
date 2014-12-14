@@ -43,10 +43,10 @@ public class BrushPanel extends JDialog {
 	
 	public BrushPanel() {
 		this.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
-		this.setAlwaysOnTop(true);
+		//this.setAlwaysOnTop(true);
 		this.setTitle("Brush Panel");
 		this.setSize(280, 400);
-		this.setLocation(100,300);
+		this.setLocation(950,50);
 		sizeSpin = null;
 		
 		// Create all the brushes

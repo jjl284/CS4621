@@ -12,6 +12,7 @@ public class PaintCanvas extends Canvas{
 	
 	//public ToolType activeTool;
 	public static Color activeColor;
+	public static Color oldColor;
 	public int activeToolSize;
 	public static String activeTool; // "Brush" "Eraser" or "Pointer"
 	
@@ -29,6 +30,8 @@ public class PaintCanvas extends Canvas{
 		this.setEdit(false);
 		this.setBackground(java.awt.Color.BLACK);
 		this.activeToolSize = Brush.DEFAULT_BRUSH_SIZE;
+		this.oldColor = Color.White;
+		this.activeColor = Color.Black;
 	}
 
 	//public void setActiveTool(ToolType t){

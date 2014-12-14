@@ -150,7 +150,7 @@ public class PaintSceneApp extends PaintMainGame implements ActionListener, Chan
 		mainFrame.setResizable(false);
 		mainFrame.setSize(MAIN_WIDTH, MAIN_HEIGHT);
 		mainFrame.setTitle("3DPaint");
-		mainFrame.setLocation(200,200);
+		mainFrame.setLocation(50,50);
 		mainFrame.setLayout(new BorderLayout());
 		mainFrame.addWindowListener(new WindowAdapter() {
 			public void windowClosing(WindowEvent e) {
@@ -666,11 +666,14 @@ public class PaintSceneApp extends PaintMainGame implements ActionListener, Chan
 			//set tool as pencil
 			canvas.setEdit(true);
 			PaintCanvas.activeTool = "Brush";
+			PaintCanvas.activeColor = PaintCanvas.oldColor;
 		}
 		else if (s == eraser){
 			//set tool as eraser
 			canvas.setEdit(true);
 			PaintCanvas.activeTool = "Eraser";
+			PaintCanvas.oldColor = PaintCanvas.activeColor;
+			PaintCanvas.activeColor = egl.math.Color.fromIntRGB(Color.WHITE.getRGB());
 		}
 		else if(s == colorButton){
 			Color newColor = JColorChooser.showDialog(mainFrame, "Foreground Color", Color.BLACK);
