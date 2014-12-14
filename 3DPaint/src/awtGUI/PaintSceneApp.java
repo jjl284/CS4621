@@ -13,6 +13,7 @@ import java.awt.GridLayout;
 import java.awt.Menu;
 import java.awt.MenuBar;
 import java.awt.MenuItem;
+import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -44,6 +45,7 @@ import javax.swing.UIManager;
 import javax.swing.border.BevelBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+
 
 
 
@@ -147,7 +149,7 @@ public class PaintSceneApp extends PaintMainGame implements ActionListener, Chan
 		mainFrame = new Frame();
 		mainFrame.setResizable(false);
 		mainFrame.setSize(MAIN_WIDTH, MAIN_HEIGHT);
-		mainFrame.setTitle("3DPaint Application");
+		mainFrame.setTitle("3DPaint");
 		mainFrame.setLocation(200,200);
 		mainFrame.setLayout(new BorderLayout());
 		mainFrame.addWindowListener(new WindowAdapter() {
@@ -528,11 +530,13 @@ public class PaintSceneApp extends PaintMainGame implements ActionListener, Chan
 		ButtonGroup tools = new ButtonGroup();
 		
 		viewmodebutton = new JToggleButton(new ImageIcon("view.png"));
+		viewmodebutton.setBorderPainted(false);
 		viewmodebutton.setToolTipText("manipulate");
 		//viewmodebutton.setSelected(true);
 		viewmodebutton.addActionListener(this);
 		
 		pencil = new JToggleButton(new ImageIcon("brush.png"));
+		pencil.setBorderPainted(false);
 		pencil.setToolTipText("pencil");
 		pencil.setSelected(true);
 		pencil.addActionListener(this);
@@ -565,10 +569,12 @@ public class PaintSceneApp extends PaintMainGame implements ActionListener, Chan
 
 		
 		eraser = new JToggleButton(new ImageIcon("eraser.png"));
+		eraser.setBorderPainted(false);
 		eraser.setToolTipText("eraser");
 		eraser.addActionListener(this);
 		
 		colorButton = new JButton();
+		colorButton.setBorderPainted(false);
 		colorButton.setIcon(iconOfColor(new Color(PaintCanvas.activeColor.toIntRGB()), iconSize));
 		colorButton.addActionListener(this);
 		
@@ -606,12 +612,12 @@ public class PaintSceneApp extends PaintMainGame implements ActionListener, Chan
 	
 	private static ImageIcon iconOfColor(Color c, int size){
 		BufferedImage img = new BufferedImage (size, size, BufferedImage.TYPE_INT_ARGB);
-		Graphics2D g2d = (Graphics2D) img.getGraphics();
-		g2d.setColor(c);
+		Graphics2D g2d = img.createGraphics();
+		g2d.setRenderingHint (RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+		g2d.setPaint(c);
 		g2d.fillOval(0, 0, size, size);
-		
-		ImageIcon imic = new ImageIcon(img);
-		return imic;
+		g2d.dispose();
+		return new ImageIcon(img);
 	}
 		
 	@Override
