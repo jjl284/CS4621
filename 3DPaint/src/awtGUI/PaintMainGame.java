@@ -198,7 +198,7 @@ public abstract class PaintMainGame extends MainGame implements IDisposable {
 			GL11.glBlendFunc(GL11.GL_SRC_ALPHA,GL11.GL_ONE_MINUS_SRC_ALPHA);
 			
 			GL11.glEnable(GL11.GL_ALPHA_TEST);
-		    GL11.glAlphaFunc(GL11.GL_GREATER, 0);
+		    GL11.glAlphaFunc(GL11.GL_GREATER, 0f);
 			
 		    GL11.glTexEnvf(GL11.GL_TEXTURE_ENV, GL11.GL_TEXTURE_ENV_MODE, GL11.GL_ADD);
 		    

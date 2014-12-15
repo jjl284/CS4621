@@ -20,6 +20,7 @@ import org.lwjgl.BufferUtils;
 
 import egl.NativeMem;
 import egl.math.Color;
+import egl.math.Vector2i;
 
 public class Brush {
 
@@ -30,6 +31,7 @@ public class Brush {
 	private String filename;
 	private BufferedImage image;
 	private JToggleButton button;
+	protected Vector2i justPainted = new Vector2i(0,0);
 	
 	public Brush(final int id, File file, JPanel panel, ButtonGroup group, boolean selected) {
 		// TODO Auto-generated constructor stub
@@ -102,7 +104,9 @@ public class Brush {
 		return this.image;
 	}
 
-	public ByteBuffer getByteBuffer(int offX, int offY, int oldW, int oldH, ByteBuffer oldBuffer){
+	public ByteBuffer getByteBuffer(int offX, int offY, int oldW, int oldH, ByteBuffer oldBuffer){		
+		justPainted.x = offX; justPainted.y = offY;
+		
 		int width = image.getWidth();
 		int height = image.getHeight();
 		ByteBuffer bb = NativeMem.createByteBuffer(size * size * 4);
@@ -113,7 +117,10 @@ public class Brush {
 			i = offX*4 + (offY+y)*oldW*4;
 			int texY = (int)((y + 0.5f) / (size) * height);
 			
-			for(int x = 0;x < size;x++) {				
+			for(int x = 0;x < size;x++) {
+				if (i >= oldBuffer.capacity()) i = 0;
+				if (i < 0) i = oldBuffer.capacity() - 4;
+				
 				int texX = (int)((x + 0.5f) / (size) * width);
 				int pixel = image.getRGB(texX,texY);
 				
@@ -128,15 +135,15 @@ public class Brush {
 	    	    
 	    	    float r,g,b,a;
 
-    	    	a = 255f;
-    	    	r = (r2 * a2 / 255 + r1 * (-255 + a2));
-    	    	g = (g2 * a2 / 255 + g1 * (-255 + a2));
-    	    	b = (b2 * a2 / 255 + b1 * (-255 + a2));
+    	    	a = 255f; // alpha * fg + invAlpha * bg
+	    	    r = ( r2 * a2/255f + r1 * (1 - a2/255f) );
+	    	    g = ( g2 * a2/255f + g1 * (1 - a2/255f) );
+	    	    b = ( b2 * a2/255f + b1 * (1 - a2/255f) );
     	    	
 	    		bb.put((byte)r); oldBuffer.put(i, (byte)r);
 				bb.put((byte)g); oldBuffer.put(i+1, (byte)g);
 				bb.put((byte)b); oldBuffer.put(i+2, (byte)b); 
-				bb.put((byte)a);
+				bb.put((byte)a); oldBuffer.put(i+2, (byte)a); 
 				
 				i += 4;
 			}
