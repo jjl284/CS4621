@@ -3,22 +3,18 @@ package awtGUI;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.io.Writer;
 import java.nio.ByteBuffer;
 
 import javax.imageio.ImageIO;
-import javax.imageio.stream.ImageOutputStream;
 
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 
 import cs4620.gl.RenderEnvironment;
-import cs4620.mesh.MeshData;
 import egl.NativeMem;
 import egl.math.Color;
 import egl.math.Colord;
 import egl.math.MathHelper;
-import egl.math.Vector2;
 import egl.math.Vector2d;
 
 public class PaintTexture {
@@ -280,8 +276,6 @@ public class PaintTexture {
 			// Clamp painted location to image bounds
 			int x = MathHelper.clamp(paintX, 0, width);
 			int y  = MathHelper.clamp(paintY, 0, height);
-			
-			if(BrushPanel.selectedBrush.justPainted.x == x && BrushPanel.selectedBrush.justPainted.y == y) break;
 			
 			if (oldBuffer == null) oldBuffer = NativeMem.createByteBuffer(height * width * 4);
 			RenderEnvironment.paintTextureGL.getTexImage(GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, oldBuffer);
