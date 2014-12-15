@@ -59,7 +59,7 @@ public class BrushPanel extends JDialog {
 			int numBrushes = dir.listFiles(IMAGE_FILTER).length;
 			JPanel panel = new JPanel();
 			panel.setPreferredSize(new Dimension(250, 450));
-			panel.setLayout(new GridLayout(0,3,5,5));
+			panel.setLayout(new GridLayout(numBrushes/3+1,3,5,5));
 			ButtonGroup brushButtons = new ButtonGroup();
 			
 			int i = 0;

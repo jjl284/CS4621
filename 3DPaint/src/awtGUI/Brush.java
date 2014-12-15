@@ -71,6 +71,7 @@ public class Brush {
 		button.setPreferredSize(new Dimension(50, 50));
 		button.setToolTipText(file.getName());
 		button.addActionListener( actionListener);
+		button.setSelected(false);
 		if (selected) button.setSelected(true);
 		group.add(button);
 		panel.add(button);
@@ -144,10 +145,10 @@ public class Brush {
 	    	    g = blendFunction1(g1,g2,a2);
 	    	    b = blendFunction1(b1,b2,a2);
     	    	//System.out.println(r + ", " + g + ", " + b + ", " + a); 
-	    		bb.put((byte)r); oldBuffer.put(i, (byte)r);
-				bb.put((byte)g); oldBuffer.put(i+1, (byte)g);
-				bb.put((byte)b); oldBuffer.put(i+2, (byte)b); 
-				bb.put((byte)a); oldBuffer.put(i+2, (byte)a); 
+	    		bb.put((byte)r); //oldBuffer.put(i, (byte)r);
+				bb.put((byte)g); //oldBuffer.put(i+1, (byte)g);
+				bb.put((byte)b); //oldBuffer.put(i+2, (byte)b); 
+				bb.put((byte)a); //oldBuffer.put(i+2, (byte)a); 
 				
 				i += 4;
 			}

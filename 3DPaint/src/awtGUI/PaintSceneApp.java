@@ -201,13 +201,13 @@ public class PaintSceneApp extends PaintMainGame implements ActionListener, Chan
 	    
 	    
 	    // Option to rename XML file
-	    MenuItem mbRename = new MenuItem("Rename XML");
+	    /*MenuItem mbRename = new MenuItem("Rename XML");
 	    mbRename.addActionListener(new ActionListener() {
 	    	@Override
 			public void actionPerformed(ActionEvent arg0) {
 	    		//TODO: Create text dialog for renaming
 	    	}
-	    });
+	    });*/
 	    
 	    // Create MenuItems for new scenes of Default Meshes
 	    Menu mbNew=new Menu("New from...");
@@ -445,7 +445,7 @@ public class PaintSceneApp extends PaintMainGame implements ActionListener, Chan
 	    mFile.add(newMesh);
 	    mFile.add(mbTex);
 	    mFile.add(mbImp);
-	    mFile.add(mbRename);
+	    //mFile.add(mbRename);
 	  //  mFile.add(mbExp);
 	   
 	    // Attach menu items to submenu
@@ -525,7 +525,7 @@ public class PaintSceneApp extends PaintMainGame implements ActionListener, Chan
 		
 		pencil = new JToggleButton(new ImageIcon("brush.png"));
 		pencil.setBorderPainted(false);
-		pencil.setToolTipText("pencil");
+		pencil.setToolTipText("brush");
 		pencil.setSelected(true);
 		pencil.addActionListener(this);
 		pencil.addMouseListener(new MouseListener(){
@@ -667,6 +667,7 @@ public class PaintSceneApp extends PaintMainGame implements ActionListener, Chan
 			if(newColor!=null){
 				colorButton.setIcon(iconOfColor(newColor, iconSize));
 				PaintCanvas.activeColor = egl.math.Color.fromIntRGB(newColor.getRGB()); //(newColor);
+				PaintCanvas.oldColor = PaintCanvas.activeColor;
 			}
 		}
 		/*else if(s == mode){

@@ -64,9 +64,9 @@ public class PaintTexture {
 			try {
 			    image = ImageIO.read(new File(filepath));
 			    setSize(image.getWidth(), image.getHeight());
-				for (int i = 0; i < width; i++) {
-					for (int j = 0; j < height; j++) {
-						data[i][j].set(Color.fromIntRGB( image.getRGB(i, height - 1 - j) ));
+			    for (int j = 0; j < height; j++) {
+			    	 for (int i = 0; i < width; i++) {
+						data[i][j].set(Color.fromIntRGB( image.getRGB(i, j) ));
 					}
 				}
 			} catch (IOException e) {
@@ -84,9 +84,9 @@ public class PaintTexture {
 		try {
 		    oldImage = ImageIO.read(new File(oldName));
 		    setSize(oldImage.getWidth(), oldImage.getHeight());
-			for (int i = 0; i < width; i++) {
-				for (int j = 0; j < height; j++) {
-					data[i][j].set(Color.fromIntRGB( oldImage.getRGB(i, height - 1 - j) ));
+		    for (int j = 0; j < height; j++) {
+		    	for (int i = 0; i < width; i++) {
+					data[i][height - 1 -j].set(Color.fromIntRGB( oldImage.getRGB(i, height-1-j) ));
 				}
 			}
 			write(this.filepath);
@@ -211,7 +211,7 @@ public class PaintTexture {
 				this.getPixelColor(pixelColor, x, y);
 				pixelColor.gammaCorrect(2.2);
 				Color c = pixelColor.toColor();
-				bufferedImage.setRGB(x, (height - 1 - y), c.toIntRGB());
+				bufferedImage.setRGB(x, y, c.toIntRGB());
 			}
 		}
 		
@@ -235,15 +235,15 @@ public class PaintTexture {
 		}
 		BufferedImage img = new BufferedImage(width, height, BufferedImage.TYPE_4BYTE_ABGR);
 		int i = 0;
-		for (int x = 0; x < width; x++) {
-			for (int y = 0; y < height; y++) {
+		for (int y = 0; y < height; y++) {
+			for (int x = 0; x < width; x++) {
 				//byte r = bb.get(i);
 				//byte g = bb.get(i-1);
 				//byte b = bb.get(i-2);
 				//byte a = bb.get(i-3);
 				//java.awt.Color c = new java.awt.Color(r,g,b,a);//new Color(r,g,b,a);
 				//c = Color.fromIntRGB( bb.getInt(i) );
-				img.setRGB(x,y,bb.getInt(i));
+				img.setRGB(x,height-1-y,bb.getInt(i));
 				i+=4;
 			}
 		}
