@@ -125,8 +125,7 @@ public class PaintSceneApp extends PaintMainGame implements ActionListener, Chan
 	public static final int sliderMax = 200;
 	public static final int sliderInit = 10;
 	private int iconSize = 64;	
-	private JTextField[] controls ={new JTextField(Keyboard.getKeyName(Keyboard.KEY_TAB)),
-			new JTextField(Keyboard.getKeyName(Keyboard.KEY_W)),
+	private JTextField[] controls ={new JTextField(Keyboard.getKeyName(Keyboard.KEY_W)),
 			new JTextField(Keyboard.getKeyName(Keyboard.KEY_S)),new JTextField(Keyboard.getKeyName(Keyboard.KEY_Q)),
 			new JTextField(Keyboard.getKeyName(Keyboard.KEY_E)),new JTextField(Keyboard.getKeyName(Keyboard.KEY_A)),
 			new JTextField(Keyboard.getKeyName(Keyboard.KEY_D)),new JTextField(Keyboard.getKeyName(Keyboard.KEY_Z)),
@@ -199,15 +198,8 @@ public class PaintSceneApp extends PaintMainGame implements ActionListener, Chan
 	    //Menu mMode=new Menu("Mode");
 	    Menu mHelp = new Menu("Help");
 	    
-	    
-	    // Option to rename XML file
-	    /*MenuItem mbRename = new MenuItem("Rename XML");
-	    mbRename.addActionListener(new ActionListener() {
-	    	@Override
-			public void actionPerformed(ActionEvent arg0) {
-	    		//TODO: Create text dialog for renaming
-	    	}
-	    });*/
+	    MenuItem mbRename = new MenuItem("Save Texture (TAB)");
+	    mbRename.setEnabled(false);
 	    
 	    // Create MenuItems for new scenes of Default Meshes
 	    Menu mbNew=new Menu("New from...");
@@ -339,11 +331,13 @@ public class PaintSceneApp extends PaintMainGame implements ActionListener, Chan
 			public void actionPerformed(ActionEvent arg0) {
 				canvas.LoadPrevState(canvas.currState);				
 			}});
+	    mbUndo.setEnabled(false);
 	    MenuItem mbRedo=new MenuItem("Redo");
 	    mbRedo.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent arg0) {
 				canvas.LoadNextState(canvas.currState);				
 			}});
+	    mbRedo.setEnabled(false);
 	    
 	    MenuItem mbBrush=new MenuItem("Brush Panel");
 	    mbBrush.addActionListener(new ActionListener(){
@@ -396,14 +390,14 @@ public class PaintSceneApp extends PaintMainGame implements ActionListener, Chan
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 
-				String[] ctrlNames = {"Save Texture","Zoom in","Zoom out","Tilt right","Tilt left","Up","Down","Move left ","Move right "};
+				String[] ctrlNames = {"Zoom in","Zoom out","Tilt right","Tilt left","Up","Down","Move left ","Move right "};
 
 				JDialog diag = new JDialog(mainFrame,"Controls");
 				diag.setLayout(new FlowLayout());
 				diag.setSize(150, 250);
 				diag.setResizable(false);
 				JPanel jPan = new JPanel();
-				jPan.setLayout(new GridLayout(9,2));
+				jPan.setLayout(new GridLayout(8,2));
 				for(int i=0;i<ctrlNames.length;i++){
 					jPan.add(new JLabel(ctrlNames[i]));
 					jPan.add(controls[i]);
@@ -445,7 +439,7 @@ public class PaintSceneApp extends PaintMainGame implements ActionListener, Chan
 	    mFile.add(newMesh);
 	    mFile.add(mbTex);
 	    mFile.add(mbImp);
-	    //mFile.add(mbRename);
+	    mFile.add(mbRename);
 	  //  mFile.add(mbExp);
 	   
 	    // Attach menu items to submenu
