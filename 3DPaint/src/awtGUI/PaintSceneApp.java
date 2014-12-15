@@ -125,7 +125,8 @@ public class PaintSceneApp extends PaintMainGame implements ActionListener, Chan
 	public static final int sliderMax = 200;
 	public static final int sliderInit = 10;
 	private int iconSize = 64;	
-	private JTextField[] controls ={new JTextField(Keyboard.getKeyName(Keyboard.KEY_W)),
+	private JTextField[] controls ={new JTextField(Keyboard.getKeyName(Keyboard.KEY_TAB)),
+			new JTextField(Keyboard.getKeyName(Keyboard.KEY_W)),
 			new JTextField(Keyboard.getKeyName(Keyboard.KEY_S)),new JTextField(Keyboard.getKeyName(Keyboard.KEY_Q)),
 			new JTextField(Keyboard.getKeyName(Keyboard.KEY_E)),new JTextField(Keyboard.getKeyName(Keyboard.KEY_A)),
 			new JTextField(Keyboard.getKeyName(Keyboard.KEY_D)),new JTextField(Keyboard.getKeyName(Keyboard.KEY_Z)),
@@ -350,18 +351,6 @@ public class PaintSceneApp extends PaintMainGame implements ActionListener, Chan
 				brushPanel.setVisible(true);
 				return;
 			}});
-	    
-	    MenuItem mbSaveTexture=new MenuItem("Save Texture");
-	    mbSaveTexture.addActionListener(new ActionListener(){
-			public void actionPerformed(ActionEvent arg0) {
-				try {
-					paintTexture.writeFromGL(paintTextureName);
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-				return;
-			}});
 	   
 	    
 	    // Add shading menu options
@@ -407,14 +396,14 @@ public class PaintSceneApp extends PaintMainGame implements ActionListener, Chan
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 
-				String[] ctrlNames = {"Zoom in","Zoom out","Tilt right","Tilt left","Up","Down","Move left ","Move right "};
+				String[] ctrlNames = {"Save Texture","Zoom in","Zoom out","Tilt right","Tilt left","Up","Down","Move left ","Move right "};
 
 				JDialog diag = new JDialog(mainFrame,"Controls");
 				diag.setLayout(new FlowLayout());
-				diag.setSize(150, 200);
+				diag.setSize(150, 250);
 				diag.setResizable(false);
 				JPanel jPan = new JPanel();
-				jPan.setLayout(new GridLayout(8,2));
+				jPan.setLayout(new GridLayout(9,2));
 				for(int i=0;i<ctrlNames.length;i++){
 					jPan.add(new JLabel(ctrlNames[i]));
 					jPan.add(controls[i]);
@@ -457,7 +446,6 @@ public class PaintSceneApp extends PaintMainGame implements ActionListener, Chan
 	    mFile.add(mbTex);
 	    mFile.add(mbImp);
 	    mFile.add(mbRename);
-	    mFile.add(mbSaveTexture);
 	  //  mFile.add(mbExp);
 	   
 	    // Attach menu items to submenu

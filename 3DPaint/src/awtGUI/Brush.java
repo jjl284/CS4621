@@ -144,9 +144,8 @@ public class Brush {
 	    	    
 	    	    float r,g,b,a;
 	    	    
-	    	    if (a1 == r1 && r1 == g1 && g1 == b1 && b1 != 0f && b1 != -1f) {
-	    	    	//System.out.println(texX + ", " + texY);
-	    	    	a = r = g = b = 0f;	    	    	
+	    	    if (a2 == 0) {
+	    	    	a = r2 = g2 = b2 = 255;    	    	
 	    	    } else {
 	    	    	a = 255f;
 	    	    	r = (r2 * a2 / 255 + r1 * (-255 + a2));
@@ -154,10 +153,12 @@ public class Brush {
 	    	    	b = (b2 * a2 / 255 + b1 * (-255 + a2));
 	    	    }
 	    	    
-	    		bb.put((byte)r); oldBuffer.put(i, (byte)r);
-				bb.put((byte)g); oldBuffer.put(i+1, (byte)g);
-				bb.put((byte)b); oldBuffer.put(i+2, (byte)b); 
-				bb.put((byte)a); //oldBuffer.put(i+3, (byte)a1);
+	    	    //a = 255; r = g= b = 0;
+	    	    
+	    		bb.put((byte)r2); //oldBuffer.put(i, (byte)r);
+				bb.put((byte)g2); //oldBuffer.put(i+1, (byte)g);
+				bb.put((byte)b2); //oldBuffer.put(i+2, (byte)b); 
+				bb.put((byte)a); //oldBuffer.put(i+3, (byte)a);
 				//System.out.println(r+","+g+","+b+","+a+ " :: " + texX + ", " + texY);
 				i += 4;
 			}
