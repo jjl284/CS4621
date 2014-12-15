@@ -266,15 +266,16 @@ public class PaintTexture {
 	public void addPaint(Vector2d currTexCoords, Vector2d lastTexCoords) {
 		int size = BrushPanel.selectedBrush.getSize(); // Brush size
 		
-		Vector2d texCoords = new Vector2d(0,0);
+		Vector2d texCoords;
+		int numLerps = (int)(currTexCoords.clone().dist(lastTexCoords) * 3500 / size);
 		
-		for (int r = 0; r <= 100; r++) {
-			double lerpRatio = r * 0.01;
-			texCoords = lastTexCoords.lerp(currTexCoords, lerpRatio);
+		for (int r = 0; r <= numLerps; r++) {
+			double lerpRatio = (numLerps == 0) ? 1.0 : (double)r / numLerps;
+			texCoords = currTexCoords.clone().lerp(lastTexCoords, lerpRatio);
 			
 			// Center paint around click
-			int paintX = (int)(currTexCoords.x*width + 0.5) - (int)(size/2.0);
-			int paintY = (int)(currTexCoords.y*height + 0.5) - (int)(size/2.0);
+			int paintX = (int)(texCoords.x*width + 0.5) - (int)(size/2.0);
+			int paintY = (int)(texCoords.y*height + 0.5) - (int)(size/2.0);
 			
 			// Clamp painted location to image bounds
 			int x = MathHelper.clamp(paintX, 0, width);
@@ -289,8 +290,6 @@ public class PaintTexture {
 			
 			RenderEnvironment.paintTextureGL.updateImage(x, y, size, size, 
 					GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, brushBuffer);
-			
-			if (texCoords == currTexCoords) break;
 		}
 	}
 }
