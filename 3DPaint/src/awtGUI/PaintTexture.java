@@ -4,6 +4,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 
 import javax.imageio.ImageIO;
 
@@ -227,7 +228,6 @@ public class PaintTexture {
 	
 	public void writeFromGL(String filename) throws IOException {
 		ByteBuffer bb = BufferUtils.createByteBuffer(4*width*height);
-		//RenderEnvironment.paintTextureGL.readImage(0,0,width,height,GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, bb);
 		if(oldBuffer == null) {
 			RenderEnvironment.paintTextureGL.writeToImage(GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, bb);
 		} else {
@@ -237,17 +237,14 @@ public class PaintTexture {
 		int i = 0;
 		for (int y = 0; y < height; y++) {
 			for (int x = 0; x < width; x++) {
-				//byte r = bb.get(i);
-				//byte g = bb.get(i-1);
-				//byte b = bb.get(i-2);
-				//byte a = bb.get(i-3);
-				//java.awt.Color c = new java.awt.Color(r,g,b,a);//new Color(r,g,b,a);
-				//c = Color.fromIntRGB( bb.getInt(i) );
-				img.setRGB(x,height-1-y,bb.getInt(i));
+				int r =((bb.getInt(i)) & 0xFF);
+				int g =((bb.getInt(i) >> 8) & 0xFF);
+				int b =((bb.getInt(i) >> 16) & 0xFF);
+				java.awt.Color c = new java.awt.Color(r,g,b);
+				img.setRGB(x,height-1-y,c.getRGB());
 				i+=4;
 			}
 		}
-		//img.getAlphaRaster().setDataElements(0, 0, width, height, bb);
 		ImageIO.write(img, "PNG", new File(filename));
 	}
 	
