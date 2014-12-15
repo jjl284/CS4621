@@ -105,7 +105,7 @@ public class Brush {
 	}
 	
 	private float blendFunction1(float x1, float x2, float a) {
-		return x1*(1-a/255f) + x2*a/255f;
+		return x1 + (x2 - x1)*a/255f;
 	}
 
 	public ByteBuffer getByteBuffer(int offX, int offY, int oldW, int oldH, ByteBuffer oldBuffer){		
