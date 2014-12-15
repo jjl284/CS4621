@@ -195,12 +195,12 @@ public class PaintViewScreen extends GameScreen {
 		
 		Vector3 bg = PaintSceneApp.scene.background;
 		
-		//GL11.glClearColor(bg.x, bg.y, bg.z, 1f);
-		GL11.glClearColor(0f, 0f, 0f, 1f);
+		GL11.glClearColor(bg.x, bg.y, bg.z, 1f);
+		//GL11.glClearColor(0f, 0f, 0f, 1f);
 		GL11.glClearDepth(1.0);
 		GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
 		
-		//BlendState.ALPHA_BLEND.set();
+		BlendState.ALPHA_BLEND.set();
 		
 		if(camController.camera != null){
 			renderer.draw(camController.camera, rController.env.lights);

@@ -124,7 +124,6 @@ public class Brush {
 		int height = image.getHeight();
 		ByteBuffer bb = NativeMem.createByteBuffer(size * size * 4);
 		int i = (offX*oldH + offY*oldW)*2;//getNearestByteIndex((offX*oldH + offY*oldW)*2);
-		//if (i%4 != 0) System.out.println("UHOH");
 		for(int y = 0;y < size;y++) {
 			int texY = (int)((y + 0.5f) / (size) * height);
 			for(int x = 0;x < size;x++) {
