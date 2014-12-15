@@ -194,11 +194,14 @@ public abstract class PaintMainGame extends MainGame implements IDisposable {
 			Display.create(glPixelFormat, glContext);
 			GLState.enableAll();
 			
-			GL11.glEnable(GL11.GL_BLEND); //GL11.glBlendFunc(GL11.GL_ONE, GL11.GL_ONE);
-			GL11.glBlendFunc(GL11.GL_SRC_ALPHA,GL11.GL_ONE_MINUS_SRC_ALPHA);
+			//GL11.glEnable(GL11.GL_BLEND); 
+			//GL11.glBlendFunc(GL11.GL_ONE, GL11.GL_ONE);
+			//GL11.glBlendFunc(GL11.GL_ZERO, GL11.GL_SRC_COLOR);
+			//GL11.glBlendFunc(GL11.GL_SRC_ALPHA,GL11.GL_ONE_MINUS_SRC_ALPHA);
+			//GL11.glA (GL11.GL_ADD);
 			
-			GL11.glEnable(GL11.GL_ALPHA_TEST);
-		    GL11.glAlphaFunc(GL11.GL_GREATER, 0f);
+			//GL11.glEnable(GL11.GL_ALPHA_TEST);
+		    //GL11.glAlphaFunc(GL11.GL_GREATER, 0f);
 			
 		    GL11.glTexEnvf(GL11.GL_TEXTURE_ENV, GL11.GL_TEXTURE_ENV_MODE, GL11.GL_ADD);
 		    
