@@ -103,6 +103,10 @@ public class Brush {
 	public BufferedImage getImage() {
 		return this.image;
 	}
+	
+	private float blendFunction1(float x1, float x2, float a) {
+		return x1*(1-a/255f) + x2*a/255f;
+	}
 
 	public ByteBuffer getByteBuffer(int offX, int offY, int oldW, int oldH, ByteBuffer oldBuffer){		
 		justPainted.x = offX; justPainted.y = offY;
@@ -136,9 +140,9 @@ public class Brush {
 	    	    float r,g,b,a;
 
     	    	a = 255f; // alpha * fg + invAlpha * bg
-	    	    r = ( r2 * a2/255f + r1 * (1 - a2/255f) );
-	    	    g = ( g2 * a2/255f + g1 * (1 - a2/255f) );
-	    	    b = ( b2 * a2/255f + b1 * (1 - a2/255f) );
+	    	    r = blendFunction1(r1,r2,a2);
+	    	    g = blendFunction1(g1,g2,a2);
+	    	    b = blendFunction1(b1,b2,a2);
     	    	
 	    		bb.put((byte)r); oldBuffer.put(i, (byte)r);
 				bb.put((byte)g); oldBuffer.put(i+1, (byte)g);
