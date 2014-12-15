@@ -24,7 +24,7 @@ import egl.math.Vector2i;
 
 public class Brush {
 
-	public static int DEFAULT_BRUSH_SIZE = 10;
+	public static int DEFAULT_BRUSH_SIZE = 40;
 	
 	private int size;
 	private int id;
@@ -105,11 +105,8 @@ public class Brush {
 	}
 	
 	private float blendFunction1(float x1, float x2, float a) {
-		return x1 + x2*a/255f - x1*a/255f;
-		//if (a == 0f) return x1;
-		//return x2 - x1*a/255f;
-		//if (x2 <= 255f/2f) return x2 + a/255f*(10f);
-		//return -x2*a/255f;//x1 + x2*a/255f - x1*a/255f;
+		if (a == 255f) return x1;
+		return x2*a/255f + x2;
 	}
 
 	public ByteBuffer getByteBuffer(int offX, int offY, int oldW, int oldH, ByteBuffer oldBuffer){		
@@ -144,9 +141,9 @@ public class Brush {
 	    	    float r,g,b,a;
 
     	    	a = 255f; // alpha * fg + invAlpha * bg
-	    	    r = blendFunction1(r1,r2,a2);
-	    	    g = blendFunction1(g1,g2,a2);
-	    	    b = blendFunction1(b1,b2,a2);
+	    	    r = blendFunction1(r1,r2,255f-a2);
+	    	    g = blendFunction1(g1,g2,255f-a2);
+	    	    b = blendFunction1(b1,b2,255f-a2);
     	    	//System.out.println(r + ", " + g + ", " + b + ", " + a); 
 	    		bb.put((byte)r); oldBuffer.put(i, (byte)r);
 				bb.put((byte)g); oldBuffer.put(i+1, (byte)g);
