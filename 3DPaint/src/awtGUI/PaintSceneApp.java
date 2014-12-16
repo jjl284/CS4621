@@ -382,7 +382,9 @@ public class PaintSceneApp extends PaintMainGame implements ActionListener, Chan
 				mat.setType(Material.T_COOKTORRANCE);
 				scene.addMaterial(new NameBindMaterial("CookTorrance", mat));			
 			}});
-	    
+	    mbBP.setEnabled(false);
+	    mbCT.setEnabled(false);
+	    mbLamb.setEnabled(false);
 
 	    MenuItem mCtrl = new MenuItem("Controls");
 	    
@@ -710,6 +712,7 @@ public class PaintSceneApp extends PaintMainGame implements ActionListener, Chan
 		paintMeshData = new MeshData();
 		MeshGenerator meshGen; 
 		MeshGenOptions meshGenOpt = new MeshGenOptions();
+		Mesh m = new Mesh(); 
 		//canvas.setEdit(true);
 		//scene.setEditMode(true);
 		//mode.setIcon(new ImageIcon("pencil.png"));
@@ -720,6 +723,7 @@ public class PaintSceneApp extends PaintMainGame implements ActionListener, Chan
 				meshGenOpt.setInnerRadius(5);
 				meshGen = new MeshGenCube();
 				meshGen.generate(paintMeshData, meshGenOpt);
+				m.setGenerator( meshGen );
 				break;
 			case "Cylinder":
 				meshGenOpt.setDivLatitude(32);
@@ -727,20 +731,28 @@ public class PaintSceneApp extends PaintMainGame implements ActionListener, Chan
 				meshGenOpt.setInnerRadius(5);
 				meshGen = new MeshGenCylinder();
 				meshGen.generate(paintMeshData, meshGenOpt);
+				m.setGenerator( meshGen );
 				break;
 			case "Sphere":
-				meshGenOpt.setDivLatitude(32);
-				meshGenOpt.setDivLongitude(32);
-				meshGenOpt.setInnerRadius(1);
-				meshGen = new MeshGenSphere();
-				meshGen.generate(paintMeshData, meshGenOpt);
+				//meshGenOpt.setDivLatitude(32);
+				//meshGenOpt.setDivLongitude(32);
+				//meshGenOpt.setInnerRadius(1);
+				//meshGen = new MeshGenSphere();
+				//meshGen.generate(paintMeshData, meshGenOpt);
+				OBJMesh objm = OBJParser.parse("data/meshes/sphere.obj");
+				paintMeshData = objm.flatten();
+				m.setFile("data/meshes/sphere.obj");
 				break;
 			case "Torus":
-				meshGenOpt.setDivLatitude(32);
-				meshGenOpt.setDivLongitude(32);
-				meshGenOpt.setInnerRadius(1);
-				meshGen = new MeshGenTorus();
-				meshGen.generate(paintMeshData, meshGenOpt);
+				//meshGenOpt.setDivLatitude(32);
+				//meshGenOpt.setDivLongitude(32);
+				//meshGenOpt.setInnerRadius(1);
+				//meshGen = new MeshGenTorus();
+				//meshGen.generate(paintMeshData, meshGenOpt);
+				//m.setGenerator( meshGen );
+				OBJMesh objm2 = OBJParser.parse("data/meshes/torus.obj");
+				paintMeshData = objm2.flatten();
+				m.setFile("data/meshes/torus.obj");
 				break;
 			case "Plane":
 				meshGenOpt.setDivLatitude(32);
@@ -748,6 +760,7 @@ public class PaintSceneApp extends PaintMainGame implements ActionListener, Chan
 				meshGenOpt.setInnerRadius(1);
 				meshGen = new MeshGenPlane();
 				meshGen.generate(paintMeshData, meshGenOpt);
+				m.setGenerator( meshGen );
 				break;
 			default:
 				meshGenOpt.setDivLatitude(32);
@@ -755,13 +768,13 @@ public class PaintSceneApp extends PaintMainGame implements ActionListener, Chan
 				meshGenOpt.setInnerRadius(5);
 				meshGen = new MeshGenCube();
 				meshGen.generate(paintMeshData, meshGenOpt);
+				m.setGenerator( meshGen );
 				break;	
 		}
 		
 		sceneName = shape;
 		paintTextureName = "PaintedTexture";
 		
-		Mesh m = new Mesh(); m.setGenerator( meshGen );
 		//m.generator.generate(paintMeshData, new MeshGenOptions());
 		scene.addMesh( new NameBindMesh("PaintedMesh", m) );
 		
