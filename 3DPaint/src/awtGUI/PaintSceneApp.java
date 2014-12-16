@@ -24,6 +24,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Date;
@@ -233,14 +234,23 @@ public class PaintSceneApp extends PaintMainGame implements ActionListener, Chan
 								m.setFile(file);
 								scene.addMesh(new NameBindMesh("PaintedMesh", m));
 								
+								try {
+									scene.removeTexture("NormalMapped");
+									scene.saveData(scenePath+sceneName+".xml");
+								} catch (ParserConfigurationException e) {
+									// TODO Auto-generated catch block
+									e.printStackTrace();
+								} catch (TransformerException e) {
+									// TODO Auto-generated catch block
+									e.printStackTrace();
+								}
+								scene.sendEvent(new SceneReloadEvent(file));
+								return;
+								
 							} else {
 								// ERROR: specified XML file is not valid for 3D Paint App
 								System.out.println("3D PAINT ERROR: The specified XML file does not contain a PaintedMesh and is therefore not compatible with 3D Paint");
 							}
-							
-							scene.sendEvent(new SceneReloadEvent(file));
-							//mode.setIcon(new ImageIcon("pencil.png"));
-							return;
 						}
 					}
 				}
@@ -266,6 +276,16 @@ public class PaintSceneApp extends PaintMainGame implements ActionListener, Chan
 							t.setFile(scenePath + sceneName + paintTextureName + ".png");
 							scene.addTexture( new NameBindTexture(paintTextureName, t) );
 							
+							try {
+								scene.removeTexture("NormalMapped");
+								scene.saveData(scenePath+sceneName+".xml");
+							} catch (ParserConfigurationException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							} catch (TransformerException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
 							scene.sendEvent(new SceneReloadEvent(scenePath + sceneName + ".xml"));
 							return;
 						} else {
@@ -775,6 +795,10 @@ public class PaintSceneApp extends PaintMainGame implements ActionListener, Chan
 		sceneName = shape;
 		paintTextureName = "PaintedTexture";
 		
+		int sceneNameCount = getNumFiles(scenePath,sceneName);
+		
+		if(sceneNameCount > 0) sceneName = sceneName + "_" + (sceneNameCount/2+1);
+		
 		//m.generator.generate(paintMeshData, new MeshGenOptions());
 		scene.addMesh( new NameBindMesh("PaintedMesh", m) );
 		
@@ -813,6 +837,26 @@ public class PaintSceneApp extends PaintMainGame implements ActionListener, Chan
 			e.printStackTrace();
 		}
 	}
+    
+    // get the number of files with given filename
+    private int getNumFiles(String filePath, final String filename) {
+    	
+    	File dir = new File(filePath);
+    	dir.mkdir();
+    	
+    	// filter to identify images based on their extensions
+        final FilenameFilter FILTER = new FilenameFilter() {
+            @Override
+            public boolean accept(File dir, String name) {
+                if (name.contains(filename)) {
+                    return (true);
+                }
+                return (false);
+            }
+        };
+    	
+    	return dir.listFiles(FILTER).length;
+    }
 	
 	public static void reloadScene() {
 		String file = scenePath + sceneName + ".xml";
